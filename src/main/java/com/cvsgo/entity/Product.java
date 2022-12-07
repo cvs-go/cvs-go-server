@@ -35,7 +35,7 @@ public class Product extends BaseTimeEntity {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "manu")
+    @JoinColumn(name = "manufacturer_id")
     private Manufacturer manufacturer;
 
 }
