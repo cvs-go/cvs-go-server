@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
