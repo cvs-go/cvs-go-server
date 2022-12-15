@@ -1,10 +1,11 @@
 package com.cvsgo.entity;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public enum Rating {
 
     ONE(1),
@@ -15,12 +16,11 @@ public enum Rating {
 
     private final int rating;
 
-    public static Rating valueOf(int rating) {
-        for (Rating r : values()) {
-            if (r.getRating() == rating) {
-                return r;
-            }
-        }
-        return null;
+    public static Rating fromCode(Integer dbData) {
+        return Arrays.stream(Rating.values())
+            .filter(v -> v.getRating() == dbData)
+            .findAny()
+            .orElseThrow(
+                () -> new IllegalArgumentException(String.format("순위에 %d가 존재하지 않습니다.", dbData)));
     }
 }
