@@ -21,6 +21,6 @@ public enum Rating {
             .filter(v -> v.getRating() == dbData)
             .findAny()
             .orElseThrow(
-                () -> new IllegalArgumentException(String.format("순위에 %d가 존재하지 않습니다.", dbData)));
+                () -> new IllegalArgumentException(String.format("평점에 %d가 존재하지 않습니다.", dbData)));
     }
 }
