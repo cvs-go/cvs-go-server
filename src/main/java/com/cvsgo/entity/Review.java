@@ -37,7 +37,6 @@ public class Review extends BaseTimeEntity {
     private String content;
 
     @Convert(converter = RatingConverter.class)
-    @Column(name = "rating")
     private Rating rating;
 
     @ManyToOne
