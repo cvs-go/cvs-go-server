@@ -1,6 +1,7 @@
 package com.cvsgo.controller;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
+import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.util.Arrays;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -128,6 +130,44 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(signUpRequest)))
                 .andExpect(status().isCreated())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("해당 닉네임을 가진 계정이 존재하면 회원가입 API 호출시 HTTP 409를 응답한다")
+    void respond_409_when_nickname_conflicts() throws Exception {
+        SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
+                .email("abc@naver.com")
+                .password("111111111a!")
+                .nickname("닉네임")
+                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .build();
+
+        given(userService.signUp(any())).willThrow(ExceptionConstants.DUPLICATE_NICKNAME);
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signUpRequest)))
+                .andExpect(status().isConflict())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("해당 이메일을 가진 계정이 존재하면 회원가입 API 호출시 HTTP 409를 응답한다")
+    void respond_409_when_email_conflicts() throws Exception {
+        SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
+                .email("abc@naver.com")
+                .password("111111111a!")
+                .nickname("닉네임")
+                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .build();
+
+        given(userService.signUp(any())).willThrow(ExceptionConstants.DUPLICATE_EMAIL);
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(signUpRequest)))
+                .andExpect(status().isConflict())
                 .andDo(print());
     }
 
