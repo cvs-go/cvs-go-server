@@ -45,14 +45,14 @@ public class UserService {
             throw DUPLICATE_NICKNAME;
         }
         User user = userRepository.save(signUpRequestDto.toEntity(passwordEncoder));
-        List<Tag> tags = tagRepository.findAllById(signUpRequestDto.getUserTagIds());
+        List<Tag> tags = tagRepository.findAllById(signUpRequestDto.getTagIds());
         userTagRepository.saveAll(tags.stream().map(
                 tag -> UserTag.builder()
                         .user(user)
                         .tag(tag)
                         .build())
                 .toList());
-        return new SignUpResponseDto(user, signUpRequestDto.getUserTagIds());
+        return new SignUpResponseDto(user, signUpRequestDto.getTagIds());
     }
 
     /**

@@ -52,7 +52,7 @@ public class UserServiceTest {
                 .email("abc@naver.com")
                 .password("111111111a!")
                 .nickname(nickname)
-                .userTagIds(Arrays.asList(1L, 2L, 3L))
+                .tagIds(Arrays.asList(1L, 2L, 3L))
                 .build();
 
         // given
@@ -78,7 +78,7 @@ public class UserServiceTest {
                 .email(email)
                 .password("111111111a!")
                 .nickname("닉네임")
-                .userTagIds(Arrays.asList(1L, 2L, 3L))
+                .tagIds(Arrays.asList(1L, 2L, 3L))
                 .build();
 
         // given

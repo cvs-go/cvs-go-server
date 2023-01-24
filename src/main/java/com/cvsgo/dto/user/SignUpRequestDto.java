@@ -29,14 +29,14 @@ public class SignUpRequestDto {
     @Size(min = 2, max = 8, message = "닉네임은 2자 이상 8자 이하여야 합니다.")
     private String nickname;
 
-    private List<Long> userTagIds;
+    private List<Long> tagIds;
 
     @Builder
-    public SignUpRequestDto(String email, String password, String nickname, List<Long> userTagIds) {
+    public SignUpRequestDto(String email, String password, String nickname, List<Long> tagIds) {
         this.email = email;
         this.password = password;
         this.nickname = nickname;
-        this.userTagIds = userTagIds;
+        this.tagIds = tagIds;
     }
 
     public User toEntity(PasswordEncoder passwordEncoder) {

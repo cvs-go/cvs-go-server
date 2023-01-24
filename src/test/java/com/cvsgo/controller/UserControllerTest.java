@@ -52,7 +52,7 @@ public class UserControllerTest {
                 .email(email)
                 .password("11111111aa!!")
                 .nickname("닉네임")
-                .userTagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(Arrays.asList(2L, 3L, 7L))
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -70,7 +70,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password(password)
                 .nickname("닉네임")
-                .userTagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(Arrays.asList(2L, 3L, 7L))
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -87,7 +87,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password(password)
                 .nickname("닉네임")
-                .userTagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(Arrays.asList(2L, 3L, 7L))
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -104,7 +104,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password("111111111a!")
                 .nickname(nickname)
-                .userTagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(Arrays.asList(2L, 3L, 7L))
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -115,14 +115,14 @@ public class UserControllerTest {
     }
 
     @Test
-        @DisplayName("회원가입에 성공하면 201을 응답한다")
-        void respond_201_when_sign_up_succeed() throws Exception {
-            SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
-                    .email("abc@naver.com")
-                    .password("111111111a!")
-                    .nickname("닉네임")
-                    .userTagIds(Arrays.asList(2L, 3L, 7L))
-                    .build();
+    @DisplayName("회원가입에 성공하면 201을 응답한다")
+    void respond_201_when_sign_up_succeed() throws Exception {
+        SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
+                .email("abc@naver.com")
+                .password("111111111a!")
+                .nickname("닉네임")
+                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .build();
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)
