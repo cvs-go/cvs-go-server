@@ -4,6 +4,7 @@ import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Role;
+import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.exception.user.DuplicateEmailException;
@@ -28,7 +29,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
@@ -77,7 +79,7 @@ public class UserControllerTest {
                 .email(email)
                 .password("11111111aa!!")
                 .nickname("닉네임")
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -95,7 +97,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password(password)
                 .nickname("닉네임")
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -112,7 +114,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password(password)
                 .nickname("닉네임")
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -129,7 +131,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password("111111111a!")
                 .nickname(nickname)
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
 
         mockMvc.perform(post("/api/users")
@@ -177,7 +179,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password("111111111a!")
                 .nickname("닉네임")
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
 
         given(userService.signUp(any())).willThrow(ExceptionConstants.DUPLICATE_NICKNAME);
@@ -196,7 +198,7 @@ public class UserControllerTest {
                 .email("abc@naver.com")
                 .password("111111111a!")
                 .nickname("닉네임")
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
 
         given(userService.signUp(any())).willThrow(ExceptionConstants.DUPLICATE_EMAIL);
@@ -278,16 +280,24 @@ public class UserControllerTest {
                 .andDo(print());
     }
 
-    private static SignUpRequestDto createRequest() {
+    private List<Tag> getTags() {
+        List<Tag> tags = new ArrayList<>();
+        tags.add(new Tag(2L, "맵부심", 1));
+        tags.add(new Tag(3L, "초코러버", 2));
+        tags.add(new Tag(7L, "소식가", 5));
+        return tags;
+    }
+
+    private SignUpRequestDto createRequest() {
         return SignUpRequestDto.builder()
                 .email("abc@naver.com")
                 .password("111111111a!")
                 .nickname("닉네임")
-                .tagIds(Arrays.asList(2L, 3L, 7L))
+                .tagIds(getTags().stream().map(Tag::getId).toList())
                 .build();
     }
 
-    private static User createUser() {
+    private User createUser() {
         return User.builder()
                 .userId("abc@naver.com")
                 .nickname("닉네임")
@@ -295,8 +305,8 @@ public class UserControllerTest {
                 .build();
     }
 
-    private static SignUpResponseDto createResponse() {
-        return new SignUpResponseDto(createUser(), createRequest().getTagIds());
+    private SignUpResponseDto createResponse() {
+        return SignUpResponseDto.of(createUser(), getTags());
     }
 
 }

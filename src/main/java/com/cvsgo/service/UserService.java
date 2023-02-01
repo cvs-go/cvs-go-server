@@ -52,7 +52,7 @@ public class UserService {
                         .tag(tag)
                         .build())
                 .toList());
-        return new SignUpResponseDto(user, signUpRequestDto.getTagIds());
+        return SignUpResponseDto.of(user, tags);
     }
 
     /**

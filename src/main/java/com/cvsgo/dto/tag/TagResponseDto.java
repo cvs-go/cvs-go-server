@@ -8,8 +8,12 @@ public class TagResponseDto {
     @JsonIgnore
     private final Tag tag;
 
-    public TagResponseDto(Tag tag) {
+    private TagResponseDto(Tag tag) {
         this.tag = tag;
+    }
+
+    public static TagResponseDto of(Tag tag) {
+        return new TagResponseDto(tag);
     }
 
     public Long getId() {

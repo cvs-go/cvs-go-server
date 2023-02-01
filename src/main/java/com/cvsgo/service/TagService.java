@@ -20,7 +20,7 @@ public class TagService {
      */
     public List<TagResponseDto> getTagList() {
         List<Tag> tags = tagRepository.findAll();
-        return tags.stream().map(TagResponseDto::new).toList();
+        return tags.stream().map(TagResponseDto::of).toList();
     }
 
 }

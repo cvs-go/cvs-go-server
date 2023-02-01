@@ -1,9 +1,9 @@
 package com.cvsgo.dto.user;
 
 import com.cvsgo.entity.Role;
+import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
 
 import java.util.List;
 
@@ -12,12 +12,16 @@ public class SignUpResponseDto {
     @JsonIgnore
     private final User user;
 
-    @Getter
-    private final List<Long> tagIds;
+    @JsonIgnore
+    private final List<Tag> tags;
 
-    public SignUpResponseDto(User user, List<Long> tagIds) {
+    private SignUpResponseDto(User user, List<Tag> tags) {
         this.user = user;
-        this.tagIds = tagIds;
+        this.tags = tags;
+    }
+
+    public static SignUpResponseDto of(User user, List<Tag> tags) {
+        return new SignUpResponseDto(user, tags);
     }
 
     public String getEmail() {
@@ -30,6 +34,10 @@ public class SignUpResponseDto {
 
     public Role getRole() {
         return user.getRole();
+    }
+
+    public List<Long> getTagIds() {
+        return tags.stream().map(Tag::getId).toList();
     }
 
 }
