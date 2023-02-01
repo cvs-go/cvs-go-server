@@ -1,5 +1,10 @@
 package com.cvsgo.exception;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Getter
 public enum ErrorCode {
 
     DUPLICATE_EMAIL("DUPLICATE_EMAIL", "중복된 이메일입니다."),
@@ -7,18 +12,5 @@ public enum ErrorCode {
 
     private final String code;
     private final String message;
-
-    ErrorCode(String code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 
 }
