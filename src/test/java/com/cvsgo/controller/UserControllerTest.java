@@ -1,14 +1,11 @@
 package com.cvsgo.controller;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
-import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
-import com.cvsgo.exception.user.DuplicateEmailException;
-import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
