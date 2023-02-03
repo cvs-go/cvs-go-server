@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(TagController.class)
-public class TagControllerTest {
+class TagControllerTest {
 
     @MockBean
     private TagService tagService;

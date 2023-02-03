@@ -50,7 +50,7 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(UserController.class)
-public class UserControllerTest {
+class UserControllerTest {
 
     @MockBean
     private UserService userService;
