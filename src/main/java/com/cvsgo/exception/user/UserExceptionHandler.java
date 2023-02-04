@@ -17,7 +17,7 @@ public class UserExceptionHandler {
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicateNicknameException.class)
-    public ErrorResponse handleDuplicateEmailException(DuplicateNicknameException exception) {
+    public ErrorResponse handleDuplicateNicknameException(DuplicateNicknameException exception) {
         return ErrorResponse.of(exception.getMessage(), exception.getCode());
     }
 
