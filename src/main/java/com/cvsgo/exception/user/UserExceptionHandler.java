@@ -11,14 +11,14 @@ public class UserExceptionHandler {
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicateEmailException.class)
-    public ErrorResponse handleDuplicateEmailException(DuplicateEmailException exception) {
-        return ErrorResponse.of(exception.getMessage(), exception.getCode());
+    public ErrorResponse handleDuplicateEmailException(DuplicateEmailException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicateNicknameException.class)
-    public ErrorResponse handleDuplicateNicknameException(DuplicateNicknameException exception) {
-        return ErrorResponse.of(exception.getMessage(), exception.getCode());
+    public ErrorResponse handleDuplicateNicknameException(DuplicateNicknameException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
 }

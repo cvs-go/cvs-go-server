@@ -14,9 +14,9 @@ public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-        log.info("유효성 검사 실패 - {} '{}'", ex.getFieldError().getDefaultMessage(), ex.getFieldError().getRejectedValue());
-        return ErrorResponse.of(ex.getFieldError().getDefaultMessage(), "INVALID_REQUEST");
+    protected ErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
+        log.info("유효성 검사 실패 - {} '{}'", e.getFieldError().getDefaultMessage(), e.getFieldError().getRejectedValue());
+        return ErrorResponse.of(e.getFieldError().getDefaultMessage(), "INVALID_REQUEST");
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
