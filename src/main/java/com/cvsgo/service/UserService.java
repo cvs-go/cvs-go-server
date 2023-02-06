@@ -9,6 +9,7 @@ import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import com.cvsgo.repository.UserTagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_EMAIL;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_NICKNAME;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -39,9 +41,11 @@ public class UserService {
      */
     public SignUpResponseDto signUp(SignUpRequestDto signUpRequestDto) {
         if (isDuplicatedEmail(signUpRequestDto.getEmail())) {
+            log.info("중복된 이메일: '{}'", signUpRequestDto.getEmail());
             throw DUPLICATE_EMAIL;
         }
         if (isDuplicatedNickname(signUpRequestDto.getNickname())) {
+            log.info("중복된 닉네임: '{}'", signUpRequestDto.getNickname());
             throw DUPLICATE_NICKNAME;
         }
         User user = userRepository.save(signUpRequestDto.toEntity(passwordEncoder));
