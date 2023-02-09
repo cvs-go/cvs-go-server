@@ -26,4 +26,8 @@ public class Tag {
     @Column(unique = true)
     private String name;
 
+    @NotNull
+    @Column(name = "tag_group")
+    private Integer group;
+
 }
