@@ -22,11 +22,9 @@ import java.util.Date;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
-    @Value("${jwt.secret-key}")
-    private String secretKey;
+    private final String secretKey;
 
     private final UserRepository userRepository;
 
@@ -35,6 +33,13 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     private static final String TOKEN_TYPE = "Bearer";
+
+    public AuthService(@Value("${jwt.secret-key}") final String secretKey, UserRepository userRepository, PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository) {
+        this.secretKey = secretKey;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     /**
      * 로그인을 진행한다.
