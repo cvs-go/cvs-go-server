@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.cvsgo.exception.auth.UserNotFoundException;
+import com.cvsgo.exception.auth.NotFoundUserException;
 import com.cvsgo.exception.auth.InvalidPasswordException;
 
 import java.security.Key;
@@ -44,7 +44,7 @@ public class AuthService {
     /**
      * 로그인을 진행한다.
      * @param loginRequestDto 로그인 요청 정보
-     * @throws UserNotFoundException 해당하는 아이디를 가진 사용자가 없는 경우
+     * @throws NotFoundUserException 해당하는 아이디를 가진 사용자가 없는 경우
      * @throws InvalidPasswordException 비밀번호가 일치하지 않는 경우
      * @return 토큰 정보
      */

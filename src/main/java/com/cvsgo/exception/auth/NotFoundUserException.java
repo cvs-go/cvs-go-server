@@ -2,11 +2,11 @@ package com.cvsgo.exception.auth;
 
 import com.cvsgo.exception.ErrorCode;
 
-public class UserNotFoundException extends RuntimeException {
+public class NotFoundUserException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public UserNotFoundException(ErrorCode errorCode) {
+    public NotFoundUserException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
