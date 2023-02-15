@@ -46,3 +46,14 @@ include::{snippets}/users/create/http-request.adoc[]
 include::{snippets}/users/create/response-fields.adoc[]
 ==== Sample Response
 include::{snippets}/users/create/http-response.adoc[]
+
+== 2. 인증
+=== 2-1. 로그인
+==== Request Fields
+include::{snippets}/auth/login/request-fields.adoc[]
+==== Sample Request
+include::{snippets}/auth/login/http-request.adoc[]
+==== Response Fields
+include::{snippets}/auth/login/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/auth/login/http-response.adoc[]
