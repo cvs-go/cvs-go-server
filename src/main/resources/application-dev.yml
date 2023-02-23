@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DEV_DB}
+    username: ${DEV_DB_USERNAME}
+    password: ${DEV_DB_PWD}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
