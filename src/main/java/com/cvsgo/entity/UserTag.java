@@ -33,7 +33,8 @@ public class UserTag {
     private Tag tag;
 
     @Builder
-    public UserTag(User user, Tag tag) {
+    public UserTag(Long id, User user, Tag tag) {
+        this.id = id;
         this.user = user;
         this.tag = tag;
     }

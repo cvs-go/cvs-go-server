@@ -23,7 +23,8 @@ public class ConvenienceStore {
     private String name;
 
     @Builder
-    public ConvenienceStore(String name) {
+    public ConvenienceStore(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }

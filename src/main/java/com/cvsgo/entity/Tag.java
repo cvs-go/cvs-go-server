@@ -29,7 +29,8 @@ public class Tag {
     private Integer group;
 
     @Builder
-    public Tag(String name, Integer group) {
+    public Tag(Long id, String name, Integer group) {
+        this.id = id;
         this.name = name;
         this.group = group;
     }

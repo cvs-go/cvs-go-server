@@ -23,7 +23,8 @@ public class Category {
     private String name;
 
     @Builder
-    public Category(String name) {
+    public Category(Long id, String name) {
+        this.id = id;
         this.name = name;
     }
 }

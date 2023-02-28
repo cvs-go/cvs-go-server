@@ -21,7 +21,8 @@ public class Promotion extends BaseTimeEntity {
     private String imageUrl;
 
     @Builder
-    public Promotion(String imageUrl) {
+    public Promotion(Long id, String imageUrl) {
+        this.id = id;
         this.imageUrl = imageUrl;
     }
 }

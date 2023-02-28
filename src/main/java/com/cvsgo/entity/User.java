@@ -38,7 +38,8 @@ public class User extends BaseTimeEntity {
     private Role role;
 
     @Builder
-    public User(String userId, String password, String nickname, Role role) {
+    public User(Long id, String userId, String password, String nickname, Role role) {
+        this.id = id;
         this.userId = userId;
         this.password = password;
         this.nickname = nickname;
