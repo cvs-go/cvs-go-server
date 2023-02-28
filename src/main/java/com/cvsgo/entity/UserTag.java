@@ -9,15 +9,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "tag_id"})})
 public class UserTag {
@@ -34,4 +32,10 @@ public class UserTag {
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
+    @Builder
+    public UserTag(Long id, User user, Tag tag) {
+        this.id = id;
+        this.user = user;
+        this.tag = tag;
+    }
 }

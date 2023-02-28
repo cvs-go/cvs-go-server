@@ -5,15 +5,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @IdClass(UserFollowId.class)
 public class UserFollow {
@@ -28,4 +25,8 @@ public class UserFollow {
     @JoinColumn(name = "follower_id")
     private User follower;
 
+    public UserFollow(User following, User follower) {
+        this.following = following;
+        this.follower = follower;
+    }
 }

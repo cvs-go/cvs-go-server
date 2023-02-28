@@ -6,15 +6,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Tag {
 
@@ -30,4 +28,10 @@ public class Tag {
     @Column(name = "tag_group")
     private Integer group;
 
+    @Builder
+    public Tag(Long id, String name, Integer group) {
+        this.id = id;
+        this.name = name;
+        this.group = group;
+    }
 }
