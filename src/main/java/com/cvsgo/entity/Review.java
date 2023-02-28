@@ -13,15 +13,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class Review extends BaseTimeEntity {
 
@@ -47,8 +44,17 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
+    @Builder
+    public Review(String title, String content, Rating rating, User user, Product product,
+        List<ReviewImage> reviewImages) {
+        this.title = title;
+        this.content = content;
+        this.rating = rating;
+        this.user = user;
+        this.product = product;
+        this.reviewImages = reviewImages;
+    }
 }

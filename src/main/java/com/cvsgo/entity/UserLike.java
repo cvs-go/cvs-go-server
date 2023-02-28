@@ -5,15 +5,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @IdClass(UserLikeId.class)
 public class UserLike {
@@ -28,4 +25,9 @@ public class UserLike {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    @Builder
+    public UserLike(User user, Review review) {
+        this.user = user;
+        this.review = review;
+    }
 }

@@ -6,15 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class Tag {
 
@@ -30,4 +27,9 @@ public class Tag {
     @Column(name = "tag_group")
     private Integer group;
 
+    @Builder
+    public Tag(String name, Integer group) {
+        this.name = name;
+        this.group = group;
+    }
 }
