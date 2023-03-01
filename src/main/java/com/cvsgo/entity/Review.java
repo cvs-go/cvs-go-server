@@ -28,9 +28,6 @@ public class Review extends BaseTimeEntity {
     private Long id;
 
     @NotNull
-    private String title;
-
-    @NotNull
     @Column(columnDefinition = "TEXT")
     private String content;
 
@@ -49,10 +46,9 @@ public class Review extends BaseTimeEntity {
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    public Review(Long id, String title, String content, Rating rating, User user, Product product,
+    public Review(Long id, String content, Rating rating, User user, Product product,
         List<ReviewImage> reviewImages) {
         this.id = id;
-        this.title = title;
         this.content = content;
         this.rating = rating;
         this.user = user;

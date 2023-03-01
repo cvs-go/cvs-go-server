@@ -1,6 +1,7 @@
 SET FOREIGN_KEY_CHECKS = 0;
 drop table if exists category cascade;
 drop table if exists convenience_store cascade;
+drop table if exists event cascade;
 drop table if exists manufacturer cascade;
 drop table if exists product cascade;
 drop table if exists product_bookmark cascade;
@@ -30,6 +31,18 @@ create table convenience_store (
                                    created_at datetime,
                                    modified_at datetime,
                                    primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create table event (
+                       id bigint not null auto_increment,
+                       event_type varchar(10) not null,
+                       product_id bigint,
+                       convenience_store_id bigint,
+                       discount_amount integer,
+                       gift_product_id bigint,
+                       created_at datetime,
+                       modified_at datetime,
+                       primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create table manufacturer (
@@ -84,7 +97,6 @@ create table review (
                         modified_at datetime,
                         content TEXT not null,
                         rating integer,
-                        title varchar(50) not null,
                         product_id bigint,
                         user_id bigint,
                         primary key (id)
