@@ -27,7 +27,7 @@ import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
 @Service
 public class AuthService {
 
-    private final String secretKey;
+    private final Key key;
 
     private final UserRepository userRepository;
 
@@ -36,10 +36,11 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public AuthService(@Value("${jwt.secret-key}") final String secretKey, UserRepository userRepository, PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository) {
-        this.secretKey = secretKey;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenRepository = refreshTokenRepository;
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
     /**
@@ -53,7 +54,6 @@ public class AuthService {
         User user = userRepository.findByUserId(loginRequestDto.getEmail()).orElseThrow(() -> NOT_FOUND_USER);
         user.validatePassword(loginRequestDto.getPassword(), passwordEncoder);
 
-        Key key = createKey();
         String accessToken = createAccessToken(user, key, ACCESS_TOKEN_TTL_MILLISECOND);
         RefreshToken refreshToken = RefreshToken.create(user, key, REFRESH_TOKEN_TTL_MILLISECOND);
 
@@ -74,11 +74,6 @@ public class AuthService {
                 .setExpiration(new Date(now + ttlMillis))
                 .signWith(key)
                 .compact();
-    }
-
-    private Key createKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
 }
