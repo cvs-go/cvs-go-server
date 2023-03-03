@@ -20,6 +20,9 @@ import java.security.Key;
 import java.util.Date;
 
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
+import static com.cvsgo.util.AuthConstants.ACCESS_TOKEN_TTL_MILLISECOND;
+import static com.cvsgo.util.AuthConstants.REFRESH_TOKEN_TTL_MILLISECOND;
+import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
 
 @Service
 public class AuthService {
@@ -31,8 +34,6 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final RefreshTokenRepository refreshTokenRepository;
-
-    private static final String TOKEN_TYPE = "Bearer";
 
     public AuthService(@Value("${jwt.secret-key}") final String secretKey, UserRepository userRepository, PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository) {
         this.secretKey = secretKey;
@@ -52,8 +53,6 @@ public class AuthService {
         User user = userRepository.findByUserId(loginRequestDto.getEmail()).orElseThrow(() -> NOT_FOUND_USER);
         user.validatePassword(loginRequestDto.getPassword(), passwordEncoder);
 
-        final long ACCESS_TOKEN_TTL_MILLISECOND = 1000 * 60 * 30;
-        final long REFRESH_TOKEN_TTL_MILLISECOND = 1000 * 60 * 60 * 24 * 14;
         Key key = createKey();
         String accessToken = createAccessToken(user, key, ACCESS_TOKEN_TTL_MILLISECOND);
         RefreshToken refreshToken = RefreshToken.create(user, key, REFRESH_TOKEN_TTL_MILLISECOND);

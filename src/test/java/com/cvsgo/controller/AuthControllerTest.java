@@ -22,6 +22,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -63,7 +64,7 @@ class AuthControllerTest {
         TokenDto tokenDto = TokenDto.builder()
                 .accessToken(getSampleAccessToken())
                 .refreshToken(getSampleRefreshToken())
-                .tokenType("Bearer")
+                .tokenType(TOKEN_TYPE)
                 .build();
 
         given(authService.login(any())).willReturn(tokenDto);
