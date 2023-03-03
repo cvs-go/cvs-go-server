@@ -18,6 +18,7 @@ import com.cvsgo.exception.auth.InvalidPasswordException;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.Optional;
 
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
 import static com.cvsgo.util.AuthConstants.ACCESS_TOKEN_TTL_MILLISECOND;
@@ -74,6 +75,27 @@ public class AuthService {
                 .setExpiration(new Date(now + ttlMillis))
                 .signWith(key)
                 .compact();
+    }
+
+    public String extractAccessToken(String authorizationHeaderValue, String tokenType) {
+        String[] strTokens = authorizationHeaderValue.split(" ");
+        if (strTokens.length == 2 && tokenType.equals(strTokens[0])) {
+            return strTokens[1];
+        }
+        return null;
+    }
+
+    public Optional<User> getLoginUser(String accessToken) {
+        if (accessToken == null) {
+            return Optional.empty();
+        }
+        String email = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody()
+                .getSubject();
+        return userRepository.findByUserId(email);
     }
 
 }

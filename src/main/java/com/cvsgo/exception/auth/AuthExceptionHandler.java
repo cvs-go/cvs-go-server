@@ -21,5 +21,10 @@ public class AuthExceptionHandler {
         return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UnauthorizedUserException.class)
+    public ErrorResponse handleUnauthorizedUserException(UnauthorizedUserException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
+    }
 
 }
