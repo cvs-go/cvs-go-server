@@ -10,3 +10,5 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDB102Dialect
+jwt:
+  secret: ${SECRET_KEY}
