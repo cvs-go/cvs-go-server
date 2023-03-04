@@ -2,11 +2,15 @@ package com.cvsgo.service;
 
 import com.cvsgo.dto.auth.LoginRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
+import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.auth.InvalidPasswordException;
 import com.cvsgo.exception.auth.NotFoundUserException;
+import com.cvsgo.exception.auth.UnauthorizedUserException;
 import com.cvsgo.repository.RefreshTokenRepository;
 import com.cvsgo.repository.UserRepository;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,11 +23,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.security.Key;
 import java.util.Optional;
 
+import static com.cvsgo.util.AuthConstants.REFRESH_TOKEN_TTL_MILLISECOND;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
@@ -105,6 +112,40 @@ class AuthServiceTest {
         assertThrows(InvalidPasswordException.class, () -> authService.login(loginRequestDto));
 
         then(userRepository).should(times(1)).findByUserId(any());
+    }
+
+    @Test
+    @DisplayName("로그아웃에 성공한다")
+    void should_throw_nothing_when_succeed_to_logout() {
+        User user = User.builder()
+                .userId("abc@naver.com")
+                .password(passwordEncoder.encode("password1!"))
+                .build();
+        RefreshToken refreshToken = RefreshToken.create(user, getSampleKey(), REFRESH_TOKEN_TTL_MILLISECOND);
+
+        given(refreshTokenRepository.findByToken(anyString()))
+                .willReturn(Optional.of(refreshToken));
+
+        authService.logout(anyString());
+
+        then(refreshTokenRepository).should(times(1)).findByToken(any());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 토큰으로 로그아웃 시도시 로그아웃에 실패한다")
+    void should_throw_UnauthorizedUserException_when_try_to_logout_with_invalid_token() {
+
+        given(refreshTokenRepository.findByToken(anyString()))
+                .willReturn(Optional.empty());
+
+        assertThrows(UnauthorizedUserException.class, () -> authService.logout(anyString()));
+
+        then(refreshTokenRepository).should(times(1)).findByToken(any());
+    }
+
+    private Key getSampleKey() {
+        byte[] keyBytes = Decoders.BASE64.decode("thisisasamplesecretkeyfortestthisisasamplesecretkeyfortest");
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
 }

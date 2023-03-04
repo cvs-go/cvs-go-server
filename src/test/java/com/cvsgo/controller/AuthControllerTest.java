@@ -1,8 +1,10 @@
 package com.cvsgo.controller;
 
 import com.cvsgo.dto.auth.LoginRequestDto;
+import com.cvsgo.dto.auth.LogoutRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.exception.ExceptionConstants;
+import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -25,9 +28,14 @@ import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +45,8 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
 
+    @MockBean
+    private AuthInterceptor authInterceptor;
 
     @MockBean
     private AuthService authService;
@@ -122,6 +132,30 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(loginRequestDto)))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
+    }
+
+    @Test
+    @DisplayName("로그아웃에 성공하면 HTTP 200을 응답한다")
+    void respond_200_when_succeed_to_logout() throws Exception {
+        LogoutRequestDto logoutRequestDto = LogoutRequestDto.builder().token(getSampleRefreshToken()).build();
+
+        willDoNothing().given(authService).logout(any());
+        mockMvc.perform(post("/api/auth/logout")
+                        .header(HttpHeaders.AUTHORIZATION, TOKEN_TYPE + " " + getSampleAccessToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(logoutRequestDto)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("auth/logout",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰")
+                        ),
+                        requestFields(
+                                fieldWithPath("token").type(JsonFieldType.STRING).description("리프레시 토큰")
+                        )
+                ));
     }
 
     private String getSampleAccessToken() {
