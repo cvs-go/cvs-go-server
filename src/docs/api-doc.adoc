@@ -66,3 +66,12 @@ include::{snippets}/auth/logout/request-fields.adoc[]
 include::{snippets}/auth/logout/http-request.adoc[]
 ==== Sample Response
 include::{snippets}/auth/logout/http-response.adoc[]
+=== 2-3. 토큰 재발급
+==== Request Headers
+include::{snippets}/auth/tokens/request-headers.adoc[]
+==== Sample Request
+include::{snippets}/auth/tokens/http-request.adoc[]
+==== Response Fields
+include::{snippets}/auth/tokens/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/auth/tokens/http-response.adoc[]
