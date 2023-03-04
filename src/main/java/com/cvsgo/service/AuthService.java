@@ -66,6 +66,21 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
+    public TokenDto reissueToken(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> UNAUTHORIZED_USER);
+        refreshToken.updateToken(key, REFRESH_TOKEN_TTL_MILLISECOND);
+        refreshTokenRepository.save(refreshToken);
+
+        String accessToken = createAccessToken(refreshToken.getUser(), key, ACCESS_TOKEN_TTL_MILLISECOND);
+
+        return TokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .tokenType(TOKEN_TYPE)
+                .build();
+    }
+
     private String createAccessToken(User user, Key key, long ttlMillis) {
         long now = System.currentTimeMillis();
         return Jwts.builder()

@@ -42,4 +42,16 @@ public class RefreshToken extends BaseTimeEntity {
                 .compact();
         return new RefreshToken(user, refreshToken);
     }
+
+    public RefreshToken updateToken(Key key, long ttlMillis) {
+        long now = System.currentTimeMillis();
+        this.token = Jwts.builder()
+                .setIssuedAt(new Date(now))
+                .setId(UUID.randomUUID().toString())
+                .setExpiration(new Date(now + ttlMillis))
+                .signWith(key)
+                .compact();
+        return this;
+    }
+
 }
