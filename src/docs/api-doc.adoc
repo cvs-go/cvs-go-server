@@ -57,3 +57,12 @@ include::{snippets}/auth/login/http-request.adoc[]
 include::{snippets}/auth/login/response-fields.adoc[]
 ==== Sample Response
 include::{snippets}/auth/login/http-response.adoc[]
+=== 2-2. 로그아웃
+==== Request Headers
+include::{snippets}/auth/logout/request-headers.adoc[]
+==== Request Fields
+include::{snippets}/auth/logout/request-fields.adoc[]
+==== Sample Request
+include::{snippets}/auth/logout/http-request.adoc[]
+==== Sample Response
+include::{snippets}/auth/logout/http-response.adoc[]

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.18">
-<title>CVS Go API Guide</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
-<style>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="generator" content="Asciidoctor 2.0.18">
+  <title>CVS Go API Guide</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+  <style>
 /*! Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
 /* Uncomment the following line when using as a custom stylesheet */
 /* @import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700"; */
@@ -435,258 +435,259 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/styles/github.min.css">
 </head>
 <body class="book toc2 toc-left">
 <div id="header">
-<h1>CVS Go API Guide</h1>
-<div id="toc" class="toc2">
-<div id="toctitle">목차</div>
-<ul class="sectlevel1">
-<li><a href="#signUp">1. 회원가입</a>
-<ul class="sectlevel2">
-<li><a href="#create-user">1-1. 이메일 중복 검사</a></li>
-<li><a href="#_1_2_닉네임_중복_검사">1-2. 닉네임 중복 검사</a></li>
-<li><a href="#_1_3_태그_목록_조회">1-3. 태그 목록 조회</a></li>
-<li><a href="#_1_4_회원가입">1-4. 회원가입</a></li>
-</ul>
-</li>
-<li><a href="#_2_인증">2. 인증</a>
-<ul class="sectlevel2">
-<li><a href="#_2_1_로그인">2-1. 로그인</a></li>
-</ul>
-</li>
-</ul>
-</div>
+  <h1>CVS Go API Guide</h1>
+  <div id="toc" class="toc2">
+    <div id="toctitle">목차</div>
+    <ul class="sectlevel1">
+      <li><a href="#signUp">1. 회원가입</a>
+        <ul class="sectlevel2">
+          <li><a href="#create-user">1-1. 이메일 중복 검사</a></li>
+          <li><a href="#_1_2_닉네임_중복_검사">1-2. 닉네임 중복 검사</a></li>
+          <li><a href="#_1_3_태그_목록_조회">1-3. 태그 목록 조회</a></li>
+          <li><a href="#_1_4_회원가입">1-4. 회원가입</a></li>
+        </ul>
+      </li>
+      <li><a href="#_2_인증">2. 인증</a>
+        <ul class="sectlevel2">
+          <li><a href="#_2_1_로그인">2-1. 로그인</a></li>
+          <li><a href="#_2_2_로그아웃">2-2. 로그아웃</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
 </div>
 <div id="content">
-<div class="sect1">
-<h2 id="signUp"><a class="link" href="#signUp">1. 회원가입</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="create-user"><a class="link" href="#create-user">1-1. 이메일 중복 검사</a></h3>
-<div class="sect3">
-<h4 id="_request_path_parameters"><a class="link" href="#_request_path_parameters">Request Path Parameters</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. /api/users/emails/{email}/exists</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_request"><a class="link" href="#_sample_request">Sample Request</a></h4>
-<div class="listingblock">
-<div class="content">
+  <div class="sect1">
+    <h2 id="signUp"><a class="link" href="#signUp">1. 회원가입</a></h2>
+    <div class="sectionbody">
+      <div class="sect2">
+        <h3 id="create-user"><a class="link" href="#create-user">1-1. 이메일 중복 검사</a></h3>
+        <div class="sect3">
+          <h4 id="_request_path_parameters"><a class="link" href="#_request_path_parameters">Request Path Parameters</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <caption class="title">Table 1. /api/users/emails/{email}/exists</caption>
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Parameter</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_request"><a class="link" href="#_sample_request">Sample Request</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/users/emails/aaa@naver.com/exists HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Host: cvsgo.docs.api.com</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_fields"><a class="link" href="#_response_fields">Response Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">해당 이메일로 가입된 계정 존재 여부</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_response"><a class="link" href="#_sample_response">Sample Response</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
-Content-Type: application/json;charset=UTF-8
-Content-Length: 68
-
-{
-  "timestamp" : "2023-01-26T23:34:51.224337",
-  "data" : true
-}</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_1_2_닉네임_중복_검사"><a class="link" href="#_1_2_닉네임_중복_검사">1-2. 닉네임 중복 검사</a></h3>
-<div class="sect3">
-<h4 id="_request_path_parameters_2"><a class="link" href="#_request_path_parameters_2">Request Path Parameters</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. /api/users/nicknames/{nickname}/exists</caption>
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickname</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_request_2"><a class="link" href="#_sample_request_2">Sample Request</a></h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/users/nicknames/%EB%8B%89%EB%84%A4%EC%9E%84/exists HTTP/1.1
-Content-Type: application/json;charset=UTF-8
-Host: cvsgo.docs.api.com</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_fields_2"><a class="link" href="#_response_fields_2">Response Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">해당 닉네임으로 가입된 계정 존재 여부</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_response_2"><a class="link" href="#_sample_response_2">Sample Response</a></h4>
-<div class="listingblock">
-<div class="content">
+            </div>
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_response_fields"><a class="link" href="#_response_fields">Response Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">해당 이메일로 가입된 계정 존재 여부</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_response"><a class="link" href="#_sample_response">Sample Response</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
 Content-Length: 69
 
 {
-  "timestamp" : "2023-01-26T23:34:50.5713242",
+  "timestamp" : "2023-02-15T23:23:24.1049776",
   "data" : true
 }</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_1_3_태그_목록_조회"><a class="link" href="#_1_3_태그_목록_조회">1-3. 태그 목록 조회</a></h3>
-<div class="sect3">
-<h4 id="_sample_request_3"><a class="link" href="#_sample_request_3">Sample Request</a></h4>
-<div class="listingblock">
-<div class="content">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_1_2_닉네임_중복_검사"><a class="link" href="#_1_2_닉네임_중복_검사">1-2. 닉네임 중복 검사</a></h3>
+        <div class="sect3">
+          <h4 id="_request_path_parameters_2"><a class="link" href="#_request_path_parameters_2">Request Path Parameters</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <caption class="title">Table 2. /api/users/nicknames/{nickname}/exists</caption>
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Parameter</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickname</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_request_2"><a class="link" href="#_sample_request_2">Sample Request</a></h4>
+          <div class="listingblock">
+            <div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/users/nicknames/%EB%8B%89%EB%84%A4%EC%9E%84/exists HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Host: cvsgo.docs.api.com</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_response_fields_2"><a class="link" href="#_response_fields_2">Response Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Boolean</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">해당 닉네임으로 가입된 계정 존재 여부</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_response_2"><a class="link" href="#_sample_response_2">Sample Response</a></h4>
+          <div class="listingblock">
+            <div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Content-Length: 68
+
+{
+  "timestamp" : "2023-02-15T23:23:23.607672",
+  "data" : true
+}</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_1_3_태그_목록_조회"><a class="link" href="#_1_3_태그_목록_조회">1-3. 태그 목록 조회</a></h3>
+        <div class="sect3">
+          <h4 id="_sample_request_3"><a class="link" href="#_sample_request_3">Sample Request</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">GET /api/tags HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Host: cvsgo.docs.api.com</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_fields_3"><a class="link" href="#_response_fields_3">Response Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">태그 목록</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[].id</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">태그 ID</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[].name</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">태그 이름</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[].group</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">태그 그룹</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_response_3"><a class="link" href="#_sample_response_3">Sample Response</a></h4>
-<div class="listingblock">
-<div class="content">
+            </div>
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_response_fields_3"><a class="link" href="#_response_fields_3">Response Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">태그 목록</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[].id</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">태그 ID</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[].name</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">태그 이름</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data[].group</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Number</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">태그 그룹</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_response_3"><a class="link" href="#_sample_response_3">Sample Response</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 271
+Content-Length: 270
 
 {
-  "timestamp" : "2023-01-26T23:34:49.6190963",
+  "timestamp" : "2023-02-15T23:23:24.719345",
   "data" : [ {
     "name" : "맵찔이",
     "id" : 1,
@@ -701,174 +702,134 @@ Content-Length: 271
     "group" : 2
   } ]
 }</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_1_4_회원가입"><a class="link" href="#_1_4_회원가입">1-4. 회원가입</a></h3>
-<div class="sect3">
-<h4 id="_request_fields"><a class="link" href="#_request_fields">Request Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">비밀번호</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>nickname</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>tagIds</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">태그 ID 목록</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_request_4"><a class="link" href="#_sample_request_4">Sample Request</a></h4>
-<div class="listingblock">
-<div class="content">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_1_4_회원가입"><a class="link" href="#_1_4_회원가입">1-4. 회원가입</a></h3>
+        <div class="sect3">
+          <h4 id="_request_fields"><a class="link" href="#_request_fields">Request Fields</a></h4>
+
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_request_4"><a class="link" href="#_sample_request_4">Sample Request</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/users HTTP/1.1
 Content-Type: application/json;charset=UTF-8
-Content-Length: 120
+Content-Length: 87
 Host: cvsgo.docs.api.com
 
-{
-  "email" : "abc@naver.com",
-  "password" : "111111111a!",
-  "nickname" : "닉네임",
-  "tagIds" : [ 2, 3, 7 ]
-}</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_fields_4"><a class="link" href="#_response_fields_4">Response Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.email</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.nickname</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.role</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">회원 등급</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tagIds</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">태그 ID 목록</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_response_4"><a class="link" href="#_sample_response_4">Sample Response</a></h4>
-<div class="listingblock">
-<div class="content">
+{"email":"abc@naver.com","password":"111111111a!","nickname":"�г���","tagIds":[2,3,7]}</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_response_fields_4"><a class="link" href="#_response_fields_4">Response Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.email</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.nickname</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">닉네임</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.role</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">회원 등급</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tagIds</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Array</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">태그 ID 목록</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_response_4"><a class="link" href="#_sample_response_4">Sample Response</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 201 Created
 Content-Type: application/json;charset=UTF-8
 Content-Length: 189
 
 {
-  "timestamp" : "2023-01-26T23:34:51.1174591",
+  "timestamp" : "2023-02-15T23:23:24.0104857",
   "data" : {
-    "tagIds" : [ 2, 3, 7 ],
     "nickname" : "닉네임",
     "role" : "ASSOCIATE",
-    "email" : "abc@naver.com"
+    "email" : "abc@naver.com",
+    "tagIds" : [ 2, 3, 7 ]
   }
 }</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_2_인증"><a class="link" href="#_2_인증">2. 인증</a></h2>
-<div class="sectionbody">
-<div class="sect2">
-<h3 id="_2_1_로그인"><a class="link" href="#_2_1_로그인">2-1. 로그인</a></h3>
-<div class="sect3">
-<h4 id="_request_fields_2"><a class="link" href="#_request_fields_2">Request Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">비밀번호</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_request_5"><a class="link" href="#_sample_request_5">Sample Request</a></h4>
-<div class="listingblock">
-<div class="content">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sect1">
+    <h2 id="_2_인증"><a class="link" href="#_2_인증">2. 인증</a></h2>
+    <div class="sectionbody">
+      <div class="sect2">
+        <h3 id="_2_1_로그인"><a class="link" href="#_2_1_로그인">2-1. 로그인</a></h3>
+        <div class="sect3">
+          <h4 id="_request_fields_2"><a class="link" href="#_request_fields_2">Request Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>email</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">이메일</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>password</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">비밀번호</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_request_5"><a class="link" href="#_sample_request_5">Sample Request</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/auth/login HTTP/1.1
 Content-Type: application/json;charset=UTF-8
 Content-Length: 63
@@ -878,75 +839,147 @@ Host: cvsgo.docs.api.com
   "email" : "abc@naver.com",
   "password" : "password1!"
 }</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_response_fields_5"><a class="link" href="#_response_fields_5">Response Fields</a></h4>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 33.3333%;">
-<col style="width: 33.3333%;">
-<col style="width: 33.3334%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Path</th>
-<th class="tableblock halign-left valign-top">Type</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.accessToken</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">액세스 토큰</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.refreshToken</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">리프레시 토큰</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tokenType</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">토큰 종류</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect3">
-<h4 id="_sample_response_5"><a class="link" href="#_sample_response_5">Sample Response</a></h4>
-<div class="listingblock">
-<div class="content">
+            </div>
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_response_fields_5"><a class="link" href="#_response_fields_5">Response Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>timestamp</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">요청 시각</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.accessToken</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">액세스 토큰</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.refreshToken</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">리프레시 토큰</p></td>
+            </tr>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>data.tokenType</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">토큰 종류</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_response_5"><a class="link" href="#_sample_response_5">Sample Response</a></h4>
+          <div class="listingblock">
+            <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json;charset=UTF-8
-Content-Length: 463
+Content-Length: 462
 
 {
-  "timestamp" : "2023-02-15T22:44:54.4094678",
+  "timestamp" : "2023-03-04T21:22:29.118052",
   "data" : {
     "accessToken" : "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNAbmF2ZXIuY29tIiwiaWF0IjoxNjc2NDU1NTQzLCJleHAiOjE2NzY0NTczNDN9.1GsEkNAENDMCRdgmcpzZB5EBw8HiAhS3HPqVidhVwmA",
     "refreshToken" : "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzY0NTU1NDMsImp0aSI6IjQzNDIzMWY1LWU3MTktNDRhOC1hODM0LWZmYjAxN2NmM2M1MyIsImV4cCI6MTY3NzY2NTE0M30.3vitvpssbPtWb7NDM8JjfkYY2vOOq5GgC6cQu85dHVA",
     "tokenType" : "Bearer"
   }
 }</code></pre>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sect2">
+        <h3 id="_2_2_로그아웃"><a class="link" href="#_2_2_로그아웃">2-2. 로그아웃</a></h3>
+        <div class="sect3">
+          <h4 id="_request_headers"><a class="link" href="#_request_headers">Request Headers</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 50%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Name</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>Authorization</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">액세스 토큰</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_request_fields_3"><a class="link" href="#_request_fields_3">Request Fields</a></h4>
+          <table class="tableblock frame-all grid-all stretch">
+            <colgroup>
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3333%;">
+              <col style="width: 33.3334%;">
+            </colgroup>
+            <thead>
+            <tr>
+              <th class="tableblock halign-left valign-top">Path</th>
+              <th class="tableblock halign-left valign-top">Type</th>
+              <th class="tableblock halign-left valign-top">Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock"><code>String</code></p></td>
+              <td class="tableblock halign-left valign-top"><p class="tableblock">리프레시 토큰</p></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_request_6"><a class="link" href="#_sample_request_6">Sample Request</a></h4>
+          <div class="listingblock">
+            <div class="content">
+<pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">POST /api/auth/logout HTTP/1.1
+Content-Type: application/json;charset=UTF-8
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmNAbmF2ZXIuY29tIiwiaWF0IjoxNjc2NDU1NTQzLCJleHAiOjE2NzY0NTczNDN9.1GsEkNAENDMCRdgmcpzZB5EBw8HiAhS3HPqVidhVwmA
+Content-Length: 192
+Host: cvsgo.docs.api.com
+
+{
+  "token" : "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NzY0NTU1NDMsImp0aSI6IjQzNDIzMWY1LWU3MTktNDRhOC1hODM0LWZmYjAxN2NmM2M1MyIsImV4cCI6MTY3NzY2NTE0M30.3vitvpssbPtWb7NDM8JjfkYY2vOOq5GgC6cQu85dHVA"
+}</code></pre>
+            </div>
+          </div>
+        </div>
+        <div class="sect3">
+          <h4 id="_sample_response_6"><a class="link" href="#_sample_response_6">Sample Response</a></h4>
+          <div class="listingblock">
+            <div class="content">
+              <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 200 OK</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 <div id="footer">
-<div id="footer-text">
-Last updated 2023-02-15 19:06:17 +0900
-</div>
+  <div id="footer-text">
+    Last updated 2023-03-04 23:02:32 +0900
+  </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.3/highlight.min.js"></script>
 <script>
