@@ -2,6 +2,7 @@ package com.cvsgo.controller;
 
 import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.auth.LoginRequestDto;
+import com.cvsgo.dto.auth.LogoutRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,12 @@ public class AuthController {
     @PostMapping("/login")
     public SuccessResponse<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) {
         return SuccessResponse.of(authService.login(loginRequestDto));
+    }
+
+    @PostMapping("/logout")
+    public SuccessResponse<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
+        authService.logout(logoutRequestDto.getToken());
+        return SuccessResponse.of();
     }
 
     @GetMapping("/tokens")

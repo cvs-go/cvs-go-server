@@ -9,6 +9,7 @@ import com.cvsgo.repository.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.Date;
 import java.util.Optional;
 
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
+import static com.cvsgo.exception.ExceptionConstants.UNAUTHORIZED_USER;
 import static com.cvsgo.util.AuthConstants.ACCESS_TOKEN_TTL_MILLISECOND;
 import static com.cvsgo.util.AuthConstants.REFRESH_TOKEN_TTL_MILLISECOND;
 import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
@@ -64,6 +66,12 @@ public class AuthService {
                 .refreshToken(refreshToken.getToken())
                 .tokenType(TOKEN_TYPE)
                 .build();
+    }
+
+    @Transactional
+    public void logout(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> UNAUTHORIZED_USER);
+        refreshTokenRepository.delete(refreshToken);
     }
 
     @Transactional
