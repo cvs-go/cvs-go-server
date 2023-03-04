@@ -76,7 +76,7 @@ public class AuthService {
                 .compact();
     }
 
-    public String extractAccessToken(String authorizationHeaderValue, String tokenType) {
+    public String extractToken(String authorizationHeaderValue, String tokenType) {
         String[] strTokens = authorizationHeaderValue.split(" ");
         if (strTokens.length == 2 && tokenType.equals(strTokens[0])) {
             return strTokens[1];

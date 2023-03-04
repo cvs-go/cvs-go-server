@@ -23,7 +23,7 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (authorizationHeader == null) {
             throw UNAUTHORIZED_USER;
         }
-        String accessToken = authService.extractAccessToken(authorizationHeader, TOKEN_TYPE);
+        String accessToken = authService.extractToken(authorizationHeader, TOKEN_TYPE);
         authService.getLoginUser(accessToken).orElseThrow(() -> UNAUTHORIZED_USER);
         return true;
     }

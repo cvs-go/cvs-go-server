@@ -35,7 +35,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
         if (authorizationHeader == null) {
             return null;
         }
-        String accessToken = authService.extractAccessToken(authorizationHeader, TOKEN_TYPE);
+        String accessToken = authService.extractToken(authorizationHeader, TOKEN_TYPE);
         User user = authService.getLoginUser(accessToken).orElseThrow(() -> NOT_FOUND_USER);
         return user;
     }
