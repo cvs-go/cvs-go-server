@@ -37,6 +37,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
@@ -154,6 +155,37 @@ class AuthControllerTest {
                         ),
                         requestFields(
                                 fieldWithPath("token").type(JsonFieldType.STRING).description("리프레시 토큰")
+                        )
+                ));
+    }
+
+    @Test
+    @DisplayName("토큰 연장에 성공하면 HTTP 200을 응답한다")
+    void respond_200_when_succeed_to_reissue_tokens() throws Exception {
+
+        given(authService.reissueToken(any()))
+                .willReturn(TokenDto.builder()
+                        .accessToken(getSampleAccessToken())
+                        .refreshToken(getSampleRefreshToken())
+                        .tokenType(TOKEN_TYPE)
+                        .build());
+
+        mockMvc.perform(get("/api/auth/tokens")
+                        .header(HttpHeaders.AUTHORIZATION, TOKEN_TYPE + " " + getSampleRefreshToken())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andDo(document("auth/tokens",
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("리프레시 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("요청 시각"),
+                                fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
+                                fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 종류")
                         )
                 ));
     }

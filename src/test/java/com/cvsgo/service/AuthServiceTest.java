@@ -143,6 +143,36 @@ class AuthServiceTest {
         then(refreshTokenRepository).should(times(1)).findByToken(any());
     }
 
+    @Test
+    @DisplayName("유효한 리프레시 토큰으로 토큰 재발급을 시도하면 액세스 토큰과 리프레시 토큰을 발급받는다")
+    void should_return_tokens_when_token_is_valid() {
+        User user = User.builder()
+                .userId("abc@naver.com")
+                .password(passwordEncoder.encode("password1!"))
+                .build();
+        RefreshToken refreshToken = RefreshToken.create(user, getSampleKey(), REFRESH_TOKEN_TTL_MILLISECOND);
+
+        given(refreshTokenRepository.findByToken(anyString()))
+                .willReturn(Optional.of(refreshToken));
+
+        TokenDto tokenDto = authService.reissueToken(anyString());
+
+        assertNotNull(tokenDto.getAccessToken());
+        assertNotNull(tokenDto.getRefreshToken());
+        then(refreshTokenRepository).should(times(1)).findByToken(any());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 리프레시 토큰으로 토큰 재발급을 시도하면 UnauthorizedUserException이 발생한다")
+    void should_throw_UnauthorizedUserException_when_token_is_invalid() {
+        given(refreshTokenRepository.findByToken(anyString()))
+                .willReturn(Optional.empty());
+
+        assertThrows(UnauthorizedUserException.class, () -> authService.reissueToken(anyString()));
+
+        then(refreshTokenRepository).should(times(1)).findByToken(any());
+    }
+
     private Key getSampleKey() {
         byte[] keyBytes = Decoders.BASE64.decode("thisisasamplesecretkeyfortestthisisasamplesecretkeyfortest");
         return Keys.hmacShaKeyFor(keyBytes);
