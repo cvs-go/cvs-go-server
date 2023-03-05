@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.cvsgo.exception.auth.NotFoundUserException;
 import com.cvsgo.exception.auth.InvalidPasswordException;
+import com.cvsgo.exception.auth.UnauthorizedUserException;
 
 import java.security.Key;
 import java.util.Date;
@@ -68,12 +69,23 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * DB에 저장되어 있는 사용자의 리프레시 토큰을 삭제하여 로그아웃 처리를 한다.
+     * @param token 리프레시 토큰
+     * @throws UnauthorizedUserException 토큰이 유효하지 않은 경우
+     */
     @Transactional
     public void logout(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> UNAUTHORIZED_USER);
         refreshTokenRepository.delete(refreshToken);
     }
 
+    /**
+     * 액세스 토큰과 리프레시 토큰을 재발급한다.
+     * @param token 리프레시 토큰
+     * @return 토큰 정보
+     * @throws UnauthorizedUserException 토큰이 유효하지 않은 경우
+     */
     @Transactional
     public TokenDto reissueToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> UNAUTHORIZED_USER);
@@ -99,6 +111,12 @@ public class AuthService {
                 .compact();
     }
 
+    /**
+     * 토큰 타입 부분을 제거하고 토큰 문자열만 분리하여 꺼낸다.
+     * @param authorizationHeaderValue Authorization 헤더
+     * @param tokenType 토큰 타입
+     * @return 토큰 문자열
+     */
     public String extractToken(String authorizationHeaderValue, String tokenType) {
         String[] strTokens = authorizationHeaderValue.split(" ");
         if (strTokens.length == 2 && tokenType.equals(strTokens[0])) {
