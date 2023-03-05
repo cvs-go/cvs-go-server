@@ -6,9 +6,11 @@ import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
 import com.cvsgo.repository.RefreshTokenRepository;
 import com.cvsgo.repository.UserRepository;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -123,6 +125,19 @@ public class AuthService {
             return strTokens[1];
         }
         return null;
+    }
+
+    /**
+     * 해당 토큰이 유효한지 검사한다.
+     * @param token 유효성 검사하려는 토큰
+     * @throws ExpiredJwtException 토큰이 만료된 경우
+     * @throws SignatureException 토큰의 시그니처가 다른 경우
+     */
+    public void validateToken(String token) {
+        Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token);
     }
 
     public Optional<User> getLoginUser(String accessToken) {
