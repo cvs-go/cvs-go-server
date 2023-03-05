@@ -4,7 +4,6 @@ import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
-import com.cvsgo.entity.UserTag;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import com.cvsgo.repository.UserTagRepository;
@@ -48,15 +47,9 @@ public class UserService {
             log.info("중복된 닉네임: '{}'", signUpRequestDto.getNickname());
             throw DUPLICATE_NICKNAME;
         }
-        User user = userRepository.save(signUpRequestDto.toEntity(passwordEncoder));
         List<Tag> tags = tagRepository.findAllById(signUpRequestDto.getTagIds());
-        userTagRepository.saveAll(tags.stream().map(
-                tag -> UserTag.builder()
-                        .user(user)
-                        .tag(tag)
-                        .build())
-                .toList());
-        return SignUpResponseDto.of(user, tags);
+        User user = userRepository.save(signUpRequestDto.toEntity(passwordEncoder, tags));
+        return SignUpResponseDto.from(user);
     }
 
     /**

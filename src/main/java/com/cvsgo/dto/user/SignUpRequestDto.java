@@ -1,6 +1,7 @@
 package com.cvsgo.dto.user;
 
 import com.cvsgo.entity.Role;
+import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -39,13 +40,8 @@ public class SignUpRequestDto {
         this.tagIds = tagIds;
     }
 
-    public User toEntity(PasswordEncoder passwordEncoder) {
-        return User.builder()
-                .userId(email)
-                .role(Role.ASSOCIATE)
-                .password(passwordEncoder.encode(password))
-                .nickname(nickname)
-                .build();
+    public User toEntity(PasswordEncoder passwordEncoder, List<Tag> tags) {
+        return User.create(email, passwordEncoder.encode(password), nickname, tags);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.cvsgo.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,12 +8,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.cvsgo.exception.ExceptionConstants.INVALID_PASSWORD;
 
@@ -40,6 +45,9 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserTag> userTags = new ArrayList<>();
+
     @Builder
     public User(Long id, String userId, String password, String nickname, Role role) {
         this.id = id;
@@ -48,10 +56,32 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.role = role;
     }
-    
+
+    public static User create(String userId, String password, String nickname, List<Tag> tags) {
+        User user = User.builder()
+                .userId(userId)
+                .password(password)
+                .nickname(nickname)
+                .role(Role.ASSOCIATE)
+                .build();
+        for (Tag tag : tags) {
+            user.addTag(tag);
+        }
+        return user;
+    }
+
     public void validatePassword(String password, PasswordEncoder passwordEncoder) {
         if (!passwordEncoder.matches(password, this.password)) {
             throw INVALID_PASSWORD;
         }
     }
+
+    public void addTag(Tag tag) {
+        UserTag userTag = UserTag.builder()
+                .user(this)
+                .tag(tag)
+                .build();
+        userTags.add(userTag);
+    }
+
 }

@@ -303,7 +303,7 @@ class UserControllerTest {
     }
 
     private SignUpResponseDto createResponse() {
-        return SignUpResponseDto.of(createUser(), getTags());
+        return SignUpResponseDto.from(createUser());
     }
 
 }
