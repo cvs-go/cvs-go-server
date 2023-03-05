@@ -279,9 +279,9 @@ class UserControllerTest {
 
     private List<Tag> getTags() {
         List<Tag> tags = new ArrayList<>();
-        tags.add(new Tag(2L, "맵부심", 1));
-        tags.add(new Tag(3L, "초코러버", 2));
-        tags.add(new Tag(7L, "소식가", 5));
+        tags.add(Tag.builder().id(2L).name("맵부심").group(1).build());
+        tags.add(Tag.builder().id(3L).name("초코러버").group(2).build());
+        tags.add(Tag.builder().id(7L).name("소식가").group(5).build());
         return tags;
     }
 

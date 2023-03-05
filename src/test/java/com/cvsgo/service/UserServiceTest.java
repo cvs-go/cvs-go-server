@@ -58,7 +58,7 @@ public class UserServiceTest {
         // given
         given(userRepository.findByNickname(nickname))
                 .willReturn(Optional.empty())
-                .willReturn(Optional.of(new User()));
+                .willReturn(Optional.of(User.builder().build()));
 
         // when
         userService.signUp(signUpRequest);
@@ -84,7 +84,7 @@ public class UserServiceTest {
         // given
         given(userRepository.findByUserId(email))
                 .willReturn(Optional.empty())
-                .willReturn(Optional.of(new User()));
+                .willReturn(Optional.of(User.builder().build()));
 
         // when
         userService.signUp(signUpRequest);
@@ -102,7 +102,7 @@ public class UserServiceTest {
 
         // given
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.of(new User()));
+                .willReturn(Optional.of(User.builder().build()));
 
         // when
         boolean result = userService.isDuplicatedEmail(email);
@@ -138,7 +138,7 @@ public class UserServiceTest {
 
         // given
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.of(new User()));
+                .willReturn(Optional.of(User.builder().build()));
 
         // when
         boolean result = userService.isDuplicatedNickname(nickname);
