@@ -46,3 +46,32 @@ include::{snippets}/users/create/http-request.adoc[]
 include::{snippets}/users/create/response-fields.adoc[]
 ==== Sample Response
 include::{snippets}/users/create/http-response.adoc[]
+
+== 2. 인증
+=== 2-1. 로그인
+==== Request Fields
+include::{snippets}/auth/login/request-fields.adoc[]
+==== Sample Request
+include::{snippets}/auth/login/http-request.adoc[]
+==== Response Fields
+include::{snippets}/auth/login/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/auth/login/http-response.adoc[]
+=== 2-2. 로그아웃
+==== Request Headers
+include::{snippets}/auth/logout/request-headers.adoc[]
+==== Request Fields
+include::{snippets}/auth/logout/request-fields.adoc[]
+==== Sample Request
+include::{snippets}/auth/logout/http-request.adoc[]
+==== Sample Response
+include::{snippets}/auth/logout/http-response.adoc[]
+=== 2-3. 토큰 재발급
+==== Request Headers
+include::{snippets}/auth/tokens/request-headers.adoc[]
+==== Sample Request
+include::{snippets}/auth/tokens/http-request.adoc[]
+==== Response Fields
+include::{snippets}/auth/tokens/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/auth/tokens/http-response.adoc[]

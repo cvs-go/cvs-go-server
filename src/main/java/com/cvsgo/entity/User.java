@@ -12,6 +12,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import static com.cvsgo.exception.ExceptionConstants.INVALID_PASSWORD;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,5 +47,11 @@ public class User extends BaseTimeEntity {
         this.password = password;
         this.nickname = nickname;
         this.role = role;
+    }
+    
+    public void validatePassword(String password, PasswordEncoder passwordEncoder) {
+        if (!passwordEncoder.matches(password, this.password)) {
+            throw INVALID_PASSWORD;
+        }
     }
 }

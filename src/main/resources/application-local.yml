@@ -9,3 +9,5 @@ spring:
     properties:
       hibernate:
         format_sql: true
+jwt:
+  secret-key: ${SECRET_KEY}

@@ -1,6 +1,8 @@
 package com.cvsgo.exception;
 
 import com.cvsgo.dto.ErrorResponse;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +21,18 @@ public class GlobalExceptionHandler {
         return ErrorResponse.of(e.getFieldError().getDefaultMessage(), "INVALID_REQUEST");
     }
 
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ErrorResponse handleExpiredJwtException(ExpiredJwtException e) {
+        return ErrorResponse.of(ErrorCode.EXPIRED_TOKEN.getCode(), ErrorCode.EXPIRED_TOKEN.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(SignatureException.class)
+    public ErrorResponse handleSignatureException(SignatureException e) {
+        return ErrorResponse.of(ErrorCode.UNAUTHORIZED_USER.getCode(), ErrorCode.UNAUTHORIZED_USER.getMessage());
+    }
+    
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUnexpectedException(Exception e) {
         log.error("Unexpected error occurred.", e);

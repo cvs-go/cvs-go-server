@@ -1,3 +1,6 @@
+jwt:
+  secret-key: ${SECRET_KEY}
+
 spring:
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
