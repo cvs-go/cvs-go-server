@@ -6,7 +6,6 @@ import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
-import com.cvsgo.repository.UserTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,8 +24,6 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final TagRepository tagRepository;
-
-    private final UserTagRepository userTagRepository;
 
     private final PasswordEncoder passwordEncoder;
 
