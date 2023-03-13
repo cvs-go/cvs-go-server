@@ -5,15 +5,16 @@ drop table if exists event cascade;
 drop table if exists manufacturer cascade;
 drop table if exists product cascade;
 drop table if exists product_bookmark cascade;
+drop table if exists product_like cascade;
 drop table if exists promotion cascade;
 drop table if exists refresh_token cascade;
 drop table if exists review cascade;
 drop table if exists review_image cascade;
+drop table if exists review_like cascade;
 drop table if exists sell_at cascade;
 drop table if exists tag cascade;
 drop table if exists user cascade;
 drop table if exists user_follow cascade;
-drop table if exists user_like cascade;
 drop table if exists user_tag cascade;
 SET FOREIGN_KEY_CHECKS = 1;
 
@@ -74,6 +75,15 @@ create table product_bookmark (
                                   primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+create table product_like (
+                             id bigint not null auto_increment,
+                             user_id bigint not null,
+                             product_id bigint not null,
+                             created_at datetime,
+                             modified_at datetime,
+                             primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 create table promotion (
                            id bigint not null auto_increment,
                            created_at datetime,
@@ -109,6 +119,15 @@ create table review_image (
                               created_at datetime,
                               modified_at datetime,
                               primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+create table review_like (
+                             id bigint not null auto_increment,
+                             user_id bigint not null,
+                             review_id bigint not null,
+                             created_at datetime,
+                             modified_at datetime,
+                             primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create table sell_at (
@@ -147,15 +166,6 @@ create table user_follow (
                              created_at datetime,
                              modified_at datetime,
                              primary key (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-create table user_like (
-                           id bigint not null auto_increment,
-                           user_id bigint not null,
-                           review_id bigint not null,
-                           created_at datetime,
-                           modified_at datetime,
-                           primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 create table user_tag (
