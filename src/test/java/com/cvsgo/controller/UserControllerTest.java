@@ -307,11 +307,7 @@ class UserControllerTest {
     }
 
     private User createUser() {
-        return User.builder()
-                .userId("abc@naver.com")
-                .nickname("닉네임")
-                .role(Role.ASSOCIATE)
-                .build();
+        return User.create("abc@naver.com", "password1!", "닉네임", getTags());
     }
 
     private SignUpResponseDto createResponse() {
