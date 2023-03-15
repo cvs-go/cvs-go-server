@@ -88,7 +88,7 @@ class TagControllerTest {
                 .name("초코러버")
                 .group(2)
                 .build();
-        return Stream.of(tag1, tag2, tag3).map(TagResponseDto::of).toList();
+        return Stream.of(tag1, tag2, tag3).map(TagResponseDto::from).toList();
     }
 
 }

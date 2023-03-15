@@ -13,6 +13,7 @@ public class TagResponseDto {
     }
 
     public static TagResponseDto of(Tag tag) {
+    public static TagResponseDto from(Tag tag) {
         return new TagResponseDto(tag);
     }
 

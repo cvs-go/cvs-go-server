@@ -22,7 +22,7 @@ public class TagService {
     @Transactional(readOnly = true)
     public List<TagResponseDto> getTagList() {
         List<Tag> tags = tagRepository.findAll();
-        return tags.stream().map(TagResponseDto::of).toList();
+        return tags.stream().map(TagResponseDto::from).toList();
     }
 
 }
