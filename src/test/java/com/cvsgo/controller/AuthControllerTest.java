@@ -1,5 +1,7 @@
 package com.cvsgo.controller;
 
+import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
+import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.auth.LoginRequestDto;
 import com.cvsgo.dto.auth.LogoutRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
@@ -45,6 +47,12 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(AuthController.class)
 class AuthControllerTest {
+
+    @MockBean
+    LoginUserArgumentResolver loginUserArgumentResolver;
+
+    @MockBean
+    WebConfig webConfig;
 
     @MockBean
     private AuthInterceptor authInterceptor;

@@ -1,11 +1,14 @@
 package com.cvsgo.controller;
 
+import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
+import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
+import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,6 +61,15 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @MockBean
+    private AuthInterceptor authInterceptor;
+    
+    @MockBean
+    LoginUserArgumentResolver loginUserArgumentResolver;
+
+    @MockBean
+    WebConfig webConfig;
 
     @BeforeEach
     void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {

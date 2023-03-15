@@ -1,7 +1,10 @@
 package com.cvsgo.controller;
 
+import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
+import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.tag.TagResponseDto;
 import com.cvsgo.entity.Tag;
+import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.TagService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +44,15 @@ class TagControllerTest {
     private TagService tagService;
 
     private MockMvc mockMvc;
+
+    @MockBean
+    private AuthInterceptor authInterceptor;
+
+    @MockBean
+    LoginUserArgumentResolver loginUserArgumentResolver;
+
+    @MockBean
+    WebConfig webConfig;
 
     @BeforeEach
     void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
