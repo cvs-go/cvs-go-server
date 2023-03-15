@@ -24,19 +24,19 @@ public class AuthController {
 
     @PostMapping("/login")
     public SuccessResponse<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) {
-        return SuccessResponse.of(authService.login(loginRequestDto));
+        return SuccessResponse.from(authService.login(loginRequestDto));
     }
 
     @PostMapping("/logout")
     public SuccessResponse<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
         authService.logout(logoutRequestDto.getToken());
-        return SuccessResponse.of();
+        return SuccessResponse.create();
     }
 
     @GetMapping("/tokens")
     public SuccessResponse<TokenDto> reissueToken(@RequestHeader("Authorization") String authorizationHeader) {
         String refreshToken = authService.extractToken(authorizationHeader, TOKEN_TYPE);
-        return SuccessResponse.of(authService.reissueToken(refreshToken));
+        return SuccessResponse.from(authService.reissueToken(refreshToken));
     }
 
 }

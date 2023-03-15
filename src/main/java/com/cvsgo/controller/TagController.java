@@ -19,7 +19,7 @@ public class TagController {
 
     @GetMapping
     public SuccessResponse<List<TagResponseDto>> getTagList() {
-        return SuccessResponse.of(tagService.getTagList());
+        return SuccessResponse.from(tagService.getTagList());
     }
 
 }

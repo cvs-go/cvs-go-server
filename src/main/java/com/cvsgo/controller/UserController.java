@@ -25,17 +25,17 @@ public class UserController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<SignUpResponseDto> register(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
-        return SuccessResponse.of(userService.signUp(signUpRequestDto));
+        return SuccessResponse.from(userService.signUp(signUpRequestDto));
     }
 
     @GetMapping("/emails/{email}/exists")
     public SuccessResponse<Boolean> checkEmailExists(@PathVariable String email) {
-        return SuccessResponse.of(userService.isDuplicatedEmail(email));
+        return SuccessResponse.from(userService.isDuplicatedEmail(email));
     }
 
     @GetMapping("/nicknames/{nickname}/exists")
     public SuccessResponse<Boolean> checkNicknameExists(@PathVariable String nickname) {
-        return SuccessResponse.of(userService.isDuplicatedNickname(nickname));
+        return SuccessResponse.from(userService.isDuplicatedNickname(nickname));
     }
 
 }
