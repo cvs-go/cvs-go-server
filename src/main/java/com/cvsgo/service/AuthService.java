@@ -11,13 +11,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.cvsgo.exception.auth.NotFoundUserException;
 import com.cvsgo.exception.auth.InvalidPasswordException;
 import com.cvsgo.exception.auth.UnauthorizedUserException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.util.Date;
@@ -55,6 +55,7 @@ public class AuthService {
      * @throws InvalidPasswordException 비밀번호가 일치하지 않는 경우
      * @return 토큰 정보
      */
+    @Transactional
     public TokenDto login(LoginRequestDto loginRequestDto) {
         User user = userRepository.findByUserId(loginRequestDto.getEmail()).orElseThrow(() -> NOT_FOUND_USER);
         user.validatePassword(loginRequestDto.getPassword(), passwordEncoder);
@@ -140,6 +141,7 @@ public class AuthService {
                 .parseClaimsJws(token);
     }
 
+    @Transactional(readOnly = true)
     public Optional<User> getLoginUser(String accessToken) {
         if (accessToken == null) {
             return Optional.empty();
