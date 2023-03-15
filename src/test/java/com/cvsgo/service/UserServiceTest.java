@@ -20,6 +20,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
@@ -55,6 +56,8 @@ class UserServiceTest {
         given(userRepository.findByNickname(nickname))
                 .willReturn(Optional.empty())
                 .willReturn(Optional.of(User.builder().build()));
+        given(userRepository.save(any()))
+                .willReturn(User.builder().build());
 
         // when
         userService.signUp(signUpRequest);
@@ -81,6 +84,8 @@ class UserServiceTest {
         given(userRepository.findByUserId(email))
                 .willReturn(Optional.empty())
                 .willReturn(Optional.of(User.builder().build()));
+        given(userRepository.save(any()))
+                .willReturn(User.builder().build());
 
         // when
         userService.signUp(signUpRequest);
