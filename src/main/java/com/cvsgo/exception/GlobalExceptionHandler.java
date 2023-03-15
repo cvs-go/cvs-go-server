@@ -24,13 +24,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(ExpiredJwtException.class)
     public ErrorResponse handleExpiredJwtException(ExpiredJwtException e) {
-        return ErrorResponse.of(ErrorCode.EXPIRED_TOKEN.getCode(), ErrorCode.EXPIRED_TOKEN.getMessage());
+        return ErrorResponse.from(ErrorCode.EXPIRED_TOKEN);
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(SignatureException.class)
     public ErrorResponse handleSignatureException(SignatureException e) {
-        return ErrorResponse.of(ErrorCode.UNAUTHORIZED_USER.getCode(), ErrorCode.UNAUTHORIZED_USER.getMessage());
+        return ErrorResponse.from(ErrorCode.UNAUTHORIZED_USER);
     }
     
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
