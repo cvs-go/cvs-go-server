@@ -31,23 +31,23 @@ public class UserService {
     /**
      * 사용자를 등록한다.
      *
-     * @param signUpRequestDto 등록할 사용자의 정보
+     * @param request 등록할 사용자의 정보
      * @return 등록된 사용자 정보
      * @throws com.cvsgo.exception.user.DuplicateEmailException 이메일이 중복된 경우
      * @throws com.cvsgo.exception.user.DuplicateNicknameException 닉네임이 중복된 경우
      */
     @Transactional
-    public SignUpResponseDto signUp(SignUpRequestDto signUpRequestDto) {
-        if (isDuplicatedEmail(signUpRequestDto.getEmail())) {
-            log.info("중복된 이메일: '{}'", signUpRequestDto.getEmail());
+    public SignUpResponseDto signUp(SignUpRequestDto request) {
+        if (isDuplicatedEmail(request.getEmail())) {
+            log.info("중복된 이메일: '{}'", request.getEmail());
             throw DUPLICATE_EMAIL;
         }
-        if (isDuplicatedNickname(signUpRequestDto.getNickname())) {
-            log.info("중복된 닉네임: '{}'", signUpRequestDto.getNickname());
+        if (isDuplicatedNickname(request.getNickname())) {
+            log.info("중복된 닉네임: '{}'", request.getNickname());
             throw DUPLICATE_NICKNAME;
         }
-        List<Tag> tags = tagRepository.findAllById(signUpRequestDto.getTagIds());
-        User user = userRepository.save(signUpRequestDto.toEntity(passwordEncoder, tags));
+        List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+        User user = userRepository.save(request.toEntity(passwordEncoder, tags));
         return SignUpResponseDto.from(user);
     }
 

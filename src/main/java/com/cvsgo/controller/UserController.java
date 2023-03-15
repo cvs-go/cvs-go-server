@@ -24,8 +24,8 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<SignUpResponseDto> register(@RequestBody @Valid SignUpRequestDto signUpRequestDto) {
-        return SuccessResponse.from(userService.signUp(signUpRequestDto));
+    public SuccessResponse<SignUpResponseDto> register(@RequestBody @Valid SignUpRequestDto request) {
+        return SuccessResponse.from(userService.signUp(request));
     }
 
     @GetMapping("/emails/{email}/exists")

@@ -50,15 +50,15 @@ public class AuthService {
 
     /**
      * 로그인을 진행한다.
-     * @param loginRequestDto 로그인 요청 정보
+     * @param request 로그인 요청 정보
      * @throws NotFoundUserException 해당하는 아이디를 가진 사용자가 없는 경우
      * @throws InvalidPasswordException 비밀번호가 일치하지 않는 경우
      * @return 토큰 정보
      */
     @Transactional
-    public TokenDto login(LoginRequestDto loginRequestDto) {
-        User user = userRepository.findByUserId(loginRequestDto.getEmail()).orElseThrow(() -> NOT_FOUND_USER);
-        user.validatePassword(loginRequestDto.getPassword(), passwordEncoder);
+    public TokenDto login(LoginRequestDto request) {
+        User user = userRepository.findByUserId(request.getEmail()).orElseThrow(() -> NOT_FOUND_USER);
+        user.validatePassword(request.getPassword(), passwordEncoder);
 
         String accessToken = createAccessToken(user, key, ACCESS_TOKEN_TTL_MILLISECOND);
         RefreshToken refreshToken = RefreshToken.create(user, key, REFRESH_TOKEN_TTL_MILLISECOND);

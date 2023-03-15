@@ -23,13 +23,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public SuccessResponse<TokenDto> login(@RequestBody LoginRequestDto loginRequestDto) {
-        return SuccessResponse.from(authService.login(loginRequestDto));
+    public SuccessResponse<TokenDto> login(@RequestBody LoginRequestDto request) {
+        return SuccessResponse.from(authService.login(request));
     }
 
     @PostMapping("/logout")
-    public SuccessResponse<Void> logout(@RequestBody LogoutRequestDto logoutRequestDto) {
-        authService.logout(logoutRequestDto.getToken());
+    public SuccessResponse<Void> logout(@RequestBody LogoutRequestDto request) {
+        authService.logout(request.getToken());
         return SuccessResponse.create();
     }
 
