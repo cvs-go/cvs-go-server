@@ -6,7 +6,6 @@ import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
-import com.cvsgo.repository.UserTagRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,9 +33,6 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private UserTagRepository userTagRepository;
 
     @Mock
     private TagRepository tagRepository;
