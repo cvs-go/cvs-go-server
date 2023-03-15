@@ -2,39 +2,32 @@ package com.cvsgo.dto.user;
 
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 
 import java.util.List;
 
+@Getter
 public class SignUpResponseDto {
 
-    @JsonIgnore
-    private final User user;
+    private final String email;
+
+    private final String nickname;
+
+    private final Role role;
+
+    private final List<Long> tagIds;
 
     private SignUpResponseDto(User user) {
-        this.user = user;
+        this.email = user.getUserId();
+        this.nickname = user.getNickname();
+        this.role = user.getRole();
+        this.tagIds = user.getUserTags().stream()
+                .map(userTag -> userTag.getTag().getId())
+                .toList();
     }
 
     public static SignUpResponseDto from(User user) {
         return new SignUpResponseDto(user);
-    }
-
-    public String getEmail() {
-        return user.getUserId();
-    }
-
-    public String getNickname() {
-        return user.getNickname();
-    }
-
-    public Role getRole() {
-        return user.getRole();
-    }
-
-    public List<Long> getTagIds() {
-        return user.getUserTags().stream()
-                .map(userTag -> userTag.getTag().getId())
-                .toList();
     }
 
 }
