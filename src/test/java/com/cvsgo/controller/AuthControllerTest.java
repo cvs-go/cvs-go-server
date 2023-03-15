@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
@@ -93,7 +94,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(loginRequestDto)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("auth/login",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -155,7 +156,7 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(logoutRequestDto)))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("auth/logout",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestHeaders(
@@ -183,7 +184,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("auth/tokens",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestHeaders(

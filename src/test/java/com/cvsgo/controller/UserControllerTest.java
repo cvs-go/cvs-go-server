@@ -32,6 +32,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static org.hamcrest.Matchers.containsString;
@@ -64,7 +65,7 @@ class UserControllerTest {
 
     @MockBean
     private AuthInterceptor authInterceptor;
-    
+
     @MockBean
     LoginUserArgumentResolver loginUserArgumentResolver;
 
@@ -162,7 +163,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(signUpRequest)))
                 .andExpect(status().isCreated())
                 .andDo(print())
-                .andDo(document("users/create",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -229,7 +230,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("true")))
                 .andDo(print())
-                .andDo(document("users/emails/exists",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(
@@ -264,7 +265,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("true")))
                 .andDo(print())
-                .andDo(document("users/nicknames/exists",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(

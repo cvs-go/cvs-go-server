@@ -24,6 +24,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.BDDMockito.given;
@@ -71,7 +72,7 @@ class TagControllerTest {
         mockMvc.perform(get("/api/tags").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andDo(document("tags/get",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         responseFields(
