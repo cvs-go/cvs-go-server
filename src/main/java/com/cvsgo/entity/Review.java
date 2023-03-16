@@ -2,7 +2,6 @@ package com.cvsgo.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,8 +30,7 @@ public class Review extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Convert(converter = RatingConverter.class)
-    private Rating rating;
+    private Integer rating;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -46,7 +44,7 @@ public class Review extends BaseTimeEntity {
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    public Review(Long id, String content, Rating rating, User user, Product product,
+    public Review(Long id, String content, Integer rating, User user, Product product,
         List<ReviewImage> reviewImages) {
         this.id = id;
         this.content = content;
