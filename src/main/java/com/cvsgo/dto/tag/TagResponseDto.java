@@ -1,30 +1,25 @@
 package com.cvsgo.dto.tag;
 
 import com.cvsgo.entity.Tag;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Getter;
 
+@Getter
 public class TagResponseDto {
 
-    @JsonIgnore
-    private final Tag tag;
+    private final Long id;
+
+    private final String name;
+
+    private final Integer group;
 
     private TagResponseDto(Tag tag) {
-        this.tag = tag;
+        this.id = tag.getId();
+        this.name = tag.getName();
+        this.group = tag.getGroup();
     }
 
-    public static TagResponseDto of(Tag tag) {
+    public static TagResponseDto from(Tag tag) {
         return new TagResponseDto(tag);
     }
 
-    public Long getId() {
-        return tag.getId();
-    }
-
-    public String getName() {
-        return tag.getName();
-    }
-
-    public Integer getGroup() {
-        return tag.getGroup();
-    }
 }

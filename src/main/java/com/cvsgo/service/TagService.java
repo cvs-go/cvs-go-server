@@ -5,6 +5,7 @@ import com.cvsgo.entity.Tag;
 import com.cvsgo.repository.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,9 +19,10 @@ public class TagService {
      * 사용자 태그를 조회한다.
      * @return 사용자 태그 목록
      */
+    @Transactional(readOnly = true)
     public List<TagResponseDto> getTagList() {
         List<Tag> tags = tagRepository.findAll();
-        return tags.stream().map(TagResponseDto::of).toList();
+        return tags.stream().map(TagResponseDto::from).toList();
     }
 
 }

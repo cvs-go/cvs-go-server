@@ -4,14 +4,13 @@ import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
-import com.cvsgo.entity.UserTag;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
-import com.cvsgo.repository.UserTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,36 +26,29 @@ public class UserService {
 
     private final TagRepository tagRepository;
 
-    private final UserTagRepository userTagRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     /**
      * 사용자를 등록한다.
      *
-     * @param signUpRequestDto 등록할 사용자의 정보
+     * @param request 등록할 사용자의 정보
      * @return 등록된 사용자 정보
      * @throws com.cvsgo.exception.user.DuplicateEmailException 이메일이 중복된 경우
      * @throws com.cvsgo.exception.user.DuplicateNicknameException 닉네임이 중복된 경우
      */
-    public SignUpResponseDto signUp(SignUpRequestDto signUpRequestDto) {
-        if (isDuplicatedEmail(signUpRequestDto.getEmail())) {
-            log.info("중복된 이메일: '{}'", signUpRequestDto.getEmail());
+    @Transactional
+    public SignUpResponseDto signUp(SignUpRequestDto request) {
+        if (isDuplicatedEmail(request.getEmail())) {
+            log.info("중복된 이메일: '{}'", request.getEmail());
             throw DUPLICATE_EMAIL;
         }
-        if (isDuplicatedNickname(signUpRequestDto.getNickname())) {
-            log.info("중복된 닉네임: '{}'", signUpRequestDto.getNickname());
+        if (isDuplicatedNickname(request.getNickname())) {
+            log.info("중복된 닉네임: '{}'", request.getNickname());
             throw DUPLICATE_NICKNAME;
         }
-        User user = userRepository.save(signUpRequestDto.toEntity(passwordEncoder));
-        List<Tag> tags = tagRepository.findAllById(signUpRequestDto.getTagIds());
-        userTagRepository.saveAll(tags.stream().map(
-                tag -> UserTag.builder()
-                        .user(user)
-                        .tag(tag)
-                        .build())
-                .toList());
-        return SignUpResponseDto.of(user, tags);
+        List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+        User user = userRepository.save(request.toEntity(passwordEncoder, tags));
+        return SignUpResponseDto.from(user);
     }
 
     /**
@@ -64,6 +56,7 @@ public class UserService {
      * @param email 이메일
      * @return 해당 이메일로 등록된 사용자 존재 여부
      */
+    @Transactional(readOnly = true)
     public Boolean isDuplicatedEmail(String email) {
         return userRepository.findByUserId(email).isPresent();
     }
@@ -73,6 +66,7 @@ public class UserService {
      * @param nickname 닉네임
      * @return 해당 닉네임을 가진 사용자 존재 여부
      */
+    @Transactional(readOnly = true)
     public Boolean isDuplicatedNickname(String nickname) {
         return userRepository.findByNickname(nickname).isPresent();
     }

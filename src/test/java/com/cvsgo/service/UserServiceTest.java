@@ -6,7 +6,6 @@ import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
-import com.cvsgo.repository.UserTagRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,22 +20,20 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+class UserServiceTest {
 
     @InjectMocks
     UserService userService;
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private UserTagRepository userTagRepository;
 
     @Mock
     private TagRepository tagRepository;
@@ -59,6 +56,8 @@ public class UserServiceTest {
         given(userRepository.findByNickname(nickname))
                 .willReturn(Optional.empty())
                 .willReturn(Optional.of(User.builder().build()));
+        given(userRepository.save(any()))
+                .willReturn(User.builder().build());
 
         // when
         userService.signUp(signUpRequest);
@@ -85,6 +84,8 @@ public class UserServiceTest {
         given(userRepository.findByUserId(email))
                 .willReturn(Optional.empty())
                 .willReturn(Optional.of(User.builder().build()));
+        given(userRepository.save(any()))
+                .willReturn(User.builder().build());
 
         // when
         userService.signUp(signUpRequest);

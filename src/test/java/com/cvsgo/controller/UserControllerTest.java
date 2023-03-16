@@ -1,11 +1,14 @@
 package com.cvsgo.controller;
 
+import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
+import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
+import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +32,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static org.hamcrest.Matchers.containsString;
@@ -58,6 +62,15 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @MockBean
+    private AuthInterceptor authInterceptor;
+
+    @MockBean
+    LoginUserArgumentResolver loginUserArgumentResolver;
+
+    @MockBean
+    WebConfig webConfig;
 
     @BeforeEach
     void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
@@ -150,7 +163,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(signUpRequest)))
                 .andExpect(status().isCreated())
                 .andDo(print())
-                .andDo(document("users/create",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         requestFields(
@@ -217,7 +230,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("true")))
                 .andDo(print())
-                .andDo(document("users/emails/exists",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(
@@ -252,7 +265,7 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("true")))
                 .andDo(print())
-                .andDo(document("users/nicknames/exists",
+                .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
                         pathParameters(
@@ -295,15 +308,11 @@ class UserControllerTest {
     }
 
     private User createUser() {
-        return User.builder()
-                .userId("abc@naver.com")
-                .nickname("닉네임")
-                .role(Role.ASSOCIATE)
-                .build();
+        return User.create("abc@naver.com", "password1!", "닉네임", getTags());
     }
 
     private SignUpResponseDto createResponse() {
-        return SignUpResponseDto.of(createUser(), getTags());
+        return SignUpResponseDto.from(createUser());
     }
 
 }

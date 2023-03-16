@@ -31,10 +31,10 @@ class UserRepositoryTest {
                 .build();
 
         // when
-        User createdUser = userRepository.save(user);
+        userRepository.save(user);
 
         // then
-        assertThat(createdUser).isNotNull();
+        assertThat(user.getId()).isNotNull();
     }
 
     @Test
