@@ -1,5 +1,6 @@
 package com.cvsgo.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
@@ -17,13 +18,16 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="event_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name="eventType", discriminatorType = DiscriminatorType.STRING)
 @Entity
 public abstract class Event extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(insertable = false, updatable = false)
+    private String eventType;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -33,8 +37,9 @@ public abstract class Event extends BaseTimeEntity {
     @JoinColumn(name = "convenience_store_id")
     private ConvenienceStore convenienceStore;
 
-    protected Event(Long id, Product product, ConvenienceStore convenienceStore) {
+    protected Event(Long id, String eventType, Product product, ConvenienceStore convenienceStore) {
         this.id = id;
+        this.eventType = eventType;
         this.product = product;
         this.convenienceStore = convenienceStore;
     }

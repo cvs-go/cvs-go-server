@@ -17,9 +17,9 @@ public class DiscountEvent extends Event {
     private Integer discountAmount;
 
     @Builder
-    public DiscountEvent(Long id, Product product, ConvenienceStore convenienceStore,
-        Integer discountAmount) {
-        super(id, product, convenienceStore);
+    public DiscountEvent(Long id, String eventType, Product product,
+        ConvenienceStore convenienceStore, Integer discountAmount) {
+        super(id, eventType, product, convenienceStore);
         this.discountAmount = discountAmount;
     }
 }

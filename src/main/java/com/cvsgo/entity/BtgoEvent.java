@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class BtgoEvent extends Event {
 
     @Builder
-    public BtgoEvent(Long id, Product product, ConvenienceStore convenienceStore) {
-        super(id, product, convenienceStore);
+    public BtgoEvent(Long id, String eventType, Product product, ConvenienceStore convenienceStore) {
+        super(id, eventType, product, convenienceStore);
     }
 }

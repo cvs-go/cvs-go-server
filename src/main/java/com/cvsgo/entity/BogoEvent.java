@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class BogoEvent extends Event {
 
     @Builder
-    public BogoEvent(Long id, Product product, ConvenienceStore convenienceStore) {
-        super(id, product, convenienceStore);
+    public BogoEvent(Long id, String eventType, Product product, ConvenienceStore convenienceStore) {
+        super(id, eventType, product, convenienceStore);
     }
 }
