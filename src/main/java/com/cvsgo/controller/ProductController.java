@@ -24,7 +24,7 @@ public class ProductController {
     @PostMapping()
     public SuccessResponse<Page<ProductResponseDto>> getProductList(@LoginUser User user,
         @RequestBody ProductSearchRequestDto request, Pageable pageable) {
-        return SuccessResponse.of(productService.getProductList(user, request, pageable));
+        return SuccessResponse.from(productService.getProductList(user, request, pageable));
     }
 
 }
