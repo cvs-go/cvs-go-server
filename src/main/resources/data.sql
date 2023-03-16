@@ -4,17 +4,6 @@ insert into category (name, created_at, modified_at) values ('간편식사', now
 -- convenience_store
 insert into convenience_store (name, created_at, modified_at) values ('CU', now(), now()), ('GS25', now(), now()), ('세븐일레븐', now(), now()), ('Emart24', now(), now()), ('미니스톱', now(), now());
 
--- event
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('GIFT', now(), now(), null, 2, 2, 3);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('GIFT', now(), now(), null, 2, 3, 2);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BOGO', now(), now(), null, 1, 4, null);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BTGO', now(), now(), null, 4, 8, null);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BTGO', now(), now(), null, 4, 9, null);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BOGO', now(), now(), null, 1, 6, null);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('DISCOUNT', now(), now(), 100, 3, 6, null);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('DISCOUNT', now(), now(), 100, 3, 7, null);
-insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('DISCOUNT', now(), now(), 100, 3, 10, null);
-
 -- manufacturer
 insert into manufacturer (name, created_at, modified_at) values ('오뚜기', now(), now()), ('크라운', now(), now()), ('매일', now(), now()), ('해태', now(), now()), ('농심', now(), now()), ('칠성', now(), now()), ('롯데', now(), now()), ('풀무원', now(), now());
 
@@ -41,6 +30,17 @@ insert into sell_at (product_id, convenience_store_id, created_at, modified_at) 
 insert into sell_at (product_id, convenience_store_id, created_at, modified_at) values (8, 1, now(), now()), (8, 2, now(), now()), (8, 3, now(), now()), (8, 4, now(), now()), (8, 5, now(), now());
 insert into sell_at (product_id, convenience_store_id, created_at, modified_at) values (9, 1, now(), now()), (9, 2, now(), now()), (9, 3, now(), now()), (9, 4, now(), now()), (9, 5, now(), now());
 insert into sell_at (product_id, convenience_store_id, created_at, modified_at) values (10, 1, now(), now()), (10, 2, now(), now()), (10, 3, now(), now()), (10, 4, now(), now()), (10, 5, now(), now());
+
+-- event
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('GIFT', now(), now(), null, 2, 2, 3);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('GIFT', now(), now(), null, 2, 3, 2);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BOGO', now(), now(), null, 3, 4, null);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BTGO', now(), now(), null, 4, 8, null);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BTGO', now(), now(), null, 4, 9, null);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('BOGO', now(), now(), null, 1, 6, null);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('DISCOUNT', now(), now(), 100, 3, 6, null);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('DISCOUNT', now(), now(), 100, 3, 7, null);
+insert into event (event_type, created_at, modified_at, discount_amount, convenience_store_id, product_id, gift_product_id) values ('DISCOUNT', now(), now(), 100, 3, 10, null);
 
 -- tag
 insert into tag (name, tag_group, created_at, modified_at) values ('맵찔이', 1, now(), now()), ('맵부심', 1, now(), now()), ('초코러버', 2, now(), now()), ('비건', 3, now(), now()), ('다이어터', 4, now(), now()), ('대식가', 5, now(), now()), ('소식가', 5, now(), now());
