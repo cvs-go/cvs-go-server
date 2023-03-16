@@ -1,5 +1,6 @@
 package com.cvsgo.repository;
 
+import com.cvsgo.config.TestConfig;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
 import org.junit.jupiter.api.DisplayName;
@@ -9,9 +10,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
+import org.springframework.context.annotation.Import;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Import(TestConfig.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
