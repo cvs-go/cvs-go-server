@@ -1,6 +1,5 @@
 package com.cvsgo.dto.product;
 
-import jakarta.persistence.criteria.CriteriaBuilder.In;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
