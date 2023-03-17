@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 public class EventTypeResponseDto {
 
-    private final EventType value;
+    private final String value;
     private final String name;
 
     private EventTypeResponseDto(EventType eventType) {
-        this.value = eventType;
+        this.value = eventType.getValue();
         this.name = eventType.getName();
     }
 
