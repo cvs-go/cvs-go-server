@@ -9,11 +9,12 @@ public class ProductFilterResponseDto {
 
     private final List<ConvenienceStoreResponseDto> convenienceStores;
     private final List<CategoryResponseDto> categories;
-    private final EventType[] eventTypes;
+    private final List<EventTypeResponseDto> eventTypes;
     private final Integer highestPrice;
 
     private ProductFilterResponseDto(List<ConvenienceStoreResponseDto> convenienceStores,
-        List<CategoryResponseDto> categories, EventType[] eventTypes, Integer highestPrice) {
+        List<CategoryResponseDto> categories, List<EventTypeResponseDto> eventTypes,
+        Integer highestPrice) {
         this.convenienceStores = convenienceStores;
         this.categories = categories;
         this.eventTypes = eventTypes;
@@ -21,7 +22,9 @@ public class ProductFilterResponseDto {
     }
 
     public static ProductFilterResponseDto of(List<ConvenienceStoreResponseDto> convenienceStores,
-        List<CategoryResponseDto> categories, EventType[] eventTypes, Integer highestPrice) {
-        return new ProductFilterResponseDto(convenienceStores, categories, eventTypes, highestPrice);
+        List<CategoryResponseDto> categories, List<EventTypeResponseDto> eventTypes,
+        Integer highestPrice) {
+        return new ProductFilterResponseDto(convenienceStores, categories, eventTypes,
+            highestPrice);
     }
 }

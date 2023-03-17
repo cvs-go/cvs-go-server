@@ -19,6 +19,7 @@ import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.product.CategoryResponseDto;
 import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
+import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
@@ -145,7 +146,8 @@ class ProductControllerTest {
                     fieldWithPath("data.convenienceStores[].name").type(JsonFieldType.STRING).description("편의점 이름"),
                     fieldWithPath("data.categories[].id").type(JsonFieldType.NUMBER).description("카테고리 ID"),
                     fieldWithPath("data.categories[].name").type(JsonFieldType.STRING).description("카테고리 이름"),
-                    fieldWithPath("data.eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),
+                    fieldWithPath("data.eventTypes[].value").type(JsonFieldType.STRING).description("이벤트 타입"),
+                    fieldWithPath("data.eventTypes[].name").type(JsonFieldType.STRING).description("이벤트 타입 이름"),
                     fieldWithPath("data.highestPrice").type(JsonFieldType.NUMBER).description("최고 가격")
                 )
             ));
@@ -241,7 +243,8 @@ class ProductControllerTest {
             ConvenienceStoreResponseDto.from(cvs3));
         List<CategoryResponseDto> categories = List.of(CategoryResponseDto.from(category1),
             CategoryResponseDto.from(category2));
-        EventType[] eventTypes = EventType.values();
+        List<EventTypeResponseDto> eventTypes = List.of(EventTypeResponseDto.from(EventType.BOGO),
+            EventTypeResponseDto.from(EventType.BTGO), EventTypeResponseDto.from(EventType.GIFT));
         Integer highestPrice = 10000;
         return ProductFilterResponseDto.of(convenienceStores, categories, eventTypes, highestPrice);
     }
