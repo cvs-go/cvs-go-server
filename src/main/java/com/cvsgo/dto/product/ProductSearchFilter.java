@@ -11,17 +11,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductSearchFilter {
 
-    private List<ConvenienceStore> convenienceStore;
-    private List<Category> category;
-    private List<EventType> event;
-    private List<Integer> price;
+    private List<ConvenienceStore> convenienceStores;
+    private List<Category> categories;
+    private List<EventType> events;
+    private List<Integer> prices;
 
-    private ProductSearchFilter(List<ConvenienceStore> convenienceStore, List<Category> category,
-        List<EventType> event, List<Integer> price) {
-        this.convenienceStore = convenienceStore;
-        this.category = category;
-        this.event = event;
-        this.price = price;
+    private ProductSearchFilter(List<ConvenienceStore> convenienceStores, List<Category> categories,
+        List<EventType> events, List<Integer> prices) {
+        this.convenienceStores = convenienceStores;
+        this.categories = categories;
+        this.events = events;
+        this.prices = prices;
     }
 
     public static ProductSearchFilter of(List<ConvenienceStore> convenienceStore,

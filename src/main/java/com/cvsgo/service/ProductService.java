@@ -52,13 +52,13 @@ public class ProductService {
 
     private ProductSearchFilter convertRequestToFilter(ProductSearchRequestDto request) {
         List<ConvenienceStore> convenienceStores = convenienceStoreRepository.findAllById(
-            request.getConvenienceStore());
-        List<Category> categories = categoryRepository.findAllById(request.getCategory());
+            request.getConvenienceStoreIds());
+        List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
         List<EventType> events = new ArrayList<>();
-        for (String event : request.getEvent()) {
+        for (String event : request.getEventTypes()) {
             events.add(EventType.valueOf(event));
         }
-        return ProductSearchFilter.of(convenienceStores, categories, events, request.getPrice());
+        return ProductSearchFilter.of(convenienceStores, categories, events, request.getPrices());
     }
 
 }

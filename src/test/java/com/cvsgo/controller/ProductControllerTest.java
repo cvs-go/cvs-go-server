@@ -82,10 +82,10 @@ class ProductControllerTest {
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
         ProductSearchRequestDto request = ProductSearchRequestDto.builder()
-            .convenienceStore(List.of(1L))
-            .category(List.of(1L))
-            .event(List.of("BOGO"))
-            .price(List.of(0, 1000))
+            .convenienceStoreIds(List.of(1L))
+            .categoryIds(List.of(1L))
+            .eventTypes(List.of("BOGO"))
+            .prices(List.of(0, 1000))
             .build();
 
         Page<ProductResponseDto> responseDto = new PageImpl<>(createProductsResponse());
@@ -100,10 +100,10 @@ class ProductControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestFields(
-                    fieldWithPath("convenienceStore").type(JsonFieldType.ARRAY).description("편의점"),
-                    fieldWithPath("category").type(JsonFieldType.ARRAY).description("제품 카테고리"),
-                    fieldWithPath("event").type(JsonFieldType.ARRAY).description("이벤트"),
-                    fieldWithPath("price").type(JsonFieldType.ARRAY).description("가격")
+                    fieldWithPath("convenienceStoreIds").type(JsonFieldType.ARRAY).description("편의점 ID 리스트"),
+                    fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("제품 카테고리 ID 리스트"),
+                    fieldWithPath("eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),
+                    fieldWithPath("prices").type(JsonFieldType.ARRAY).description("가격 리스트")
                 ),
                 relaxedResponseFields(
                     fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
@@ -112,8 +112,8 @@ class ProductControllerTest {
                     fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
                     fieldWithPath("data.content[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
                     fieldWithPath("data.content[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
-                    fieldWithPath("data.content[].isLike").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
-                    fieldWithPath("data.content[].isBookmark").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data.content[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
+                    fieldWithPath("data.content[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
                     fieldWithPath("data.content[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
                     fieldWithPath("data.content[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
                     fieldWithPath("data.content[].sellAt[].name").type(JsonFieldType.STRING).description("판매 편의점"),

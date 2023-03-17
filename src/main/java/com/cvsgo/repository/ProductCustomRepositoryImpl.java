@@ -45,10 +45,10 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 product.manufacturer.name.as("manufacturerName"),
                 ExpressionUtils.as(JPAExpressions.selectOne().from(productLike)
                     .where(product.id.eq(productLike.product.id)
-                        .and(productLike.user.id.eq(user.getId()))).limit(1), "isLike"),
+                        .and(productLike.user.id.eq(user.getId()))).limit(1), "isLiked"),
                 ExpressionUtils.as(JPAExpressions.selectOne().from(productBookmark)
                     .where(product.id.eq(productBookmark.product.id)
-                        .and(productBookmark.user.id.eq(user.getId()))).limit(1), "isBookmark"),
+                        .and(productBookmark.user.id.eq(user.getId()))).limit(1), "isBookmarked"),
                 ExpressionUtils.as(JPAExpressions.select(review.count()).from(review)
                     .where(product.id.eq(review.product.id)), "reviewCount"),
                 ExpressionUtils.as(JPAExpressions.select(review.rating.avg()).from(review)
@@ -58,11 +58,11 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .leftJoin(sellAt).on(sellAt.product.id.eq(product.id))
             .leftJoin(event).on(event.product.id.eq(product.id))
             .where(
-                eqConvenienceStore(filter.getConvenienceStore()),
-                eqCategory(filter.getCategory()),
-                eqEvent(filter.getEvent()),
-                priceLesserEqual(filter.getPrice()),
-                priceGreaterOrEqual(filter.getPrice())
+                eqConvenienceStore(filter.getConvenienceStores()),
+                eqCategory(filter.getCategories()),
+                eqEvent(filter.getEvents()),
+                priceLesserEqual(filter.getPrices()),
+                priceGreaterOrEqual(filter.getPrices())
             )
             .groupBy(product.id)
             .offset(pageable.getOffset())

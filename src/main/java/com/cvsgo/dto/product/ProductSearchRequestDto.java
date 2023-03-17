@@ -9,17 +9,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductSearchRequestDto {
 
-    private List<Long> convenienceStore;
-    private List<Long> category;
-    private List<String> event;
-    private List<Integer> price;
+    private List<Long> convenienceStoreIds;
+    private List<Long> categoryIds;
+    private List<String> eventTypes;
+    private List<Integer> prices;
 
     @Builder
-    public ProductSearchRequestDto(List<Long> convenienceStore, List<Long> category,
-        List<String> event, List<Integer> price) {
-        this.convenienceStore = convenienceStore;
-        this.category = category;
-        this.event = event;
-        this.price = price;
+    public ProductSearchRequestDto(List<Long> convenienceStoreIds, List<Long> categoryIds,
+        List<String> eventTypes, List<Integer> prices) {
+        this.convenienceStoreIds = convenienceStoreIds;
+        this.categoryIds = categoryIds;
+        this.eventTypes = eventTypes;
+        this.prices = prices;
     }
 }

@@ -59,10 +59,10 @@ class ProductServiceTest {
     void succeed_to_read_product_list() {
         Pageable pageable = PageRequest.of(0, 20);
         ProductSearchRequestDto request = ProductSearchRequestDto.builder()
-            .convenienceStore(List.of(1L))
-            .category(List.of(1L))
-            .event(List.of("BOGO"))
-            .price(List.of(0, 1000))
+            .convenienceStoreIds(List.of(1L))
+            .categoryIds(List.of(1L))
+            .eventTypes(List.of("BOGO"))
+            .prices(List.of(0, 1000))
             .build();
 
         given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
