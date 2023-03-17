@@ -61,7 +61,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 eqConvenienceStore(filter.getConvenienceStores()),
                 eqCategory(filter.getCategories()),
                 eqEvent(filter.getEvents()),
-                priceLesserEqual(filter.getHighestPrice()),
+                priceLessOrEqual(filter.getHighestPrice()),
                 priceGreaterOrEqual(filter.getLowestPrice())
             )
             .groupBy(product.id)
@@ -96,7 +96,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
         return builder;
     }
 
-    private BooleanExpression priceLesserEqual(Integer highestPrice) {
+    private BooleanExpression priceLessOrEqual(Integer highestPrice) {
         return highestPrice != null ? product.price.loe(highestPrice) : null;
     }
 
