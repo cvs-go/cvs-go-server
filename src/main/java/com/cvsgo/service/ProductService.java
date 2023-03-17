@@ -41,7 +41,7 @@ public class ProductService {
     public Page<ProductResponseDto> getProductList(User user,
         ProductSearchRequestDto request, Pageable pageable) {
         Page<ProductResponseDto> products = productRepository.searchByFilter(user,
-            convertrequestToFilter(request), pageable);
+            convertRequestToFilter(request), pageable);
         products.stream().forEach(productResponseDto -> productResponseDto.setSellAt(
             sellAtRepository.findByProductId(productResponseDto.getProductId()).stream().map(
                 sellAt -> SellAtResponseDto.of(sellAt.getConvenienceStore(),
@@ -50,7 +50,7 @@ public class ProductService {
         return products;
     }
 
-    private ProductSearchFilter convertrequestToFilter(ProductSearchRequestDto request) {
+    private ProductSearchFilter convertRequestToFilter(ProductSearchRequestDto request) {
         List<ConvenienceStore> convenienceStores = convenienceStoreRepository.findAllById(
             request.getConvenienceStore());
         List<Category> categories = categoryRepository.findAllById(request.getCategory());
