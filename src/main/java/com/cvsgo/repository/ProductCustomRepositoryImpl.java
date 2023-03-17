@@ -69,7 +69,21 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .limit(pageable.getPageSize())
             .fetch();
 
-        return new PageImpl<>(results, pageable, results.size());
+        Long totalCount = queryFactory.select(product.count())
+            .from(product)
+            .where(
+                eqConvenienceStore(filter.getConvenienceStores()),
+                eqCategory(filter.getCategories()),
+                eqEvent(filter.getEvents()),
+                priceLessOrEqual(filter.getHighestPrice()),
+                priceGreaterOrEqual(filter.getLowestPrice())
+            )
+            .leftJoin(sellAt).on(sellAt.product.id.eq(product.id))
+            .leftJoin(event).on(event.product.id.eq(product.id))
+            .groupBy(product.id)
+            .fetchFirst();
+
+        return new PageImpl<>(results, pageable, totalCount);
     }
 
     private BooleanBuilder eqConvenienceStore(List<ConvenienceStore> convenienceStoreFilter) {
