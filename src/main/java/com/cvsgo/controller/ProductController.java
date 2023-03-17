@@ -9,8 +9,8 @@ import com.cvsgo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,9 +21,9 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PostMapping()
+    @GetMapping
     public SuccessResponse<Page<ProductResponseDto>> getProductList(@LoginUser User user,
-        @RequestBody ProductSearchRequestDto request, Pageable pageable) {
+        @ModelAttribute ProductSearchRequestDto request, Pageable pageable) {
         return SuccessResponse.from(productService.getProductList(user, request, pageable));
     }
 

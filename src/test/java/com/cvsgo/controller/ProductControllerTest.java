@@ -9,7 +9,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
@@ -25,7 +25,6 @@ import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.DiscountEvent;
 import com.cvsgo.entity.EventType;
-import com.cvsgo.entity.EventType.Values;
 import com.cvsgo.entity.GiftEvent;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
@@ -93,7 +92,7 @@ class ProductControllerTest {
         Page<ProductResponseDto> responseDto = new PageImpl<>(createProductsResponse());
         given(productService.getProductList(any(), any(), any())).willReturn(responseDto);
 
-        mockMvc.perform(post("/api/products")
+        mockMvc.perform(get("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
