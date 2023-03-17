@@ -16,6 +16,6 @@ public class BtgoEvent extends Event {
 
     @Builder
     public BtgoEvent(Long id, Product product, ConvenienceStore convenienceStore) {
-        super(id, product, convenienceStore);
+        super(id, EventType.BTGO, product, convenienceStore);
     }
 }

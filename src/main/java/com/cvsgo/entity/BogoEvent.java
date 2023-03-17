@@ -16,6 +16,6 @@ public class BogoEvent extends Event {
 
     @Builder
     public BogoEvent(Long id, Product product, ConvenienceStore convenienceStore) {
-        super(id, product, convenienceStore);
+        super(id, EventType.BOGO, product, convenienceStore);
     }
 }

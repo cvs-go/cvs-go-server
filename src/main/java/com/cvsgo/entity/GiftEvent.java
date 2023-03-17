@@ -24,7 +24,7 @@ public class GiftEvent extends Event {
     @Builder
     public GiftEvent(Long id, Product product, ConvenienceStore convenienceStore,
         Product giftProduct) {
-        super(id, product, convenienceStore);
+        super(id, EventType.GIFT, product, convenienceStore);
         this.giftProduct = giftProduct;
     }
 }

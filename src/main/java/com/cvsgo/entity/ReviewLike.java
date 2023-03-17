@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "review_id"})})
-public class UserLike extends BaseTimeEntity {
+public class ReviewLike extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +32,7 @@ public class UserLike extends BaseTimeEntity {
     private Review review;
 
     @Builder
-    public UserLike(Long id, User user, Review review) {
+    public ReviewLike(Long id, User user, Review review) {
         this.id = id;
         this.user = user;
         this.review = review;

@@ -19,7 +19,7 @@ public class DiscountEvent extends Event {
     @Builder
     public DiscountEvent(Long id, Product product, ConvenienceStore convenienceStore,
         Integer discountAmount) {
-        super(id, product, convenienceStore);
+        super(id, EventType.DISCOUNT, product, convenienceStore);
         this.discountAmount = discountAmount;
     }
 }
