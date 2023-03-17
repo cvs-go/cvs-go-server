@@ -14,18 +14,20 @@ public class ProductSearchFilter {
     private List<ConvenienceStore> convenienceStores;
     private List<Category> categories;
     private List<EventType> events;
-    private List<Integer> prices;
+    private Integer lowestPrice;
+    private Integer highestPrice;
 
     private ProductSearchFilter(List<ConvenienceStore> convenienceStores, List<Category> categories,
-        List<EventType> events, List<Integer> prices) {
+        List<EventType> events, Integer lowestPrice, Integer highestPrice) {
         this.convenienceStores = convenienceStores;
         this.categories = categories;
         this.events = events;
-        this.prices = prices;
+        this.lowestPrice = lowestPrice;
+        this.highestPrice = highestPrice;
     }
 
     public static ProductSearchFilter of(List<ConvenienceStore> convenienceStore,
-        List<Category> category, List<EventType> event, List<Integer> price) {
-        return new ProductSearchFilter(convenienceStore, category, event, price);
+        List<Category> category, List<EventType> event, Integer lowestPrice, Integer highestPrice) {
+        return new ProductSearchFilter(convenienceStore, category, event, lowestPrice, highestPrice);
     }
 }

@@ -53,7 +53,7 @@ public class ProductService {
             request.getConvenienceStoreIds());
         List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
         return ProductSearchFilter.of(convenienceStores, categories, request.getEventTypes(),
-            request.getPrices());
+            request.getLowestPrice(), request.getHighestPrice());
     }
 
 }

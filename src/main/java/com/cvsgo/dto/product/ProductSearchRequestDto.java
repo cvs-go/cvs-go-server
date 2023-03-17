@@ -16,14 +16,16 @@ public class ProductSearchRequestDto {
     private List<Long> categoryIds;
     @Enumerated(EnumType.STRING)
     private List<EventType> eventTypes;
-    private List<Integer> prices;
+    private Integer lowestPrice;
+    private Integer highestPrice;
 
     @Builder
     public ProductSearchRequestDto(List<Long> convenienceStoreIds, List<Long> categoryIds,
-        List<EventType> eventTypes, List<Integer> prices) {
+        List<EventType> eventTypes, Integer lowestPrice, Integer highestPrice) {
         this.convenienceStoreIds = convenienceStoreIds;
         this.categoryIds = categoryIds;
         this.eventTypes = eventTypes;
-        this.prices = prices;
+        this.lowestPrice = lowestPrice;
+        this.highestPrice = highestPrice;
     }
 }

@@ -86,7 +86,8 @@ class ProductControllerTest {
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))
-            .prices(List.of(0, 1000))
+            .lowestPrice(0)
+            .highestPrice(1000)
             .build();
 
         Page<ProductResponseDto> responseDto = new PageImpl<>(createProductsResponse());
@@ -104,7 +105,8 @@ class ProductControllerTest {
                     fieldWithPath("convenienceStoreIds").type(JsonFieldType.ARRAY).description("편의점 ID 리스트"),
                     fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("제품 카테고리 ID 리스트"),
                     fieldWithPath("eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),
-                    fieldWithPath("prices").type(JsonFieldType.ARRAY).description("가격 리스트")
+                    fieldWithPath("lowestPrice").type(JsonFieldType.NUMBER).description("최저 가격"),
+                    fieldWithPath("highestPrice").type(JsonFieldType.NUMBER).description("최고 가격")
                 ),
                 relaxedResponseFields(
                     fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),

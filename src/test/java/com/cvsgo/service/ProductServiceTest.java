@@ -63,7 +63,8 @@ class ProductServiceTest {
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))
-            .prices(List.of(0, 1000))
+            .lowestPrice(0)
+            .highestPrice(1000)
             .build();
 
         given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
