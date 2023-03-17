@@ -45,10 +45,10 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 product.manufacturer.name.as("manufacturerName"),
                 ExpressionUtils.as(JPAExpressions.selectOne().from(productLike)
                     .where(product.id.eq(productLike.product.id)
-                        .and(productLike.user.id.eq(user.getId()))).limit(1), "isLiked"),
+                        .and(findUserProductLike(user))).limit(1), "isLiked"),
                 ExpressionUtils.as(JPAExpressions.selectOne().from(productBookmark)
                     .where(product.id.eq(productBookmark.product.id)
-                        .and(productBookmark.user.id.eq(user.getId()))).limit(1), "isBookmarked"),
+                        .and(findUserProductBookmark(user))).limit(1), "isBookmarked"),
                 ExpressionUtils.as(JPAExpressions.select(review.count()).from(review)
                     .where(product.id.eq(review.product.id)), "reviewCount"),
                 ExpressionUtils.as(JPAExpressions.select(review.rating.avg()).from(review)
@@ -84,6 +84,14 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetchFirst();
 
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    private BooleanExpression findUserProductLike(User user) {
+        return user != null ? productLike.user.id.eq(user.getId()) : null;
+    }
+
+    private BooleanExpression findUserProductBookmark(User user) {
+        return user != null ? productBookmark.user.id.eq(user.getId()) : null;
     }
 
     private BooleanBuilder eqConvenienceStore(List<ConvenienceStore> convenienceStoreFilter) {
