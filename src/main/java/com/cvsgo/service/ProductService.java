@@ -1,11 +1,15 @@
 package com.cvsgo.service;
 
+import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
+import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchFilter;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
+import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
@@ -46,6 +50,23 @@ public class ProductService {
                     eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
                         sellAt.getConvenienceStore()))).toList()));
         return products;
+    }
+
+    /**
+     * 상품 조회 시 적용할 필터를 조회한다.
+     * @return 상품 필터
+     */
+    @Transactional(readOnly = true)
+    public ProductFilterResponseDto getProductFilter() {
+        List<ConvenienceStoreResponseDto> convenienceStoreNames = convenienceStoreRepository.findAll()
+            .stream().map(ConvenienceStoreResponseDto::from).toList();
+        List<CategoryResponseDto> categoryNames = categoryRepository.findAll().stream()
+            .map(CategoryResponseDto::from).toList();
+        EventType[] eventTypes = EventType.values();
+        Integer highestPrice = productRepository.findFirstByOrderByPriceDesc().getPrice();
+
+        return ProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
+            highestPrice);
     }
 
     private ProductSearchFilter convertRequestToFilter(ProductSearchRequestDto request) {
