@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 **/*.log
 /src/main/generated/
+api-doc.html
 
 ### STS ###
 .apt_generated

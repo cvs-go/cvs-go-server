@@ -8,7 +8,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.0'
 	id 'io.spring.dependency-management' version '1.1.0'
-	id 'org.asciidoctor.convert' version "1.5.9.2"
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'com.cvsgo'
@@ -16,6 +16,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
+	asciidoctorExtensions
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
@@ -38,8 +39,8 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 
 	// spring rest docs
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-	asciidoctor 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
 	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
@@ -54,19 +55,47 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api:3.1.0"
 }
 
-asciidoctor {
-	dependsOn test
+ext {
+	snippetsDir = file('build/generated-snippets')
 }
 
 bootJar {
+	enabled = true
 	dependsOn asciidoctor
-	from ("${asciidoctor.outputDir}/html5") {
-		into 'static/docs'
+	copy {
+		from "${asciidoctor.outputDir}/html5"
+		into 'build/resources/static/docs'
 	}
+}
+
+tasks.named('bootJar') {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	outputs.dir snippetsDir
+	finalizedBy 'asciidoctor'
+}
+
+asciidoctor {
+	configurations 'asciidoctorExtensions'
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+asciidoctor.doFirst {
+	delete file("src/main/resources/static/docs")
+}
+
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static/docs")
+}
+
+build {
+	dependsOn copyDocument
 }
 
 def querydslDir = 'src/main/generated'
