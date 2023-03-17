@@ -77,7 +77,15 @@ include::{snippets}/auth-controller-test/respond_200_when_succeed_to_reissue_tok
 include::{snippets}/auth-controller-test/respond_200_when_succeed_to_reissue_tokens/http-response.adoc[]
 
 == 3. 상품
-=== 3-1. 상품 목록 조회
+=== 3-1. 상품 필터 조회
+==== Sample Request
+include::{snippets}/product-controller-test/respond_200_when_read_product_filter_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/product-controller-test/respond_200_when_read_product_filter_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/product-controller-test/respond_200_when_read_product_filter_successfully/http-response.adoc[]
+
+=== 3-2. 상품 목록 조회
 ==== Request Fields
 include::{snippets}/product-controller-test/respond_200_when_read_product_list_successfully/request-fields.adoc[]
 ==== Sample Request

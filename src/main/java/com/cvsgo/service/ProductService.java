@@ -1,17 +1,23 @@
 package com.cvsgo.service;
 
+import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
+import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchFilter;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
+import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,6 +52,25 @@ public class ProductService {
                     eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
                         sellAt.getConvenienceStore()))).toList()));
         return products;
+    }
+
+    /**
+     * 상품 조회 시 적용할 필터를 조회한다.
+     *
+     * @return 상품 필터
+     */
+    @Transactional(readOnly = true)
+    public ProductFilterResponseDto getProductFilter() {
+        List<ConvenienceStoreResponseDto> convenienceStoreNames = convenienceStoreRepository.findAll()
+            .stream().map(ConvenienceStoreResponseDto::from).toList();
+        List<CategoryResponseDto> categoryNames = categoryRepository.findAll().stream()
+            .map(CategoryResponseDto::from).toList();
+        List<EventTypeResponseDto> eventTypes = Arrays.stream(EventType.values())
+            .map(EventTypeResponseDto::from).toList();
+        Integer highestPrice = productRepository.findFirstByOrderByPriceDesc().getPrice();
+
+        return ProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
+            highestPrice);
     }
 
     private ProductSearchFilter convertRequestToFilter(ProductSearchRequestDto request) {

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ProductResponseDto;
@@ -76,6 +77,20 @@ class ProductServiceTest {
         assertEquals(result.getTotalElements(), getProductList().getTotalElements());
         then(productRepository).should(times(1)).searchByFilter(any(), any(), any());
         then(eventRepository).should(times(1)).findByProductAndConvenienceStore(any(), any());
+    }
+
+    @Test
+    @DisplayName("상품 필터를 정상적으로 조회한다")
+    void succeed_to_read_product_filter() {
+        given(convenienceStoreRepository.findAll()).willReturn(List.of(cvs1));
+        given(categoryRepository.findAll()).willReturn(List.of(category1));
+        given(productRepository.findFirstByOrderByPriceDesc()).willReturn(product1);
+
+        productService.getProductFilter();
+
+        then(convenienceStoreRepository).should(atLeastOnce()).findAll();
+        then(categoryRepository).should(atLeastOnce()).findAll();
+        then(productRepository).should(atLeastOnce()).findFirstByOrderByPriceDesc();
     }
 
     Category category1 = Category.builder()

@@ -1,5 +1,6 @@
 package com.cvsgo.controller;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static org.mockito.ArgumentMatchers.any;
@@ -16,6 +17,10 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
+import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
+import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
@@ -70,7 +75,8 @@ class ProductControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
-    void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
+    void setup(WebApplicationContext webApplicationContext,
+        RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(documentationConfiguration(restDocumentation))
             .apply(sharedHttpSession())
@@ -122,7 +128,29 @@ class ProductControllerTest {
                     fieldWithPath("data.content[].sellAt[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
                 )
             ));
+    }
 
+    @Test
+    @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_product_filter_successfully() throws Exception {
+        given(productService.getProductFilter()).willReturn(getProductFilterResponse());
+
+        mockMvc.perform(get("/api/products/filter").contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                relaxedResponseFields(
+                    fieldWithPath("data.convenienceStores[].id").type(JsonFieldType.NUMBER).description("편의점 ID"),
+                    fieldWithPath("data.convenienceStores[].name").type(JsonFieldType.STRING).description("편의점 이름"),
+                    fieldWithPath("data.categories[].id").type(JsonFieldType.NUMBER).description("카테고리 ID"),
+                    fieldWithPath("data.categories[].name").type(JsonFieldType.STRING).description("카테고리 이름"),
+                    fieldWithPath("data.eventTypes[].value").type(JsonFieldType.STRING).description("이벤트 타입"),
+                    fieldWithPath("data.eventTypes[].name").type(JsonFieldType.STRING).description("이벤트 타입 이름"),
+                    fieldWithPath("data.highestPrice").type(JsonFieldType.NUMBER).description("최고 가격")
+                )
+            ));
     }
 
     Category category1 = Category.builder()
@@ -162,14 +190,17 @@ class ProductControllerTest {
         .build();
 
     ConvenienceStore cvs1 = ConvenienceStore.builder()
+        .id(1L)
         .name("CU")
         .build();
 
     ConvenienceStore cvs2 = ConvenienceStore.builder()
+        .id(2L)
         .name("GS25")
         .build();
 
     ConvenienceStore cvs3 = ConvenienceStore.builder()
+        .id(3L)
         .name("세븐일레븐")
         .build();
 
@@ -197,10 +228,24 @@ class ProductControllerTest {
 
     private List<ProductResponseDto> createProductsResponse() {
         ProductResponseDto productResponse1 = ProductResponseDto.of(product1, 1, null, 15L, 2.5);
-        productResponse1.setSellAt(List.of(SellAtResponseDto.of(cvs1, bogoEvent), SellAtResponseDto.of(cvs2, btgoEvent), SellAtResponseDto.of(cvs3, null)));
+        productResponse1.setSellAt(
+            List.of(SellAtResponseDto.of(cvs1, bogoEvent), SellAtResponseDto.of(cvs2, btgoEvent),
+                SellAtResponseDto.of(cvs3, null)));
         ProductResponseDto productResponse2 = ProductResponseDto.of(product2, null, 1, 1L, 5.0);
-        productResponse2.setSellAt(List.of(SellAtResponseDto.of(cvs1, giftEvent), SellAtResponseDto.of(cvs2, discountEvent)));
+        productResponse2.setSellAt(List.of(SellAtResponseDto.of(cvs1, giftEvent),
+            SellAtResponseDto.of(cvs2, discountEvent)));
         return List.of(productResponse1, productResponse2);
     }
 
+    private ProductFilterResponseDto getProductFilterResponse() {
+        List<ConvenienceStoreResponseDto> convenienceStores = List.of(
+            ConvenienceStoreResponseDto.from(cvs1), ConvenienceStoreResponseDto.from(cvs2),
+            ConvenienceStoreResponseDto.from(cvs3));
+        List<CategoryResponseDto> categories = List.of(CategoryResponseDto.from(category1),
+            CategoryResponseDto.from(category2));
+        List<EventTypeResponseDto> eventTypes = List.of(EventTypeResponseDto.from(EventType.BOGO),
+            EventTypeResponseDto.from(EventType.BTGO), EventTypeResponseDto.from(EventType.GIFT));
+        Integer highestPrice = 10000;
+        return ProductFilterResponseDto.of(convenienceStores, categories, eventTypes, highestPrice);
+    }
 }
