@@ -24,6 +24,7 @@ import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.DiscountEvent;
+import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.EventType.Values;
 import com.cvsgo.entity.GiftEvent;
 import com.cvsgo.entity.Manufacturer;
@@ -84,7 +85,7 @@ class ProductControllerTest {
         ProductSearchRequestDto request = ProductSearchRequestDto.builder()
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
-            .eventTypes(List.of("BOGO"))
+            .eventTypes(List.of(EventType.BOGO))
             .prices(List.of(0, 1000))
             .build();
 
@@ -174,26 +175,22 @@ class ProductControllerTest {
     BogoEvent bogoEvent = BogoEvent.builder()
         .product(product1)
         .convenienceStore(cvs1)
-        .eventType(Values.BOGO)
         .build();
 
     BtgoEvent btgoEvent = BtgoEvent.builder()
         .product(product1)
         .convenienceStore(cvs2)
-        .eventType(Values.BTGO)
         .build();
 
     GiftEvent giftEvent = GiftEvent.builder()
         .product(product2)
         .convenienceStore(cvs1)
-        .eventType(Values.GIFT)
         .giftProduct(product1)
         .build();
 
     DiscountEvent discountEvent = DiscountEvent.builder()
         .product(product2)
         .convenienceStore(cvs2)
-        .eventType(Values.DISCOUNT)
         .discountAmount(300)
         .build();
 

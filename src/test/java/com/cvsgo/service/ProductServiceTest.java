@@ -11,6 +11,7 @@ import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
+import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.EventType.Values;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
@@ -61,7 +62,7 @@ class ProductServiceTest {
         ProductSearchRequestDto request = ProductSearchRequestDto.builder()
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
-            .eventTypes(List.of("BOGO"))
+            .eventTypes(List.of(EventType.BOGO))
             .prices(List.of(0, 1000))
             .build();
 
@@ -101,7 +102,6 @@ class ProductServiceTest {
     BogoEvent bogoEvent = BogoEvent.builder()
         .product(product1)
         .convenienceStore(cvs1)
-        .eventType(Values.BOGO)
         .build();
 
     SellAt sellAt1 = SellAt.builder()

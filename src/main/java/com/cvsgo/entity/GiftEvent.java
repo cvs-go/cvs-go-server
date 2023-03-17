@@ -22,9 +22,9 @@ public class GiftEvent extends Event {
     private Product giftProduct;
 
     @Builder
-    public GiftEvent(Long id, String eventType, Product product, ConvenienceStore convenienceStore,
+    public GiftEvent(Long id, Product product, ConvenienceStore convenienceStore,
         Product giftProduct) {
-        super(id, eventType, product, convenienceStore);
+        super(id, EventType.GIFT, product, convenienceStore);
         this.giftProduct = giftProduct;
     }
 }

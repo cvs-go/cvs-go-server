@@ -91,7 +91,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
     private BooleanBuilder eqEvent(List<EventType> eventTypeFilter) {
         BooleanBuilder builder = new BooleanBuilder();
         for (EventType eventType : eventTypeFilter) {
-            builder.or(QEvent.event.eventType.eq(eventType.getValue()));
+            builder.or(QEvent.event.eventType.eq(eventType));
         }
         return builder;
     }

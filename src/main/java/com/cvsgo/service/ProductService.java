@@ -6,14 +6,12 @@ import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
-import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -54,11 +52,8 @@ public class ProductService {
         List<ConvenienceStore> convenienceStores = convenienceStoreRepository.findAllById(
             request.getConvenienceStoreIds());
         List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
-        List<EventType> events = new ArrayList<>();
-        for (String event : request.getEventTypes()) {
-            events.add(EventType.valueOf(event));
-        }
-        return ProductSearchFilter.of(convenienceStores, categories, events, request.getPrices());
+        return ProductSearchFilter.of(convenienceStores, categories, request.getEventTypes(),
+            request.getPrices());
     }
 
 }

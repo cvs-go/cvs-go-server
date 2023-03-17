@@ -8,7 +8,7 @@ import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.DiscountEvent;
 import com.cvsgo.entity.Event;
-import com.cvsgo.entity.EventType.Values;
+import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.GiftEvent;
 import com.cvsgo.entity.Product;
 import java.util.List;
@@ -60,26 +60,22 @@ class EventRepositoryTest {
         BogoEvent event1 = BogoEvent.builder()
             .product(product1)
             .convenienceStore(cvs1)
-            .eventType(Values.BOGO)
             .build();
 
         BtgoEvent event2 = BtgoEvent.builder()
             .product(product1)
             .convenienceStore(cvs2)
-            .eventType(Values.BTGO)
             .build();
 
         GiftEvent event3 = GiftEvent.builder()
             .product(product2)
             .convenienceStore(cvs1)
-            .eventType(Values.GIFT)
             .giftProduct(product1)
             .build();
 
         DiscountEvent event4 = DiscountEvent.builder()
             .product(product2)
             .convenienceStore(cvs3)
-            .eventType(Values.DISCOUNT)
             .discountAmount(500)
             .build();
 
@@ -94,10 +90,10 @@ class EventRepositoryTest {
         Event foundEvent4 = eventRepository.findByProductAndConvenienceStore(product2, cvs3);
 
         // then
-        assertThat(foundEvent1.getEventType()).isEqualTo(Values.BOGO);
-        assertThat(foundEvent2.getEventType()).isEqualTo(Values.BTGO);
-        assertThat(foundEvent3.getEventType()).isEqualTo(Values.GIFT);
-        assertThat(foundEvent4.getEventType()).isEqualTo(Values.DISCOUNT);
-        assertThat(foundEvent4.getEventType()).isNotEqualTo(Values.BOGO);
+        assertThat(foundEvent1.getEventType()).isEqualTo(EventType.BOGO);
+        assertThat(foundEvent2.getEventType()).isEqualTo(EventType.BTGO);
+        assertThat(foundEvent3.getEventType()).isEqualTo(EventType.GIFT);
+        assertThat(foundEvent4.getEventType()).isEqualTo(EventType.DISCOUNT);
+        assertThat(foundEvent4.getEventType()).isNotEqualTo(EventType.BOGO);
     }
 }
