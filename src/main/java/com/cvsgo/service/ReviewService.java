@@ -20,7 +20,7 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private final S3FileUploadService fileUploadService;
+    private final FileUploadService fileUploadService;
 
     private final ReviewRepository reviewRepository;
 
