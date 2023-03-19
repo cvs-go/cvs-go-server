@@ -7,15 +7,22 @@ import com.cvsgo.service.ReviewService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
+import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
+import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -26,12 +33,15 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.io.IOException;
 
 import static org.mockito.BDDMockito.willThrow;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
 
+@ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(ReviewController.class)
 class ReviewControllerTest {
 
@@ -52,8 +62,9 @@ class ReviewControllerTest {
     private static final String CREATE_REVIEW_API_PATH = "/api/products/{productId}/reviews";
 
     @BeforeEach
-    void setup(WebApplicationContext webApplicationContext) {
+    void setup(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .apply(documentationConfiguration(restDocumentation))
                 .apply(sharedHttpSession())
                 .addFilters(new CharacterEncodingFilter("UTF-8", true))
                 .build();
@@ -71,8 +82,22 @@ class ReviewControllerTest {
                         .file(image2)
                         .param("content", "진짜 맛있어요")
                         .param("rating", "5")
-                        .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk()).andDo(print());
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isOk()).andDo(print())
+                .andDo(document(documentIdentifier,
+                        getDocumentRequest(),
+                        getDocumentResponse(),
+                        RequestDocumentation.pathParameters(
+                                RequestDocumentation.parameterWithName("productId").description("상품 ID")
+                        ),
+                        RequestDocumentation.requestParts(
+                                RequestDocumentation.partWithName("images").description("리뷰 이미지")
+                        ),
+                        RequestDocumentation.formParameters(
+                                RequestDocumentation.parameterWithName("content").description("리뷰 내용"),
+                                RequestDocumentation.parameterWithName("rating").description("별점")
+                        )
+                ));
     }
 
     @ParameterizedTest
