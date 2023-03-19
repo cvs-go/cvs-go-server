@@ -71,8 +71,8 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("리뷰 생성에 성공하면 HTTP 200을 응답한다.")
-    void respond_200_when_success_to_create_review() throws Exception {
+    @DisplayName("리뷰 생성에 성공하면 HTTP 201을 응답한다.")
+    void respond_201_when_success_to_create_review() throws Exception {
 
         MockMultipartFile image1 = new MockMultipartFile("images", "sample_image1.png", MediaType.IMAGE_PNG_VALUE, "image 1".getBytes());
         MockMultipartFile image2 = new MockMultipartFile("images", "sample_image2.png", MediaType.IMAGE_PNG_VALUE, "image 2".getBytes());
@@ -83,7 +83,7 @@ class ReviewControllerTest {
                         .param("content", "진짜 맛있어요")
                         .param("rating", "5")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED))
-                .andExpect(status().isOk()).andDo(print())
+                .andExpect(status().isCreated()).andDo(print())
                 .andDo(document(documentIdentifier,
                         getDocumentRequest(),
                         getDocumentResponse(),
@@ -142,14 +142,14 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("리뷰 내용이 1000글자이면 HTTP 200을 응답한다.")
+    @DisplayName("리뷰 내용이 1000글자이면 HTTP 201을 응답한다.")
     void respond_200_when_review_content_does_not_exceed_1000_letters() throws Exception {
 
         mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
                         .param("content", "내용".repeat(500))
                         .param("rating", "5")
                         .contentType(MediaType.MULTIPART_FORM_DATA))
-                .andExpect(status().isOk()).andDo(print());
+                .andExpect(status().isCreated()).andDo(print());
     }
 
 

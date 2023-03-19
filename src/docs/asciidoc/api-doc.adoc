@@ -90,18 +90,18 @@ include::{snippets}/product-controller-test/respond_200_when_read_product_list_s
 == 4. 리뷰
 === 4-1. 리뷰 작성
 ==== Path Parameters
-include::{snippets}/review-controller-test/respond_200_when_success_to_create_review/path-parameters.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_success_to_create_review/path-parameters.adoc[]
 ==== Request Form Data
 ===== Fields
-include::{snippets}/review-controller-test/respond_200_when_success_to_create_review/form-parameters.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_success_to_create_review/form-parameters.adoc[]
 ===== Multipart
-include::{snippets}/review-controller-test/respond_200_when_success_to_create_review/request-parts.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_success_to_create_review/request-parts.adoc[]
 ==== Sample Request
-include::{snippets}/review-controller-test/respond_200_when_success_to_create_review/http-request.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_success_to_create_review/http-request.adoc[]
 ==== Sample CURL Request
-include::{snippets}/review-controller-test/respond_200_when_success_to_create_review/curl-request.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_success_to_create_review/curl-request.adoc[]
 ==== Sample response
-include::{snippets}/review-controller-test/respond_200_when_success_to_create_review/http-response.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_success_to_create_review/http-response.adoc[]
 ==== Error Response
 |===
 | HTTP Status | Error Code | Detail
