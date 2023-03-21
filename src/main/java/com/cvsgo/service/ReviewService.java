@@ -10,6 +10,7 @@ import com.cvsgo.util.FileConstants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.cvsgo.exception.product.NotFoundProductException;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +32,7 @@ public class ReviewService {
      * @param user 리뷰를 작성한 사용자
      * @param productId 상품 ID
      * @param request 사용자가 작성한 리뷰 정보
+     * @throws NotFoundProductException 해당 상품이 존재하지 않는 경우
      * @throws IOException 파일 접근에 실패한 경우
      */
     @Transactional(rollbackFor = Exception.class)
