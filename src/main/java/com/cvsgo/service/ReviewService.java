@@ -33,7 +33,7 @@ public class ReviewService {
      * @param request 사용자가 작성한 리뷰 정보
      * @throws IOException 파일 접근에 실패한 경우
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void createReview(User user, Long productId, CreateReviewRequestDto request) throws IOException {
         Product product = productRepository.findById(productId).orElseThrow(() -> NOT_FOUND_PRODUCT);
 
