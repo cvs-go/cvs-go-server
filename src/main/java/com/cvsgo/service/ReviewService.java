@@ -39,13 +39,7 @@ public class ReviewService {
 
         List<String> imageUrls = fileUploadService.upload(request.getImages(), FileConstants.REVIEW_DIR_NAME);
 
-        Review review = Review.builder()
-                .user(user)
-                .product(product)
-                .rating(request.getRating())
-                .content(request.getContent())
-                .imageUrls(imageUrls)
-                .build();
+        Review review = request.toEntity(user, product, imageUrls);
         reviewRepository.save(review);
     }
 
