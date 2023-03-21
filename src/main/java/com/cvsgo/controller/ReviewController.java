@@ -5,8 +5,10 @@ import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ReviewService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,9 +28,8 @@ public class ReviewController {
 
     @PostMapping("/products/{productId}/reviews")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<Void> createReview(@LoginUser User user,
-                                              @PathVariable Long productId,
-                                              @ModelAttribute @Valid CreateReviewRequestDto request) throws IOException {
+    public SuccessResponse<Void> createReview(@LoginUser User user, @PathVariable Long productId,
+        @ModelAttribute @Valid CreateReviewRequestDto request) throws IOException {
         reviewService.createReview(user, productId, request);
         return SuccessResponse.create();
     }
