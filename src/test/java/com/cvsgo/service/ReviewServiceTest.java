@@ -57,7 +57,7 @@ class ReviewServiceTest {
                 .willThrow(NotFoundProductException.class);
 
         assertThrows(NotFoundProductException.class,
-                () -> reviewService.createReview(User.builder().build(), 100L, CreateReviewRequestDto.builder().build()));
+                () -> reviewService.createReview(user, 100L, requestDto));
     }
 
     User user = User.builder().build();
