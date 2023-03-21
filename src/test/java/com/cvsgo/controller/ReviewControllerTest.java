@@ -143,7 +143,7 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("리뷰 내용이 1000글자이면 HTTP 201을 응답한다.")
-    void respond_200_when_review_content_does_not_exceed_1000_letters() throws Exception {
+    void respond_201_when_review_content_does_not_exceed_1000_letters() throws Exception {
 
         mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
                         .param("content", "내용".repeat(500))
