@@ -1,0 +1,19 @@
+package com.cvsgo.exception.product;
+
+import com.cvsgo.dto.ErrorResponse;
+import com.cvsgo.exception.ErrorCode;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class ProductExceptionHandler {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NotFoundProductException.class)
+    public ErrorResponse handleProductNotFoundException(NotFoundProductException e) {
+        return ErrorResponse.from(ErrorCode.NOT_FOUND_PRODUCT);
+    }
+
+}

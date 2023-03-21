@@ -10,8 +10,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,13 +46,18 @@ public class Review extends BaseTimeEntity {
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    public Review(Long id, String content, Integer rating, User user, Product product,
-        List<ReviewImage> reviewImages) {
+    public Review(Long id, String content, Integer rating, User user, Product product, List<String> imageUrls) {
         this.id = id;
         this.content = content;
         this.rating = rating;
         this.user = user;
         this.product = product;
-        this.reviewImages = reviewImages;
+        this.reviewImages = imageUrls.stream()
+                .map(url -> ReviewImage.builder()
+                        .review(this)
+                        .imageUrl(url)
+                        .build())
+                .toList();
     }
+
 }
