@@ -94,3 +94,19 @@ include::{snippets}/product-controller-test/respond_200_when_read_product_list_s
 include::{snippets}/product-controller-test/respond_200_when_read_product_list_successfully/response-fields.adoc[]
 ==== Sample Response
 include::{snippets}/product-controller-test/respond_200_when_read_product_list_successfully/http-response.adoc[]
+
+=== 3-3. 상품 상세 조회
+==== Path Parameters
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `400 BAD REQUEST` | `NOT_FOUND_PRODUCT` | 해당하는 상품이 없는 경우
+|===
