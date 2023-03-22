@@ -16,6 +16,12 @@ public class ProductExceptionHandler {
         return ErrorResponse.from(ErrorCode.NOT_FOUND_PRODUCT);
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NotFoundProductLikeException.class)
+    public ErrorResponse handleNotFoundProductLikeException(NotFoundProductLikeException e) {
+        return ErrorResponse.from(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
+    }
+
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicateProductLikeException.class)
     public ErrorResponse handleDuplicateProductLikeException(DuplicateProductLikeException e) {

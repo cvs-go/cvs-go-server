@@ -48,6 +48,13 @@ public class ProductController {
         return SuccessResponse.create();
     }
 
+    @DeleteMapping("/{productId}/like")
+    public SuccessResponse<Void> deleteProductLike(@LoginUser User user,
+        @PathVariable Long productId) {
+        productService.deleteProductLike(user, productId);
+        return SuccessResponse.create();
+    }
+
     @GetMapping("/filter")
     public SuccessResponse<ProductFilterResponseDto> getProductFilter() {
         return SuccessResponse.from(productService.getProductFilter());

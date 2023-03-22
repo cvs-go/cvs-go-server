@@ -2,6 +2,7 @@ package com.cvsgo.service;
 
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 
 import com.cvsgo.dto.product.CategoryResponseDto;
 import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
@@ -21,6 +22,7 @@ import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.product.DuplicateProductLikeException;
 import com.cvsgo.exception.product.NotFoundProductException;
+import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
@@ -106,6 +108,25 @@ public class ProductService {
             .build();
         productLikeRepository.save(productLike);
         product.plusLikeCount();
+    }
+
+    /**
+     * 상품 좋아요를 삭제한다.
+     *
+     * @param user      로그인한 사용자
+     * @param productId 상품 ID
+     * @throws NotFoundProductException     해당하는 아이디를 가진 상품이 없는 경우
+     * @throws NotFoundProductLikeException 해당하는 상품 좋아요가 없는 경우
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteProductLike(User user, Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> NOT_FOUND_PRODUCT);
+
+        ProductLike productLike = productLikeRepository.findByProductAndUser(product, user)
+            .orElseThrow(() -> NOT_FOUND_PRODUCT_LIKE);
+        productLikeRepository.delete(productLike);
+        product.minusLikeCount();
     }
 
     /**

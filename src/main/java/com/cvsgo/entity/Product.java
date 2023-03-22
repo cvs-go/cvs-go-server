@@ -59,4 +59,8 @@ public class Product extends BaseTimeEntity {
     public void plusLikeCount() {
         this.likeCount++;
     }
+
+    public void minusLikeCount() {
+        this.likeCount--;
+    }
 }
