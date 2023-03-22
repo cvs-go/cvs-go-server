@@ -105,6 +105,21 @@ include::{snippets}/product-controller-test/respond_200_when_read_product_succes
 ==== Sample Response
 include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/http-response.adoc[]
 
+=== 3-4. 상품 좋아요 생성
+==== Path Parameters
+include::{snippets}/product-controller-test/respond_201_when_create_product_like_succeed/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/product-controller-test/respond_201_when_create_product_like_succeed/http-request.adoc[]
+==== Sample Response
+include::{snippets}/product-controller-test/respond_201_when_create_product_like_succeed/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `400 BAD REQUEST` | `NOT_FOUND_PRODUCT` | 해당하는 상품이 없는 경우
+| `409 CONFLICT` | `DUPLICATE_PRODUCT_LIKE` | 해당하는 상품 좋아요가 이미 있는 경우
+|===
+
 == 4. 리뷰
 === 4-1. 리뷰 작성
 ==== Path Parameters
