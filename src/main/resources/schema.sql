@@ -61,6 +61,7 @@ create table product (
                          image_url varchar(255),
                          name varchar(50) not null,
                          price integer,
+                         like_count bigint default 0 not null,
                          category_id bigint,
                          manufacturer_id bigint,
                          primary key (id)

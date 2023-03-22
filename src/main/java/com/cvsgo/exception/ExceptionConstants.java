@@ -1,11 +1,12 @@
 package com.cvsgo.exception;
 
+import com.cvsgo.exception.auth.InvalidPasswordException;
 import com.cvsgo.exception.auth.NotFoundUserException;
 import com.cvsgo.exception.auth.UnauthorizedUserException;
+import com.cvsgo.exception.product.DuplicateProductLikeException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
-import com.cvsgo.exception.auth.InvalidPasswordException;
 
 public interface ExceptionConstants {
 
@@ -15,5 +16,6 @@ public interface ExceptionConstants {
     InvalidPasswordException INVALID_PASSWORD = new InvalidPasswordException(ErrorCode.INVALID_PASSWORD);
     UnauthorizedUserException UNAUTHORIZED_USER = new UnauthorizedUserException(ErrorCode.UNAUTHORIZED_USER);
     NotFoundProductException NOT_FOUND_PRODUCT = new NotFoundProductException(ErrorCode.NOT_FOUND_PRODUCT);
+    DuplicateProductLikeException DUPLICATE_PRODUCT_LIKE = new DuplicateProductLikeException(ErrorCode.DUPLICATE_PRODUCT_LIKE);
 
 }

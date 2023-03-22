@@ -1,5 +1,6 @@
 package com.cvsgo.service;
 
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 
 import com.cvsgo.dto.product.CategoryResponseDto;
@@ -15,11 +16,15 @@ import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.EventType;
+import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.product.DuplicateProductLikeException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
+import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
 import java.util.Arrays;
@@ -39,6 +44,7 @@ public class ProductService {
     private final EventRepository eventRepository;
     private final SellAtRepository sellAtRepository;
     private final ConvenienceStoreRepository convenienceStoreRepository;
+    private final ProductLikeRepository productLikeRepository;
 
     /**
      * 사용자가 적용한 필터를 적용해 상품을 조회한다.
@@ -76,6 +82,30 @@ public class ProductService {
                 eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
                     sellAt.getConvenienceStore()))).toList());
         return product;
+    }
+
+    /**
+     * 상품 좋아요를 생성한다.
+     *
+     * @param user      로그인한 사용자
+     * @param productId 상품 ID
+     * @throws NotFoundProductException      해당하는 아이디를 가진 상품이 없는 경우
+     * @throws DuplicateProductLikeException 이미 해당하는 상품 좋아요가 존재하는 경우
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void createProductLike(User user, Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> NOT_FOUND_PRODUCT);
+
+        if (Boolean.TRUE.equals(productLikeRepository.existsByProductAndUser(product, user))) {
+            throw DUPLICATE_PRODUCT_LIKE;
+        }
+        ProductLike productLike = ProductLike.builder()
+            .user(user)
+            .product(product)
+            .build();
+        productLikeRepository.save(productLike);
+        product.plusLikeCount();
     }
 
     /**

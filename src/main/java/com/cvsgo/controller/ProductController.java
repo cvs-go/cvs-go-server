@@ -11,11 +11,14 @@ import com.cvsgo.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -35,6 +38,14 @@ public class ProductController {
     public SuccessResponse<ProductDetailResponseDto> readProduct(@LoginUser User user,
         @PathVariable Long productId) {
         return SuccessResponse.from(productService.readProduct(user, productId));
+    }
+
+    @PostMapping("/{productId}/like")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SuccessResponse<Void> createProductLike(@LoginUser User user,
+        @PathVariable Long productId) {
+        productService.createProductLike(user, productId);
+        return SuccessResponse.create();
     }
 
     @GetMapping("/filter")
