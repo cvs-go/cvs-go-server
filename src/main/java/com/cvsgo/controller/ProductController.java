@@ -2,6 +2,7 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
+import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
@@ -12,6 +13,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,6 +29,12 @@ public class ProductController {
     public SuccessResponse<Page<ProductResponseDto>> getProductList(@LoginUser User user,
         @ModelAttribute ProductSearchRequestDto request, Pageable pageable) {
         return SuccessResponse.from(productService.getProductList(user, request, pageable));
+    }
+
+    @GetMapping("/{productId}")
+    public SuccessResponse<ProductDetailResponseDto> readProduct(@LoginUser User user,
+        @PathVariable Long productId) {
+        return SuccessResponse.from(productService.readProduct(user, productId));
     }
 
     @GetMapping("/filter")
