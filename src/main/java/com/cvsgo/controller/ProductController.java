@@ -40,7 +40,7 @@ public class ProductController {
         return SuccessResponse.from(productService.readProduct(user, productId));
     }
 
-    @PostMapping("/{productId}/like")
+    @PostMapping("/{productId}/likes")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<Void> createProductLike(@LoginUser User user,
         @PathVariable Long productId) {
@@ -48,7 +48,7 @@ public class ProductController {
         return SuccessResponse.create();
     }
 
-    @DeleteMapping("/{productId}/like")
+    @DeleteMapping("/{productId}/likes")
     public SuccessResponse<Void> deleteProductLike(@LoginUser User user,
         @PathVariable Long productId) {
         productService.deleteProductLike(user, productId);

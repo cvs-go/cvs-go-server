@@ -184,7 +184,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 좋아요 생성에 성공하면 HTTP 201을 응답한다")
     void respond_201_when_create_product_like_succeed() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/products/{productId}/like", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/products/{productId}/likes", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated())
             .andDo(print())
@@ -200,7 +200,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 좋아요 삭제에 성공하면 HTTP 200을 응답한다")
     void respond_200_when_delete_product_like_succeed() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/products/{productId}/like", 1L)
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/products/{productId}/likes", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print())
