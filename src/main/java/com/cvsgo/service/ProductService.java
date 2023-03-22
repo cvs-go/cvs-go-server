@@ -102,10 +102,7 @@ public class ProductService {
         if (Boolean.TRUE.equals(productLikeRepository.existsByProductAndUser(product, user))) {
             throw DUPLICATE_PRODUCT_LIKE;
         }
-        ProductLike productLike = ProductLike.builder()
-            .user(user)
-            .product(product)
-            .build();
+        ProductLike productLike = ProductLike.create(user, product);
         productLikeRepository.save(productLike);
         product.plusLikeCount();
     }
