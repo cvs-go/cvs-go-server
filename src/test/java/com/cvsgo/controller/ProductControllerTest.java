@@ -10,6 +10,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,9 +22,11 @@ import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.product.CategoryResponseDto;
 import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
 import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SellAtEventResponseDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
@@ -33,6 +37,7 @@ import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.GiftEvent;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,6 +53,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -128,6 +134,48 @@ class ProductControllerTest {
                     fieldWithPath("data.content[].sellAt[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("상품을 정상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_product_successfully() throws Exception {
+        given(productService.readProduct(any(), any())).willReturn(getProductResponse());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/products/{productId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("productId").description("상품 ID")
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data.productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data.productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data.productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
+                    fieldWithPath("data.productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
+                    fieldWithPath("data.manufacturerName").type(JsonFieldType.STRING).description("제조사"),
+                    fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
+                    fieldWithPath("data.isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data.sellAts[].convenienceStoreId").type(JsonFieldType.NUMBER).description("판매 편의점 ID"),
+                    fieldWithPath("data.sellAts[].convenienceStoreName").type(JsonFieldType.STRING).description("판매 편의점 이름"),
+                    fieldWithPath("data.sellAts[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
+                    fieldWithPath("data.sellAts[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("해당 ID를 가진 상품이 존재하지 않으면 상품 상세 조회 API 호출시 HTTP 400를 응답한다")
+    void respond_400_when_product_does_not_exist() throws Exception {
+        given(productService.readProduct(any(), any())).willThrow(ExceptionConstants.NOT_FOUND_PRODUCT);
+
+        mockMvc.perform(get("/api/products/{productId}", 1000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print());
     }
 
     @Test
@@ -235,6 +283,13 @@ class ProductControllerTest {
         productResponse2.setSellAt(List.of(SellAtResponseDto.of(cvs1, giftEvent),
             SellAtResponseDto.of(cvs2, discountEvent)));
         return List.of(productResponse1, productResponse2);
+    }
+
+    private ProductDetailResponseDto getProductResponse() {
+        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1, manufacturer1, 1, null);
+        productDetailResponse.setSellAts(List.of(SellAtEventResponseDto.of(cvs1, bogoEvent), SellAtEventResponseDto.of(cvs2, discountEvent),
+            SellAtEventResponseDto.of(cvs3, null)));
+        return productDetailResponse;
     }
 
     private ProductFilterResponseDto getProductFilterResponse() {
