@@ -17,6 +17,8 @@ import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductBookmark;
+import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.product.NotFoundProductException;
@@ -86,7 +88,7 @@ class ProductServiceTest {
     @DisplayName("상품을 정상적으로 조회한다")
     void succeed_to_read_product() {
         given(productRepository.findByProductId(any(), any())).willReturn(
-            Optional.of(ProductDetailResponseDto.of(product1, manufacturer1, 1, null)));
+            Optional.of(ProductDetailResponseDto.of(product1, manufacturer1, productLike, productBookmark)));
         given(sellAtRepository.findByProductId(any())).willReturn(List.of(sellAt1));
         given(eventRepository.findByProductAndConvenienceStore(any(), any())).willReturn(bogoEvent);
 
@@ -154,6 +156,16 @@ class ProductServiceTest {
         .build();
 
     User user = User.builder().build();
+
+    ProductLike productLike = ProductLike.builder()
+        .user(user)
+        .product(product1)
+        .build();
+
+    ProductBookmark productBookmark = ProductBookmark.builder()
+        .user(user)
+        .product(product1)
+        .build();
 
     private Page<ProductResponseDto> getProductList() {
         Pageable pageable = PageRequest.of(0, 20);

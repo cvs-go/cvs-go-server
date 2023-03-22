@@ -94,14 +94,14 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .select(new QProductDetailResponseDto(
                 product.as("product"),
                 product.manufacturer.as("manufacturer"),
-                ExpressionUtils.as(JPAExpressions.selectOne().from(productLike)
-                    .where(product.id.eq(productLike.product.id)
-                        .and(findUserProductLike(user))).limit(1), "isLiked"),
-                ExpressionUtils.as(JPAExpressions.selectOne().from(productBookmark)
-                    .where(product.id.eq(productBookmark.product.id)
-                        .and(findUserProductBookmark(user))).limit(1), "isBookmarked")
+                productLike.as("productLike"),
+                productBookmark.as("productBookmark")
             ))
             .from(product)
+            .leftJoin(productLike)
+            .on(productLike.product.id.eq(productId).and(productLike.user.eq(user)))
+            .leftJoin(productBookmark)
+            .on(productBookmark.product.id.eq(productId).and(productBookmark.user.eq(user)))
             .where(product.id.eq(productId))
             .fetchFirst());
     }

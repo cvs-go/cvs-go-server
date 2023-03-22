@@ -37,6 +37,9 @@ import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.GiftEvent;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductBookmark;
+import com.cvsgo.entity.ProductLike;
+import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ProductService;
@@ -237,6 +240,18 @@ class ProductControllerTest {
         .manufacturer(manufacturer2)
         .build();
 
+    User user = User.builder().build();
+
+    ProductLike productLike = ProductLike.builder()
+        .user(user)
+        .product(product1)
+        .build();
+
+    ProductBookmark productBookmark = ProductBookmark.builder()
+        .user(user)
+        .product(product1)
+        .build();
+
     ConvenienceStore cvs1 = ConvenienceStore.builder()
         .id(1L)
         .name("CU")
@@ -286,7 +301,7 @@ class ProductControllerTest {
     }
 
     private ProductDetailResponseDto getProductResponse() {
-        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1, manufacturer1, 1, null);
+        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1, manufacturer1, productLike, productBookmark);
         productDetailResponse.setSellAts(List.of(SellAtEventResponseDto.of(cvs1, bogoEvent), SellAtEventResponseDto.of(cvs2, discountEvent),
             SellAtEventResponseDto.of(cvs3, null)));
         return productDetailResponse;
