@@ -198,6 +198,22 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("상품 좋아요 삭제에 성공하면 HTTP 200을 응답한다")
+    void respond_200_when_delete_product_like_succeed() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/products/{productId}/like", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("productId").description("상품 ID")
+                )
+            ));
+    }
+
+    @Test
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_filter_successfully() throws Exception {
         given(productService.getProductFilter()).willReturn(getProductFilterResponse());
