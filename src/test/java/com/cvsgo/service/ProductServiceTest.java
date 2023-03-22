@@ -1,29 +1,34 @@
 package com.cvsgo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
+import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.EventType;
-import com.cvsgo.entity.EventType.Values;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductBookmark;
+import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -80,6 +85,31 @@ class ProductServiceTest {
     }
 
     @Test
+    @DisplayName("상품을 정상적으로 조회한다")
+    void succeed_to_read_product() {
+        given(productRepository.findByProductId(any(), any())).willReturn(
+            Optional.of(ProductDetailResponseDto.of(product1, manufacturer1, productLike, productBookmark)));
+        given(sellAtRepository.findByProductId(any())).willReturn(List.of(sellAt1));
+        given(eventRepository.findByProductAndConvenienceStore(any(), any())).willReturn(bogoEvent);
+
+        productService.readProduct(user, 1L);
+
+        then(productRepository).should(times(1)).findByProductId(any(), any());
+        then(sellAtRepository).should(times(1)).findByProductId(any());
+        then(eventRepository).should(times(1)).findByProductAndConvenienceStore(any(), any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 상품이면 NotFoundProductException이 발생한다")
+    void should_throw_NotFoundProductException_when_product_does_not_exist() {
+        given(productRepository.findByProductId(any(), any())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundProductException.class, () -> productService.readProduct(user, 1000L));
+
+        then(productRepository).should(times(1)).findByProductId(any(), any());
+    }
+
+    @Test
     @DisplayName("상품 필터를 정상적으로 조회한다")
     void succeed_to_read_product_filter() {
         given(convenienceStoreRepository.findAll()).willReturn(List.of(cvs1));
@@ -126,6 +156,16 @@ class ProductServiceTest {
         .build();
 
     User user = User.builder().build();
+
+    ProductLike productLike = ProductLike.builder()
+        .user(user)
+        .product(product1)
+        .build();
+
+    ProductBookmark productBookmark = ProductBookmark.builder()
+        .user(user)
+        .product(product1)
+        .build();
 
     private Page<ProductResponseDto> getProductList() {
         Pageable pageable = PageRequest.of(0, 20);

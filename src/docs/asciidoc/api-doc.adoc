@@ -95,6 +95,16 @@ include::{snippets}/product-controller-test/respond_200_when_read_product_list_s
 ==== Sample Response
 include::{snippets}/product-controller-test/respond_200_when_read_product_list_successfully/http-response.adoc[]
 
+=== 3-3. 상품 상세 조회
+==== Path Parameters
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/product-controller-test/respond_200_when_read_product_successfully/http-response.adoc[]
+
 == 4. 리뷰
 === 4-1. 리뷰 작성
 ==== Path Parameters

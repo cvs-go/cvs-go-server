@@ -47,4 +47,12 @@ public abstract class Event extends BaseTimeEntity {
         this.product = product;
         this.convenienceStore = convenienceStore;
     }
+
+    public Integer getDiscountAmount() {
+        if (this instanceof DiscountEvent) {
+            return this.getDiscountAmount();
+        } else {
+            return null;
+        }
+    }
 }

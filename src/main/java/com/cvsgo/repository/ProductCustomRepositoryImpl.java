@@ -7,8 +7,10 @@ import static com.cvsgo.entity.QProductLike.productLike;
 import static com.cvsgo.entity.QReview.review;
 import static com.cvsgo.entity.QSellAt.sellAt;
 
+import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchFilter;
+import com.cvsgo.dto.product.QProductDetailResponseDto;
 import com.cvsgo.dto.product.QProductResponseDto;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
@@ -21,6 +23,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -84,6 +87,23 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetchFirst();
 
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    public Optional<ProductDetailResponseDto> findByProductId(User user, Long productId) {
+        return Optional.ofNullable(queryFactory
+            .select(new QProductDetailResponseDto(
+                product.as("product"),
+                product.manufacturer.as("manufacturer"),
+                productLike.as("productLike"),
+                productBookmark.as("productBookmark")
+            ))
+            .from(product)
+            .leftJoin(productLike)
+            .on(productLike.product.id.eq(productId).and(productLike.user.eq(user)))
+            .leftJoin(productBookmark)
+            .on(productBookmark.product.id.eq(productId).and(productBookmark.user.eq(user)))
+            .where(product.id.eq(productId))
+            .fetchFirst());
     }
 
     private BooleanExpression findUserProductLike(User user) {

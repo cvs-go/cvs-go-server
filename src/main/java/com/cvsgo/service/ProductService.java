@@ -1,17 +1,22 @@
 package com.cvsgo.service;
 
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
+
 import com.cvsgo.dto.product.CategoryResponseDto;
 import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
 import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchFilter;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SellAtEventResponseDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
@@ -52,6 +57,25 @@ public class ProductService {
                     eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
                         sellAt.getConvenienceStore()))).toList()));
         return products;
+    }
+
+    /**
+     * 상품 ID를 통해 상품을 상세 조회한다.
+     *
+     * @param user      로그인한 사용자
+     * @param productId 상품 ID
+     * @return 상품 상세 정보
+     * @throws NotFoundProductException 해당하는 아이디를 가진 상품이 없는 경우
+     */
+    @Transactional(readOnly = true)
+    public ProductDetailResponseDto readProduct(User user, Long productId) {
+        ProductDetailResponseDto product = productRepository.findByProductId(user, productId)
+            .orElseThrow(() -> NOT_FOUND_PRODUCT);
+        product.setSellAts(sellAtRepository.findByProductId(productId).stream().map(
+            sellAt -> SellAtEventResponseDto.of(sellAt.getConvenienceStore(),
+                eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
+                    sellAt.getConvenienceStore()))).toList());
+        return product;
     }
 
     /**
