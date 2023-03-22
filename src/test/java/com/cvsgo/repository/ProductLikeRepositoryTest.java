@@ -1,12 +1,14 @@
 package com.cvsgo.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.cvsgo.config.TestConfig;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.product.DuplicateProductLikeException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -97,61 +99,6 @@ class ProductLikeRepositoryTest {
 
         // then
         assertThat(deletedProductLike).isNotPresent();
-    }
-
-    @Test
-    @DisplayName("해당하는 상품 좋아요 존재 여부를 조회한다")
-    void succeed_to_exists_by_product_and_user() {
-        // given
-        User user1 = User.builder()
-            .userId("abc@gmail.com")
-            .password("12345678a!")
-            .nickname("닉네임1")
-            .role(Role.ASSOCIATE)
-            .build();
-
-        User user2 = User.builder()
-            .userId("xyz@gmail.com")
-            .password("12345678a!")
-            .nickname("닉네임2")
-            .role(Role.ASSOCIATE)
-            .build();
-
-        Product product1 = Product.builder()
-            .name("상품1")
-            .price(1000)
-            .build();
-
-        Product product2 = Product.builder()
-            .name("상품2")
-            .price(5000)
-            .build();
-
-        ProductLike user1ProductLike = ProductLike.builder()
-            .product(product1)
-            .user(user1)
-            .build();
-
-        ProductLike user2ProductLike = ProductLike.builder()
-            .product(product1)
-            .user(user2)
-            .build();
-
-        userRepository.saveAll(List.of(user1, user2));
-        productRepository.saveAll(List.of(product1, product2));
-        productLikeRepository.saveAll(List.of(user1ProductLike, user2ProductLike));
-
-        // when
-        Boolean trueResult1 = productLikeRepository.existsByProductAndUser(product1, user1);
-        Boolean falseResult1 = productLikeRepository.existsByProductAndUser(product2, user1);
-        Boolean trueResult2 = productLikeRepository.existsByProductAndUser(product1, user2);
-        Boolean falseResult2 = productLikeRepository.existsByProductAndUser(product2, user2);
-
-        // then
-        assertThat(trueResult1).isEqualTo(Boolean.TRUE);
-        assertThat(falseResult1).isEqualTo(Boolean.FALSE);
-        assertThat(trueResult2).isEqualTo(Boolean.TRUE);
-        assertThat(falseResult2).isEqualTo(Boolean.FALSE);
     }
 
     @Test

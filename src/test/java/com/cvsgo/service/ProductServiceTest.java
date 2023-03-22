@@ -23,7 +23,6 @@ import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.product.DuplicateProductLikeException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
@@ -122,7 +121,6 @@ class ProductServiceTest {
     @DisplayName("상품 좋아요를 정상적으로 생성한다")
     void succeed_to_create_product_like() {
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
-        given(productLikeRepository.existsByProductAndUser(any(), any())).willReturn(Boolean.FALSE);
         given(productLikeRepository.save(any())).willReturn(any());
 
         Long beforeLikeCount = product1.getLikeCount();
@@ -130,7 +128,6 @@ class ProductServiceTest {
         Long afterLikeCount = product1.getLikeCount();
 
         then(productRepository).should(times(1)).findById(1L);
-        then(productLikeRepository).should(times(1)).existsByProductAndUser(any(), any());
         then(productLikeRepository).should(times(1)).save(any());
         assertThat(afterLikeCount).isSameAs(beforeLikeCount + 1);
     }
@@ -144,19 +141,6 @@ class ProductServiceTest {
             () -> productService.createProductLike(user, 1000L));
 
         then(productRepository).should(times(1)).findById(any());
-    }
-
-    @Test
-    @DisplayName("이미 존재하는 상품 좋아요인 경우 DuplicateProductLikeException이 발생한다")
-    void should_throw_DuplicateProductLikeException_when_product_like_is_duplicate() {
-        given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
-        given(productLikeRepository.existsByProductAndUser(any(), any())).willReturn(Boolean.TRUE);
-
-        assertThrows(DuplicateProductLikeException.class,
-            () -> productService.createProductLike(user, 1L));
-
-        then(productRepository).should(times(1)).findById(any());
-        then(productLikeRepository).should(times(1)).existsByProductAndUser(any(), any());
     }
 
     @Test

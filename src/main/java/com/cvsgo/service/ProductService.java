@@ -32,6 +32,7 @@ import com.cvsgo.repository.SellAtRepository;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -99,11 +100,12 @@ public class ProductService {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        if (Boolean.TRUE.equals(productLikeRepository.existsByProductAndUser(product, user))) {
+        ProductLike productLike = ProductLike.create(user, product);
+        try {
+            productLikeRepository.save(productLike);
+        } catch (DataIntegrityViolationException e) {
             throw DUPLICATE_PRODUCT_LIKE;
         }
-        ProductLike productLike = ProductLike.create(user, product);
-        productLikeRepository.save(productLike);
         product.plusLikeCount();
     }
 
