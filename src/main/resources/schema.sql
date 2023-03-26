@@ -176,3 +176,5 @@ create table user_tag (
                           modified_at datetime,
                           primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE event ADD UNIQUE unique_event_type_convenience_store_product (event_type, convenience_store_id, product_id);
