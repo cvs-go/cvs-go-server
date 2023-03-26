@@ -59,9 +59,10 @@ create table product (
                          created_at datetime,
                          modified_at datetime,
                          image_url varchar(255),
+                         like_count bigint default 0 not null,
                          name varchar(50) not null,
                          price integer,
-                         like_count bigint default 0 not null,
+                         version bigint,
                          category_id bigint,
                          manufacturer_id bigint,
                          primary key (id)

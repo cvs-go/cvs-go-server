@@ -8,16 +8,16 @@ insert into convenience_store (name, created_at, modified_at) values ('CU', now(
 insert into manufacturer (name, created_at, modified_at) values ('오뚜기', now(), now()), ('크라운', now(), now()), ('매일', now(), now()), ('해태', now(), now()), ('농심', now(), now()), ('칠성', now(), now()), ('롯데', now(), now()), ('풀무원', now(), now());
 
 -- product
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('진라면순한맛', 950, 2, 1, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('마이쮸포도', 800, 3, 2, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('마이쮸딸기', 800, 3, 2, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('킨터초콜렛맥시', 900, 3, 3, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('칼카야버터', 800, 6, 4, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('백산수500ml', 950, 7, 5, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('아이시스500ml', 950, 7, 6, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('왓따 청포도', 500, 8, 7, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('왓따 복숭아', 500, 8, 7, now(), now());
-insert into product (name, price, category_id, manufacturer_id, created_at, modified_at) values ('풀무원샘물', 950, 7, 8, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('진라면순한맛', 950, 0, 2, 1, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('마이쮸포도', 800, 0, 3, 2, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('마이쮸딸기', 800, 0, 3, 2, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('킨터초콜렛맥시', 900, 0, 3, 3, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('칼카야버터', 800, 0, 6, 4, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('백산수500ml', 950, 0, 7, 5, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('아이시스500ml', 950, 0, 7, 6, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('왓따 청포도', 500, 0, 8, 7, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('왓따 복숭아', 500, 0, 8, 7, now(), now());
+insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('풀무원샘물', 950, 0, 7, 8, now(), now());
 
 -- sell_at
 insert into sell_at (product_id, convenience_store_id, created_at, modified_at) values (1, 1, now(), now()), (1, 2, now(), now());
