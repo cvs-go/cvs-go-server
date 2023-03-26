@@ -12,7 +12,7 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
     @Lock(LockModeType.OPTIMISTIC)
     @Query(value = "select p from Product p where p.id = :id")
-    Optional<Product> findByIdForUpdate(@Param("id") Long id);
+    Optional<Product> findByIdWithOptimisticLock(@Param("id") Long id);
 
     Product findFirstByOrderByPriceDesc();
 
