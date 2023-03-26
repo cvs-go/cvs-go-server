@@ -17,12 +17,12 @@ public class SellAtResponseDto {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private final EventType eventType;
 
-    private SellAtResponseDto(ConvenienceStore convenienceStore, Event eventType) {
-        this.name = convenienceStore.getName();
-        this.eventType = eventType != null ? eventType.getEventType() : null;
+    private SellAtResponseDto(String convenienceStoreName, EventType eventType) {
+        this.name = convenienceStoreName;
+        this.eventType = eventType;
     }
 
-    public static SellAtResponseDto of(ConvenienceStore convenienceStore, Event event) {
-        return new SellAtResponseDto(convenienceStore, event);
+    public static SellAtResponseDto of(String convenienceStoreName, EventType eventType) {
+        return new SellAtResponseDto(convenienceStoreName, eventType);
     }
 }

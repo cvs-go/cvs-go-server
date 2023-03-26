@@ -5,14 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
+import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
@@ -39,8 +42,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -81,14 +82,13 @@ class ProductServiceTest {
             .build();
 
         given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
-        given(sellAtRepository.findByProductId(any())).willReturn(List.of(sellAt1));
-        given(eventRepository.findByProductAndConvenienceStore(any(), any())).willReturn(bogoEvent);
+        given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
-        Page<ProductResponseDto> result = productService.getProductList(user, request, pageable);
+        List<ProductResponseDto> result = productService.getProductList(user, request, pageable);
+        assertEquals(result.size(), getProductList().size());
 
-        assertEquals(result.getTotalElements(), getProductList().getTotalElements());
         then(productRepository).should(times(1)).searchByFilter(any(), any(), any());
-        then(eventRepository).should(times(1)).findByProductAndConvenienceStore(any(), any());
+        then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
     }
 
     @Test
@@ -244,10 +244,34 @@ class ProductServiceTest {
         .product(product1)
         .build();
 
-    private Page<ProductResponseDto> getProductList() {
-        Pageable pageable = PageRequest.of(0, 20);
-        ProductResponseDto productResponse1 = ProductResponseDto.of(product1, 1, null, 13L, 2.5);
-        return new PageImpl<>(List.of(productResponse1), pageable, 2);
+    SearchProductQueryDto productResponse1 = SearchProductQueryDto.builder()
+        .productId(13L)
+        .productName(product1.getName())
+        .productBookmark(productBookmark)
+        .productLike(productLike)
+        .productImageUrl(product1.getImageUrl())
+        .reviewCount(13L)
+        .avgRating(2.5)
+        .build();
+
+    ConvenienceStoreEventQueryDto cvsEvent1 =
+        new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
+            "GS25", EventType.BOGO);
+
+    ConvenienceStoreEventQueryDto cvsEvent2 =
+        new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
+            "CU", EventType.DISCOUNT);
+
+    ConvenienceStoreEventQueryDto cvsEvent3 =
+        new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
+            "Emart24", null);
+
+    private List<SearchProductQueryDto> getProductList() {
+        return List.of(productResponse1);
+    }
+
+    private List<ConvenienceStoreEventQueryDto> getCvsEventList() {
+        return List.of(cvsEvent1, cvsEvent2, cvsEvent3);
     }
 
 }
