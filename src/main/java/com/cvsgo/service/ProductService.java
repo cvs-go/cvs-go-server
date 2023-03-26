@@ -3,6 +3,7 @@ package com.cvsgo.service;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 
 import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
 import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
@@ -10,6 +11,7 @@ import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchFilter;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
 import com.cvsgo.entity.Category;
@@ -24,8 +26,9 @@ import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,16 +50,35 @@ public class ProductService {
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public Page<ProductResponseDto> getProductList(User user,
-        ProductSearchRequestDto request, Pageable pageable) {
-        Page<ProductResponseDto> products = productRepository.searchByFilter(user,
-            convertRequestToFilter(request), pageable);
-        products.stream().forEach(productResponseDto -> productResponseDto.setSellAt(
-            sellAtRepository.findByProductId(productResponseDto.getProductId()).stream().map(
-                sellAt -> SellAtResponseDto.of(sellAt.getConvenienceStore(),
-                    eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
-                        sellAt.getConvenienceStore()))).toList()));
-        return products;
+    public List<ProductResponseDto> getProductList(User user, ProductSearchRequestDto request,
+        Pageable pageable) {
+        List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
+            request, pageable);
+        List<Long> productIds = products.stream().map(SearchProductQueryDto::getProductId).toList();
+
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents =
+            productRepository.findConvenienceStoreEventsByProductIds(productIds);
+
+        Map<Long, List<ConvenienceStoreEventQueryDto>> productCvsEventsMap =
+            convenienceStoreEvents.stream().collect(Collectors.groupingBy(
+                ConvenienceStoreEventQueryDto::getProductId));
+
+        return products.stream().map(p -> ProductResponseDto.builder()
+            .productId(p.getProductId())
+            .productName(p.getProductName())
+            .productPrice(p.getProductPrice())
+            .productImageUrl(p.getProductImageUrl())
+            .categoryId(p.getCategoryId())
+            .manufacturerName(p.getManufacturerName())
+            .isLiked(p.getIsLiked())
+            .isBookmarked(p.getIsBookmarked())
+            .reviewCount(p.getReviewCount())
+            .reviewRating(p.getAvgRating())
+            .sellAt(productCvsEventsMap.get(p.getProductId()).stream()
+                .map(c -> SellAtResponseDto.of(c.getConvenienceStoreName(), c.getEventType()))
+                .toList())
+            .build()
+        ).toList();
     }
 
     /**

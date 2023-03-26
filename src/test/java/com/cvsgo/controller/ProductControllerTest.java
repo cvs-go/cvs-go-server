@@ -104,7 +104,7 @@ class ProductControllerTest {
             .highestPrice(1000)
             .build();
 
-        Page<ProductResponseDto> responseDto = new PageImpl<>(createProductsResponse());
+        List<ProductResponseDto> responseDto = createProductsResponse();
         given(productService.getProductList(any(), any(), any())).willReturn(responseDto);
 
         mockMvc.perform(get("/api/products")
@@ -123,18 +123,18 @@ class ProductControllerTest {
                     fieldWithPath("highestPrice").type(JsonFieldType.NUMBER).description("최고 가격")
                 ),
                 relaxedResponseFields(
-                    fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                    fieldWithPath("data.content[].productName").type(JsonFieldType.STRING).description("상품명"),
-                    fieldWithPath("data.content[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
-                    fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
-                    fieldWithPath("data.content[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
-                    fieldWithPath("data.content[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
-                    fieldWithPath("data.content[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
-                    fieldWithPath("data.content[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data.content[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
-                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
-                    fieldWithPath("data.content[].sellAt[].name").type(JsonFieldType.STRING).description("판매 편의점"),
-                    fieldWithPath("data.content[].sellAt[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
+                    fieldWithPath("data[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data[].productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
+                    fieldWithPath("data[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
+                    fieldWithPath("data[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
+                    fieldWithPath("data[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
+                    fieldWithPath("data[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
+                    fieldWithPath("data[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
+                    fieldWithPath("data[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
+                    fieldWithPath("data[].sellAt[].name").type(JsonFieldType.STRING).description("판매 편의점"),
+                    fieldWithPath("data[].sellAt[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
                 )
             ));
     }
@@ -290,19 +290,21 @@ class ProductControllerTest {
         .build();
 
     private List<ProductResponseDto> createProductsResponse() {
-        ProductResponseDto productResponse1 = ProductResponseDto.of(product1, 1, null, 15L, 2.5);
-        productResponse1.setSellAt(
-            List.of(SellAtResponseDto.of(cvs1, bogoEvent), SellAtResponseDto.of(cvs2, btgoEvent),
-                SellAtResponseDto.of(cvs3, null)));
-        ProductResponseDto productResponse2 = ProductResponseDto.of(product2, null, 1, 1L, 5.0);
-        productResponse2.setSellAt(List.of(SellAtResponseDto.of(cvs1, giftEvent),
-            SellAtResponseDto.of(cvs2, discountEvent)));
+        ProductResponseDto productResponse1 = ProductResponseDto.of(product1, false, false, 15L, 2.5,
+            List.of(SellAtResponseDto.of(cvs1.getName(), bogoEvent.getEventType()),
+                SellAtResponseDto.of(cvs2.getName(), btgoEvent.getEventType()),
+                SellAtResponseDto.of(cvs3.getName(), null)));
+        ProductResponseDto productResponse2 = ProductResponseDto.of(product2, false, true, 1L, 5.0,
+            List.of(SellAtResponseDto.of(cvs1.getName(), giftEvent.getEventType()),
+                SellAtResponseDto.of(cvs2.getName(), discountEvent.getEventType())));
         return List.of(productResponse1, productResponse2);
     }
 
     private ProductDetailResponseDto getProductResponse() {
-        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1, manufacturer1, productLike, productBookmark);
-        productDetailResponse.setSellAts(List.of(SellAtEventResponseDto.of(cvs1, bogoEvent), SellAtEventResponseDto.of(cvs2, discountEvent),
+        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1,
+            manufacturer1, productLike, productBookmark);
+        productDetailResponse.setSellAts(List.of(SellAtEventResponseDto.of(cvs1, bogoEvent),
+            SellAtEventResponseDto.of(cvs2, discountEvent),
             SellAtEventResponseDto.of(cvs3, null)));
         return productDetailResponse;
     }

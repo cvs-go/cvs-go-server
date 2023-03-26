@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
 public class ProductResponseDto {
 
@@ -24,24 +23,24 @@ public class ProductResponseDto {
     private List<SellAtResponseDto> sellAt;
 
     @Builder
-    @QueryProjection
     public ProductResponseDto(Long productId, String productName, Integer productPrice,
-        String productImageUrl, Long categoryId, String manufacturerName, Integer isLiked,
-        Integer isBookmarked, Long reviewCount, Double reviewRating) {
+        String productImageUrl, Long categoryId, String manufacturerName, Boolean isLiked,
+        Boolean isBookmarked, Long reviewCount, Double reviewRating, List<SellAtResponseDto> sellAt) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
         this.productImageUrl = productImageUrl;
         this.categoryId = categoryId;
         this.manufacturerName = manufacturerName;
-        this.isLiked = isLiked != null ? Boolean.TRUE : Boolean.FALSE;
-        this.isBookmarked = isBookmarked != null ? Boolean.TRUE : Boolean.FALSE;
+        this.isLiked = isLiked;
         this.reviewCount = reviewCount.intValue();
+        this.isBookmarked = isBookmarked;
         this.reviewRating = reviewRating(reviewRating);
+        this.sellAt = sellAt;
     }
 
-    public static ProductResponseDto of(Product product, Integer isLiked, Integer isBookmarked,
-        Long reviewCount, Double reviewRating) {
+    public static ProductResponseDto of(Product product, Boolean isLiked, Boolean isBookmarked,
+        Long reviewCount, Double reviewRating, List<SellAtResponseDto> sellAt) {
         return ProductResponseDto.builder()
             .productId(product.getId())
             .productName(product.getName())
@@ -53,6 +52,7 @@ public class ProductResponseDto {
             .isBookmarked(isBookmarked)
             .reviewCount(reviewCount)
             .reviewRating(reviewRating)
+            .sellAt(sellAt)
             .build();
     }
 
