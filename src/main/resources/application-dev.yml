@@ -8,6 +8,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MariaDB102Dialect
+        default_batch_fetch_size: 1000
 jwt:
   secret-key: ${SECRET_KEY}
 cloud:
