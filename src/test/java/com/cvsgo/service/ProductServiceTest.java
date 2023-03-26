@@ -1,8 +1,10 @@
 package com.cvsgo.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -25,9 +27,11 @@ import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.product.NotFoundProductException;
+import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
+import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
 import java.util.List;
@@ -59,6 +63,9 @@ class ProductServiceTest {
     @Mock
     private CategoryRepository categoryRepository;
 
+    @Mock
+    private ProductLikeRepository productLikeRepository;
+
     @InjectMocks
     private ProductService productService;
 
@@ -88,7 +95,8 @@ class ProductServiceTest {
     @DisplayName("상품을 정상적으로 조회한다")
     void succeed_to_read_product() {
         given(productRepository.findByProductId(any(), any())).willReturn(
-            Optional.of(ProductDetailResponseDto.of(product1, manufacturer1, productLike, productBookmark)));
+            Optional.of(ProductDetailResponseDto.of(product1, manufacturer1, productLike,
+                productBookmark)));
         given(sellAtRepository.findByProductId(any())).willReturn(List.of(sellAt1));
         given(eventRepository.findByProductAndConvenienceStore(any(), any())).willReturn(bogoEvent);
 
@@ -107,6 +115,75 @@ class ProductServiceTest {
         assertThrows(NotFoundProductException.class, () -> productService.readProduct(user, 1000L));
 
         then(productRepository).should(times(1)).findByProductId(any(), any());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요를 정상적으로 생성한다")
+    void succeed_to_create_product_like() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willReturn(Optional.of(product1));
+        given(productLikeRepository.save(any())).willReturn(any());
+
+        Long beforeLikeCount = product1.getLikeCount();
+        productService.createProductLike(user, 1L);
+        Long afterLikeCount = product1.getLikeCount();
+
+        then(productRepository).should(times(1)).findByIdWithOptimisticLock(1L);
+        then(productLikeRepository).should(times(1)).save(any());
+        assertThat(afterLikeCount).isSameAs(beforeLikeCount + 1);
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 생성 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
+    void should_throw_NotFoundProductException_when_create_product_like_and_product_does_not_exist() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willThrow(NotFoundProductException.class);
+
+        assertThrows(NotFoundProductException.class,
+            () -> productService.createProductLike(user, 1000L));
+
+        then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요를 정상적으로 삭제한다")
+    void succeed_to_delete_product_like() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willReturn(Optional.of(product1));
+        given(productLikeRepository.findByProductAndUser(any(), any())).willReturn(
+            Optional.of(productLike));
+
+        Long beforeLikeCount = product1.getLikeCount();
+        productService.deleteProductLike(user, 1L);
+        Long afterLikeCount = product1.getLikeCount();
+
+        then(productRepository).should(times(1)).findByIdWithOptimisticLock(1L);
+        then(productLikeRepository).should(times(1)).findByProductAndUser(any(), any());
+        then(productLikeRepository).should(times(1)).delete(any());
+        assertThat(afterLikeCount).isSameAs(beforeLikeCount - 1);
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 삭제 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
+    void should_throw_NotFoundProductException_when_delete_product_like_and_product_does_not_exist() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willThrow(NotFoundProductException.class);
+
+        assertThrows(NotFoundProductException.class,
+            () -> productService.deleteProductLike(user, 1000L));
+
+        then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
+    }
+
+
+    @Test
+    @DisplayName("해당하는 상품 좋아요가 없는 경우 NotFoundProductLikeException이 발생한다")
+    void should_throw_NotFoundProductLikeException_when_product_like_does_not_exist() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willReturn(Optional.of(product1));
+        given(productLikeRepository.findByProductAndUser(any(), any())).willReturn(
+            Optional.empty());
+
+        assertThrows(NotFoundProductLikeException.class,
+            () -> productService.deleteProductLike(user, 1L));
+
+        then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
+        then(productLikeRepository).should(times(1)).findByProductAndUser(any(), any());
     }
 
     @Test

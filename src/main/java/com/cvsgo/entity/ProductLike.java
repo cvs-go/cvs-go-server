@@ -37,4 +37,11 @@ public class ProductLike extends BaseTimeEntity {
         this.user = user;
         this.product = product;
     }
+
+    public static ProductLike create(User user, Product product) {
+        return ProductLike.builder()
+            .user(user)
+            .product(product)
+            .build();
+    }
 }

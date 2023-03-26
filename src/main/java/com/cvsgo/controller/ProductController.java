@@ -8,13 +8,21 @@ import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
+
+import jakarta.persistence.OptimisticLockException;
+import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -34,6 +42,29 @@ public class ProductController {
     public SuccessResponse<ProductDetailResponseDto> readProduct(@LoginUser User user,
         @PathVariable Long productId) {
         return SuccessResponse.from(productService.readProduct(user, productId));
+    }
+
+    @PostMapping("/{productId}/likes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SuccessResponse<Void> createProductLike(@LoginUser User user,
+        @PathVariable Long productId) {
+        try {
+            productService.createProductLike(user, productId);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return createProductLike(user, productId);
+        }
+        return SuccessResponse.create();
+    }
+
+    @DeleteMapping("/{productId}/likes")
+    public SuccessResponse<Void> deleteProductLike(@LoginUser User user,
+        @PathVariable Long productId) {
+        try {
+            productService.deleteProductLike(user, productId);
+        } catch (ObjectOptimisticLockingFailureException e) {
+            return deleteProductLike(user, productId);
+        }
+        return SuccessResponse.create();
     }
 
     @GetMapping("/filter")
