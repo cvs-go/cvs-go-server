@@ -28,4 +28,10 @@ public class ProductExceptionHandler {
         return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DuplicateProductBookmarkException.class)
+    public ErrorResponse handleDuplicateProductBookmarkException(DuplicateProductBookmarkException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
+    }
+
 }

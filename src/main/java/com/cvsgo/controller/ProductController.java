@@ -8,12 +8,8 @@ import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
-
-import jakarta.persistence.OptimisticLockException;
-import org.hibernate.dialect.lock.OptimisticEntityLockException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -65,6 +61,14 @@ public class ProductController {
         } catch (ObjectOptimisticLockingFailureException e) {
             return deleteProductLike(user, productId);
         }
+        return SuccessResponse.create();
+    }
+
+    @PostMapping("/{productId}/bookmarks")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SuccessResponse<Void> createProductBookmark(@LoginUser User user,
+        @PathVariable Long productId) {
+        productService.createProductBookmark(user, productId);
         return SuccessResponse.create();
     }
 
