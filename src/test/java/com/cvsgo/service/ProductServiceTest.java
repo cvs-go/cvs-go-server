@@ -26,6 +26,7 @@ import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.product.NotFoundProductBookmarkException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
@@ -211,6 +212,46 @@ class ProductServiceTest {
             () -> productService.createProductBookmark(user, 1000L));
 
         then(productRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("상품 북마크를 정상적으로 삭제한다")
+    void succeed_to_delete_product_bookmark() {
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
+        given(productBookmarkRepository.findByProductAndUser(any(), any())).willReturn(
+            Optional.of(productBookmark));
+
+        productService.deleteProductBookmark(user, 1L);
+
+        then(productRepository).should(times(1)).findById(1L);
+        then(productBookmarkRepository).should(times(1)).findByProductAndUser(any(), any());
+        then(productBookmarkRepository).should(times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("상품 북마크 삭제 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
+    void should_throw_NotFoundProductException_when_delete_product_bookmark_and_product_does_not_exist() {
+        given(productRepository.findById(anyLong())).willThrow(NotFoundProductException.class);
+
+        assertThrows(NotFoundProductException.class,
+            () -> productService.deleteProductBookmark(user, 1000L));
+
+        then(productRepository).should(times(1)).findById(any());
+    }
+
+
+    @Test
+    @DisplayName("해당하는 상품 북마크가 없는 경우 NotFoundProductBookmarkException이 발생한다")
+    void should_throw_NotFoundProductBookmarkException_when_product_bookmark_does_not_exist() {
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
+        given(productBookmarkRepository.findByProductAndUser(any(), any())).willReturn(
+            Optional.empty());
+
+        assertThrows(NotFoundProductBookmarkException.class,
+            () -> productService.deleteProductBookmark(user, 1L));
+
+        then(productRepository).should(times(1)).findById(any());
+        then(productBookmarkRepository).should(times(1)).findByProductAndUser(any(), any());
     }
 
     @Test
