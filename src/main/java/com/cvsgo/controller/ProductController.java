@@ -72,6 +72,13 @@ public class ProductController {
         return SuccessResponse.create();
     }
 
+    @DeleteMapping("/{productId}/bookmarks")
+    public SuccessResponse<Void> deleteProductBookmark(@LoginUser User user,
+        @PathVariable Long productId) {
+        productService.deleteProductBookmark(user, productId);
+        return SuccessResponse.create();
+    }
+
     @GetMapping("/filter")
     public SuccessResponse<ProductFilterResponseDto> getProductFilter() {
         return SuccessResponse.from(productService.getProductFilter());

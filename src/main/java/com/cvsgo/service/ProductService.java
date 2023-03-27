@@ -3,6 +3,7 @@ package com.cvsgo.service;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 
 import com.cvsgo.dto.product.CategoryResponseDto;
@@ -26,6 +27,7 @@ import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.product.DuplicateProductBookmarkException;
 import com.cvsgo.exception.product.DuplicateProductLikeException;
+import com.cvsgo.exception.product.NotFoundProductBookmarkException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
@@ -174,6 +176,24 @@ public class ProductService {
         } catch (DataIntegrityViolationException e) {
             throw DUPLICATE_PRODUCT_BOOKMARK;
         }
+    }
+
+    /**
+     * 상품 북마크를 삭제한다.
+     *
+     * @param user      로그인한 사용자
+     * @param productId 상품 ID
+     * @throws NotFoundProductException         해당하는 아이디를 가진 상품이 없는 경우
+     * @throws NotFoundProductBookmarkException 해당하는 상품 북마크가 없는 경우
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteProductBookmark(User user, Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> NOT_FOUND_PRODUCT);
+
+        ProductBookmark productBookmark = productBookmarkRepository.findByProductAndUser(product,
+            user).orElseThrow(() -> NOT_FOUND_PRODUCT_BOOKMARK);
+        productBookmarkRepository.delete(productBookmark);
     }
 
     /**
