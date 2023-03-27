@@ -3,7 +3,9 @@ package com.cvsgo.exception;
 import com.cvsgo.exception.auth.InvalidPasswordException;
 import com.cvsgo.exception.auth.NotFoundUserException;
 import com.cvsgo.exception.auth.UnauthorizedUserException;
+import com.cvsgo.exception.product.DuplicateProductBookmarkException;
 import com.cvsgo.exception.product.DuplicateProductLikeException;
+import com.cvsgo.exception.product.NotFoundProductBookmarkException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.exception.user.DuplicateEmailException;
@@ -19,5 +21,7 @@ public interface ExceptionConstants {
     NotFoundProductException NOT_FOUND_PRODUCT = new NotFoundProductException(ErrorCode.NOT_FOUND_PRODUCT);
     DuplicateProductLikeException DUPLICATE_PRODUCT_LIKE = new DuplicateProductLikeException(ErrorCode.DUPLICATE_PRODUCT_LIKE);
     NotFoundProductLikeException NOT_FOUND_PRODUCT_LIKE = new NotFoundProductLikeException(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
+    DuplicateProductBookmarkException DUPLICATE_PRODUCT_BOOKMARK = new DuplicateProductBookmarkException(ErrorCode.DUPLICATE_PRODUCT_BOOKMARK);
+    NotFoundProductBookmarkException NOT_FOUND_PRODUCT_BOOKMARK = new NotFoundProductBookmarkException(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
 
 }
