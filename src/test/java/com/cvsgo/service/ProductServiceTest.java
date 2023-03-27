@@ -31,6 +31,7 @@ import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.EventRepository;
+import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.SellAtRepository;
@@ -65,6 +66,9 @@ class ProductServiceTest {
 
     @Mock
     private ProductLikeRepository productLikeRepository;
+
+    @Mock
+    private ProductBookmarkRepository productBookmarkRepository;
 
     @InjectMocks
     private ProductService productService;
@@ -184,6 +188,29 @@ class ProductServiceTest {
 
         then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
         then(productLikeRepository).should(times(1)).findByProductAndUser(any(), any());
+    }
+
+    @Test
+    @DisplayName("상품 북마크를 정상적으로 생성한다")
+    void succeed_to_create_product_bookmark() {
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
+        given(productBookmarkRepository.save(any())).willReturn(any());
+
+        productService.createProductBookmark(user, 1L);
+
+        then(productRepository).should(times(1)).findById(1L);
+        then(productBookmarkRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("상품 북마크 생성 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
+    void should_throw_NotFoundProductException_when_create_product_bookmark_and_product_does_not_exist() {
+        given(productRepository.findById(anyLong())).willThrow(NotFoundProductException.class);
+
+        assertThrows(NotFoundProductException.class,
+            () -> productService.createProductBookmark(user, 1000L));
+
+        then(productRepository).should(times(1)).findById(any());
     }
 
     @Test

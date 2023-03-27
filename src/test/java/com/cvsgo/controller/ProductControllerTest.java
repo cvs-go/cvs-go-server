@@ -51,8 +51,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -203,6 +201,22 @@ class ProductControllerTest {
         mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/products/{productId}/likes", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("productId").description("상품 ID")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("상품 북마크 생성에 성공하면 HTTP 201을 응답한다")
+    void respond_201_when_create_product_bookmark_succeed() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/products/{productId}/bookmarks", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
             .andDo(print())
             .andDo(document(documentIdentifier,
                 getDocumentRequest(),
