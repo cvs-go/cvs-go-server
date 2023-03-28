@@ -59,11 +59,13 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     private static OrderSpecifier<?> sortBy(ReviewSortBy sortBy) {
-        return switch (sortBy) {
-            case RATING -> review.rating.desc();
-            case LIKE -> review.likeCount.desc();
-            default -> review.createdAt.desc();
-        };
+        return sortBy != null ?
+            switch (sortBy) {
+                case RATING -> review.rating.desc();
+                case LIKE -> review.likeCount.desc();
+                case LATEST -> review.createdAt.desc();
+            }
+            : review.createdAt.desc();
     }
 
     BooleanExpression categoryIn(List<Long> categoryIds) {
