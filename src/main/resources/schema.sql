@@ -156,6 +156,7 @@ create table user (
                       password varchar(40) not null,
                       role varchar(20) not null,
                       user_id varchar(50) not null unique,
+                      profile_image_url varchar(255),
                       created_at datetime,
                       modified_at datetime,
                       primary key (id)
