@@ -188,3 +188,21 @@ include::{snippets}/review-controller-test/respond_201_when_success_to_create_re
 | `400 BAD REQUEST` |`NOT_FOUND_PRODUCT` | 해당하는 상품이 없는 경우
 | `500 INTERNAL SERVER ERROR` |`INTERNAL_SERVER_ERROR` | 서버 내부적인 오류가 발생한 경우
 |===
+
+=== 4-2. 리뷰 목록 조회
+==== Request Fields
+include::{snippets}/review-controller-test/respond_200_when_success_to_read_reviews/request-fields.adoc[]
+==== 정렬 기준 항목
+|===
+| sortBy 값 | 정렬 기준 | 비고
+
+| LATEST | 최신순  | 정렬 기준 미지정시 기본값
+| LIKE | 좋아요순 |
+| RATING | 별점순 |
+|===
+==== Sample Request
+include::{snippets}/review-controller-test/respond_200_when_success_to_read_reviews/http-request.adoc[]
+==== Response Fields
+include::{snippets}/review-controller-test/respond_200_when_success_to_read_reviews/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/review-controller-test/respond_200_when_success_to_read_reviews/http-response.adoc[]
