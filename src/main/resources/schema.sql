@@ -111,6 +111,7 @@ create table review (
                         rating integer,
                         product_id bigint,
                         user_id bigint,
+                        like_count bigint default 0 not null,
                         primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
