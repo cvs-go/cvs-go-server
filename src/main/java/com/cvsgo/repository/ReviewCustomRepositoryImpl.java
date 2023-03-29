@@ -69,7 +69,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     BooleanExpression categoryIn(List<Long> categoryIds) {
-        return categoryIds != null && categoryIds.size() > 0
+        return categoryIds != null && !categoryIds.isEmpty()
             ? review.product.category.id.in(categoryIds)
             : null;
     }
@@ -83,7 +83,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     BooleanExpression userIn(List<Long> tagIds) {
-        return tagIds != null && tagIds.size() > 0
+        return tagIds != null && !tagIds.isEmpty()
             ? review.user.in(
                 selectDistinct(userTag.user)
                 .from(userTag)
@@ -92,7 +92,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     BooleanExpression ratingIn(List<Integer> ratings) {
-        return ratings != null && ratings.size() > 0
+        return ratings != null && !ratings.isEmpty()
             ? review.rating.in(ratings)
             : null;
     }
