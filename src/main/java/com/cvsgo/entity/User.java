@@ -45,6 +45,8 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
+    private String profileImageUrl;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserTag> userTags = new ArrayList<>();
 
