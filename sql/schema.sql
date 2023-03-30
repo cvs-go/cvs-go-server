@@ -154,7 +154,7 @@ create table tag (
 create table user (
                       id bigint not null auto_increment,
                       nickname varchar(16) not null unique,
-                      password varchar(40) not null,
+                      password varchar(255) not null,
                       role varchar(20) not null,
                       user_id varchar(50) not null unique,
                       profile_image_url varchar(255),
@@ -181,4 +181,11 @@ create table user_tag (
                           primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-ALTER TABLE event ADD UNIQUE unique_event_type_convenience_store_product (event_type, convenience_store_id, product_id);
+ALTER TABLE event ADD CONSTRAINT unique_event_type_convenience_store_product UNIQUE (event_type, convenience_store_id, product_id);
+ALTER TABLE product_bookmark ADD CONSTRAINT unique_user_product_bookmark UNIQUE (user_id, product_id);
+ALTER TABLE product_like ADD CONSTRAINT unique_user_product_like UNIQUE (user_id, product_id);
+ALTER TABLE review ADD CONSTRAINT unique_user_product_review UNIQUE (user_id, product_id);
+ALTER TABLE review_like ADD CONSTRAINT unique_user_product_review_like UNIQUE (user_id, review_id);
+ALTER TABLE sell_at ADD CONSTRAINT unique_convenience_store_product UNIQUE (convenience_store_id, product_id);
+ALTER TABLE user_follow ADD CONSTRAINT unique_following_follower UNIQUE (following_id, follower_id);
+ALTER TABLE user_tag ADD CONSTRAINT unique_user_tag UNIQUE (user_id, tag_id);
