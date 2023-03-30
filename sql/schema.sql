@@ -154,7 +154,7 @@ create table tag (
 create table user (
                       id bigint not null auto_increment,
                       nickname varchar(16) not null unique,
-                      password varchar(40) not null,
+                      password varchar(255) not null,
                       role varchar(20) not null,
                       user_id varchar(50) not null unique,
                       profile_image_url varchar(255),
