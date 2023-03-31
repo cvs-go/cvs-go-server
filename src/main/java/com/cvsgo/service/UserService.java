@@ -8,8 +8,10 @@ import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -38,17 +40,22 @@ public class UserService {
      */
     @Transactional
     public SignUpResponseDto signUp(SignUpRequestDto request) {
-        if (isDuplicatedEmail(request.getEmail())) {
-            log.info("중복된 이메일: '{}'", request.getEmail());
-            throw DUPLICATE_EMAIL;
-        }
-        if (isDuplicatedNickname(request.getNickname())) {
-            log.info("중복된 닉네임: '{}'", request.getNickname());
-            throw DUPLICATE_NICKNAME;
-        }
         List<Tag> tags = tagRepository.findAllById(request.getTagIds());
-        User user = userRepository.save(request.toEntity(passwordEncoder, tags));
-        return SignUpResponseDto.from(user);
+        try {
+            User user = userRepository.saveAndFlush(request.toEntity(passwordEncoder, tags));
+            return SignUpResponseDto.from(user);
+        } catch (DataIntegrityViolationException e) {
+            if (isDuplicatedEmail(request.getEmail())) {
+                log.info("중복된 이메일: '{}'", request.getEmail());
+                throw DUPLICATE_EMAIL;
+            }
+            if (isDuplicatedNickname(request.getNickname())) {
+                log.info("중복된 닉네임: '{}'", request.getNickname());
+                throw DUPLICATE_NICKNAME;
+            }
+            throw e;
+        }
+
     }
 
     /**
@@ -56,7 +63,7 @@ public class UserService {
      * @param email 이메일
      * @return 해당 이메일로 등록된 사용자 존재 여부
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     public Boolean isDuplicatedEmail(String email) {
         return userRepository.findByUserId(email).isPresent();
     }
@@ -66,7 +73,7 @@ public class UserService {
      * @param nickname 닉네임
      * @return 해당 닉네임을 가진 사용자 존재 여부
      */
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
     public Boolean isDuplicatedNickname(String nickname) {
         return userRepository.findByNickname(nickname).isPresent();
     }
