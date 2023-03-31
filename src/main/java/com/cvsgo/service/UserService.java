@@ -7,6 +7,8 @@ import com.cvsgo.entity.User;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import com.cvsgo.exception.user.DuplicateEmailException;
+import com.cvsgo.exception.user.DuplicateNicknameException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,8 +37,8 @@ public class UserService {
      *
      * @param request 등록할 사용자의 정보
      * @return 등록된 사용자 정보
-     * @throws com.cvsgo.exception.user.DuplicateEmailException 이메일이 중복된 경우
-     * @throws com.cvsgo.exception.user.DuplicateNicknameException 닉네임이 중복된 경우
+     * @throws DuplicateEmailException 이메일이 중복된 경우
+     * @throws DuplicateNicknameException 닉네임이 중복된 경우
      */
     @Transactional
     public SignUpResponseDto signUp(SignUpRequestDto request) {
