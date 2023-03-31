@@ -37,7 +37,7 @@ public class UserService {
      *
      * @param request 등록할 사용자의 정보
      * @return 등록된 사용자 정보
-     * @throws DuplicateEmailException 이메일이 중복된 경우
+     * @throws DuplicateEmailException    이메일이 중복된 경우
      * @throws DuplicateNicknameException 닉네임이 중복된 경우
      */
     @Transactional
@@ -62,6 +62,7 @@ public class UserService {
 
     /**
      * 이메일 중복 체크를 한다.
+     *
      * @param email 이메일
      * @return 해당 이메일로 등록된 사용자 존재 여부
      */
@@ -72,6 +73,7 @@ public class UserService {
 
     /**
      * 닉네임 중복 체크를 한다.
+     *
      * @param nickname 닉네임
      * @return 해당 닉네임을 가진 사용자 존재 여부
      */
