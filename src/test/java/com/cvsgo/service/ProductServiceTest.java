@@ -312,15 +312,10 @@ class ProductServiceTest {
         .product(product1)
         .build();
 
-    SearchProductQueryDto productResponse1 = SearchProductQueryDto.builder()
-        .productId(13L)
-        .productName(product1.getName())
-        .productBookmark(productBookmark)
-        .productLike(productLike)
-        .productImageUrl(product1.getImageUrl())
-        .reviewCount(13L)
-        .avgRating(2.5)
-        .build();
+    SearchProductQueryDto productResponse1 = new SearchProductQueryDto(product1.getId(),
+        product1.getName(), product1.getPrice(), product1.getImageUrl(),
+        product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark,
+        5L, 3.5);
 
     ConvenienceStoreEventQueryDto cvsEvent1 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
