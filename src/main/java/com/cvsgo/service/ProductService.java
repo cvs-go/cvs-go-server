@@ -67,31 +67,18 @@ public class ProductService {
         Pageable pageable) {
         List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
             request, pageable);
-        List<Long> productIds = products.stream().map(SearchProductQueryDto::getProductId).toList();
 
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents =
-            productRepository.findConvenienceStoreEventsByProductIds(productIds);
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
+            products.stream().map(SearchProductQueryDto::getProductId).toList());
 
-        Map<Long, List<ConvenienceStoreEventQueryDto>> productCvsEventsMap =
+        Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventByProduct =
             convenienceStoreEvents.stream().collect(Collectors.groupingBy(
                 ConvenienceStoreEventQueryDto::getProductId));
 
-        return products.stream().map(p -> ProductResponseDto.builder()
-            .productId(p.getProductId())
-            .productName(p.getProductName())
-            .productPrice(p.getProductPrice())
-            .productImageUrl(p.getProductImageUrl())
-            .categoryId(p.getCategoryId())
-            .manufacturerName(p.getManufacturerName())
-            .isLiked(p.getIsLiked())
-            .isBookmarked(p.getIsBookmarked())
-            .reviewCount(p.getReviewCount())
-            .reviewRating(p.getAvgRating())
-            .sellAt(productCvsEventsMap.get(p.getProductId()).stream()
-                .map(
+        return products.stream().map(productDto -> ProductResponseDto.of(productDto,
+            cvsEventByProduct.get(productDto.getProductId()).stream().map(
                     c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEventType()))
                 .toList())
-            .build()
         ).toList();
     }
 

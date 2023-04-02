@@ -1,6 +1,5 @@
 package com.cvsgo.dto.product;
 
-import com.cvsgo.entity.Product;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,13 +17,13 @@ public class ProductResponseDto {
     private final Boolean isBookmarked;
     private final Integer reviewCount;
     private final String reviewRating;
-    private List<ConvenienceStoreEventDto> sellAt;
+    private final List<ConvenienceStoreEventDto> convenienceStoreEvents;
 
     @Builder
     public ProductResponseDto(Long productId, String productName, Integer productPrice,
         String productImageUrl, Long categoryId, String manufacturerName, Boolean isLiked,
         Boolean isBookmarked, Long reviewCount, Double reviewRating,
-        List<ConvenienceStoreEventDto> sellAt) {
+        List<ConvenienceStoreEventDto> convenienceStoreEvents) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
@@ -35,23 +34,23 @@ public class ProductResponseDto {
         this.reviewCount = reviewCount.intValue();
         this.isBookmarked = isBookmarked;
         this.reviewRating = reviewRating(reviewRating);
-        this.sellAt = sellAt;
+        this.convenienceStoreEvents = convenienceStoreEvents;
     }
 
-    public static ProductResponseDto of(Product product, Boolean isLiked, Boolean isBookmarked,
-        Long reviewCount, Double reviewRating, List<ConvenienceStoreEventDto> sellAt) {
+    public static ProductResponseDto of(SearchProductQueryDto searchProductQueryDto,
+        List<ConvenienceStoreEventDto> convenienceStoreEvents) {
         return ProductResponseDto.builder()
-            .productId(product.getId())
-            .productName(product.getName())
-            .productPrice(product.getPrice())
-            .productImageUrl(product.getImageUrl())
-            .categoryId(product.getCategory().getId())
-            .manufacturerName(product.getManufacturer().getName())
-            .isLiked(isLiked)
-            .isBookmarked(isBookmarked)
-            .reviewCount(reviewCount)
-            .reviewRating(reviewRating)
-            .sellAt(sellAt)
+            .productId(searchProductQueryDto.getProductId())
+            .productName(searchProductQueryDto.getProductName())
+            .productPrice(searchProductQueryDto.getProductPrice())
+            .productImageUrl(searchProductQueryDto.getProductImageUrl())
+            .categoryId(searchProductQueryDto.getCategoryId())
+            .manufacturerName(searchProductQueryDto.getManufacturerName())
+            .isLiked(searchProductQueryDto.getIsLiked())
+            .isBookmarked(searchProductQueryDto.getIsBookmarked())
+            .reviewCount(searchProductQueryDto.getReviewCount())
+            .reviewRating(searchProductQueryDto.getAvgRating())
+            .convenienceStoreEvents(convenienceStoreEvents)
             .build();
     }
 
