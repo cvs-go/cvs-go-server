@@ -16,7 +16,7 @@ import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
-import com.cvsgo.dto.product.SellAtResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -88,7 +88,8 @@ public class ProductService {
             .reviewCount(p.getReviewCount())
             .reviewRating(p.getAvgRating())
             .sellAt(productCvsEventsMap.get(p.getProductId()).stream()
-                .map(c -> SellAtResponseDto.of(c.getConvenienceStoreName(), c.getEventType()))
+                .map(
+                    c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEventType()))
                 .toList())
             .build()
         ).toList();

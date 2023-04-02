@@ -1,11 +1,9 @@
 package com.cvsgo.dto.product;
 
 import com.cvsgo.entity.Product;
-import com.querydsl.core.annotations.QueryProjection;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class ProductResponseDto {
@@ -20,12 +18,13 @@ public class ProductResponseDto {
     private final Boolean isBookmarked;
     private final Integer reviewCount;
     private final String reviewRating;
-    private List<SellAtResponseDto> sellAt;
+    private List<ConvenienceStoreEventDto> sellAt;
 
     @Builder
     public ProductResponseDto(Long productId, String productName, Integer productPrice,
         String productImageUrl, Long categoryId, String manufacturerName, Boolean isLiked,
-        Boolean isBookmarked, Long reviewCount, Double reviewRating, List<SellAtResponseDto> sellAt) {
+        Boolean isBookmarked, Long reviewCount, Double reviewRating,
+        List<ConvenienceStoreEventDto> sellAt) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
@@ -40,7 +39,7 @@ public class ProductResponseDto {
     }
 
     public static ProductResponseDto of(Product product, Boolean isLiked, Boolean isBookmarked,
-        Long reviewCount, Double reviewRating, List<SellAtResponseDto> sellAt) {
+        Long reviewCount, Double reviewRating, List<ConvenienceStoreEventDto> sellAt) {
         return ProductResponseDto.builder()
             .productId(product.getId())
             .productName(product.getName())

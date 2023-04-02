@@ -27,7 +27,7 @@ import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
-import com.cvsgo.dto.product.SellAtResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
@@ -353,12 +353,12 @@ class ProductControllerTest {
 
     private List<ProductResponseDto> createProductsResponse() {
         ProductResponseDto productResponse1 = ProductResponseDto.of(product1, false, false, 15L, 2.5,
-            List.of(SellAtResponseDto.of(cvs1.getName(), bogoEvent.getEventType()),
-                SellAtResponseDto.of(cvs2.getName(), btgoEvent.getEventType()),
-                SellAtResponseDto.of(cvs3.getName(), null)));
+            List.of(ConvenienceStoreEventDto.of(cvs1.getName(), bogoEvent.getEventType()),
+                ConvenienceStoreEventDto.of(cvs2.getName(), btgoEvent.getEventType()),
+                ConvenienceStoreEventDto.of(cvs3.getName(), null)));
         ProductResponseDto productResponse2 = ProductResponseDto.of(product2, false, true, 1L, 5.0,
-            List.of(SellAtResponseDto.of(cvs1.getName(), giftEvent.getEventType()),
-                SellAtResponseDto.of(cvs2.getName(), discountEvent.getEventType())));
+            List.of(ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent.getEventType()),
+                ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent.getEventType())));
         return List.of(productResponse1, productResponse2);
     }
 
