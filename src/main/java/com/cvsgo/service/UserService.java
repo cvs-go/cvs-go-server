@@ -71,7 +71,7 @@ public class UserService {
      * @return 해당 이메일로 등록된 사용자 존재 여부
      */
     @Transactional(readOnly = true)
-    public Boolean isDuplicatedEmail(String email) {
+    public boolean isDuplicatedEmail(String email) {
         return userRepository.findByUserId(email).isPresent();
     }
 
@@ -82,7 +82,7 @@ public class UserService {
      * @return 해당 닉네임을 가진 사용자 존재 여부
      */
     @Transactional(readOnly = true)
-    public Boolean isDuplicatedNickname(String nickname) {
+    public boolean isDuplicatedNickname(String nickname) {
         return userRepository.findByNickname(nickname).isPresent();
     }
 }
