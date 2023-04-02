@@ -32,8 +32,8 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<SearchProductQueryDto> searchByFilter(User user,
-        SearchProductRequestDto filter, Pageable pageable) {
+    public List<SearchProductQueryDto> searchByFilter(User loginUser,
+        SearchProductRequestDto searchFilter, Pageable pageable) {
         return queryFactory.select(new QSearchProductQueryDto(
                 product.id,
                 product.name,
@@ -47,9 +47,9 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 review.rating.avg()))
             .from(product)
             .leftJoin(productLike)
-            .on(productLike.product.eq(product).and(eqProductLikeUser(user)))
+            .on(productLike.product.eq(product).and(productLikeUserEq(loginUser)))
             .leftJoin(productBookmark)
-            .on(productBookmark.product.eq(product).and(eqProductBookmarkUser(user)))
+            .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
             .leftJoin(review).on(review.product.eq(product))
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(
@@ -58,11 +58,11 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         .from(sellAt)
                         .leftJoin(event).on(sellAt.product.eq(event.product))
                         .where(
-                            eqConvenienceStore(filter.getConvenienceStoreIds()),
-                            eqEventType(filter.getEventTypes()),
-                            eqCategory(filter.getCategoryIds()),
-                            priceLessOrEqual(filter.getHighestPrice()),
-                            priceGreaterOrEqual(filter.getLowestPrice())
+                            convenienceStoreEq(searchFilter.getConvenienceStoreIds()),
+                            eventTypeEq(searchFilter.getEventTypes()),
+                            categoryEq(searchFilter.getCategoryIds()),
+                            priceLessOrEqual(searchFilter.getHighestPrice()),
+                            priceGreaterOrEqual(searchFilter.getLowestPrice())
                         ))
             )
             .groupBy(product)
@@ -102,27 +102,27 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetchFirst());
     }
 
-    private BooleanExpression eqProductLikeUser(User user) {
+    private BooleanExpression productLikeUserEq(User user) {
         return user != null ? productLike.user.eq(user) : null;
     }
 
-    private BooleanExpression eqProductBookmarkUser(User user) {
+    private BooleanExpression productBookmarkUserEq(User user) {
         return user != null ? productBookmark.user.eq(user) : null;
     }
 
-    private BooleanExpression eqConvenienceStore(List<Long> convenienceStoreIds) {
+    private BooleanExpression convenienceStoreEq(List<Long> convenienceStoreIds) {
         return convenienceStoreIds != null && convenienceStoreIds.size() > 0
             ? sellAt.convenienceStore.id.in(convenienceStoreIds)
             : null;
     }
 
-    private BooleanExpression eqCategory(List<Long> categoryIds) {
+    private BooleanExpression categoryEq(List<Long> categoryIds) {
         return categoryIds != null && categoryIds.size() > 0
             ? product.category.id.in(categoryIds)
             : null;
     }
 
-    private BooleanExpression eqEventType(List<EventType> eventTypes) {
+    private BooleanExpression eventTypeEq(List<EventType> eventTypes) {
         return eventTypes != null && eventTypes.size() > 0
             ? event.eventType.in(eventTypes)
             : null;
