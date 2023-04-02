@@ -13,13 +13,10 @@ import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchFilter;
 import com.cvsgo.dto.product.ProductSearchRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
 import com.cvsgo.dto.product.SellAtResponseDto;
-import com.cvsgo.entity.Category;
-import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -213,14 +210,6 @@ public class ProductService {
 
         return ProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
             highestPrice);
-    }
-
-    private ProductSearchFilter convertRequestToFilter(ProductSearchRequestDto request) {
-        List<ConvenienceStore> convenienceStores = convenienceStoreRepository.findAllById(
-            request.getConvenienceStoreIds());
-        List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
-        return ProductSearchFilter.of(convenienceStores, categories, request.getEventTypes(),
-            request.getLowestPrice(), request.getHighestPrice());
     }
 
 }
