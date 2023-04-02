@@ -25,7 +25,7 @@ import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
@@ -95,7 +95,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
-        ProductSearchRequestDto request = ProductSearchRequestDto.builder()
+        SearchProductRequestDto request = SearchProductRequestDto.builder()
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))

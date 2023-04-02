@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
@@ -78,7 +78,7 @@ class ProductServiceTest {
     @DisplayName("상품 목록을 정상적으로 조회한다")
     void succeed_to_read_product_list() {
         Pageable pageable = PageRequest.of(0, 20);
-        ProductSearchRequestDto request = ProductSearchRequestDto.builder()
+        SearchProductRequestDto request = SearchProductRequestDto.builder()
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))

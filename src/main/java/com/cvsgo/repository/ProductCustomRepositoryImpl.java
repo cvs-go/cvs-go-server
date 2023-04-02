@@ -11,7 +11,7 @@ import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.QProductDetailResponseDto;
 import com.cvsgo.dto.product.QSearchProductQueryDto;
@@ -33,7 +33,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
     private final JPAQueryFactory queryFactory;
 
     public List<SearchProductQueryDto> searchByFilter(User user,
-        ProductSearchRequestDto filter, Pageable pageable) {
+        SearchProductRequestDto filter, Pageable pageable) {
         return queryFactory.select(new QSearchProductQueryDto(
                 product.id,
                 product.name,

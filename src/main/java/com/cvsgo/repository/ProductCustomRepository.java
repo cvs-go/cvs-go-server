@@ -2,7 +2,7 @@ package com.cvsgo.repository;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.entity.User;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductCustomRepository {
 
-    List<SearchProductQueryDto> searchByFilter(User user, ProductSearchRequestDto filter,
+    List<SearchProductQueryDto> searchByFilter(User user, SearchProductRequestDto filter,
         Pageable pageable);
 
     List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(

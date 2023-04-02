@@ -5,7 +5,7 @@ import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ProductController {
 
     @GetMapping
     public SuccessResponse<List<ProductResponseDto>> getProductList(@LoginUser User user,
-        @ModelAttribute ProductSearchRequestDto request, Pageable pageable) {
+        @ModelAttribute SearchProductRequestDto request, Pageable pageable) {
         return SuccessResponse.from(productService.getProductList(user, request, pageable));
     }
 

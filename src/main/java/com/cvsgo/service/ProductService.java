@@ -13,7 +13,7 @@ import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
@@ -63,7 +63,7 @@ public class ProductService {
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public List<ProductResponseDto> getProductList(User user, ProductSearchRequestDto request,
+    public List<ProductResponseDto> getProductList(User user, SearchProductRequestDto request,
         Pageable pageable) {
         List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
             request, pageable);
