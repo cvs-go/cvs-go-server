@@ -47,7 +47,7 @@ public class UserService {
     public SignUpResponseDto signUp(SignUpRequestDto request) {
         List<Tag> tags = tagRepository.findAllById(request.getTagIds());
         try {
-            User user = userRepository.saveAndFlush(request.toEntity(passwordEncoder, tags));
+            User user = userRepository.save(request.toEntity(passwordEncoder, tags));
             return SignUpResponseDto.from(user);
         } catch (DataIntegrityViolationException e) {
             entityManager.clear();
