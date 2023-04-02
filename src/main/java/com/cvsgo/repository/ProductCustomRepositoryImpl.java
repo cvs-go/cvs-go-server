@@ -111,19 +111,19 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
     }
 
     private BooleanExpression convenienceStoreEq(List<Long> convenienceStoreIds) {
-        return convenienceStoreIds != null && convenienceStoreIds.size() > 0
+        return convenienceStoreIds != null && !convenienceStoreIds.isEmpty()
             ? sellAt.convenienceStore.id.in(convenienceStoreIds)
             : null;
     }
 
     private BooleanExpression categoryEq(List<Long> categoryIds) {
-        return categoryIds != null && categoryIds.size() > 0
+        return categoryIds != null && !categoryIds.isEmpty()
             ? product.category.id.in(categoryIds)
             : null;
     }
 
     private BooleanExpression eventTypeEq(List<EventType> eventTypes) {
-        return eventTypes != null && eventTypes.size() > 0
+        return eventTypes != null && !eventTypes.isEmpty()
             ? event.eventType.in(eventTypes)
             : null;
     }
