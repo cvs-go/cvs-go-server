@@ -169,13 +169,13 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("해당 ID를 가진 상품이 존재하지 않으면 상품 상세 조회 API 호출시 HTTP 400를 응답한다")
-    void respond_400_when_product_does_not_exist() throws Exception {
+    @DisplayName("해당 ID를 가진 상품이 존재하지 않으면 상품 상세 조회 API 호출시 HTTP 404를 응답한다")
+    void respond_404_when_product_does_not_exist() throws Exception {
         given(productService.readProduct(any(), any())).willThrow(ExceptionConstants.NOT_FOUND_PRODUCT);
 
         mockMvc.perform(get("/api/products/{productId}", 1000L)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isNotFound())
             .andDo(print());
     }
 

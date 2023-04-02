@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ProductExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundProductException.class)
     public ErrorResponse handleProductNotFoundException(NotFoundProductException e) {
         return ErrorResponse.from(ErrorCode.NOT_FOUND_PRODUCT);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundProductLikeException.class)
     public ErrorResponse handleNotFoundProductLikeException(NotFoundProductLikeException e) {
         return ErrorResponse.from(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundProductBookmarkException.class)
     public ErrorResponse handleNotFoundProductBookmarkException(NotFoundProductBookmarkException e) {
         return ErrorResponse.from(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
