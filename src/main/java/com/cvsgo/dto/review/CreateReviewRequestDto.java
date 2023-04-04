@@ -34,12 +34,12 @@ public class CreateReviewRequestDto {
 
     public Review toEntity(User user, Product product, List<String> imageUrls) {
         return Review.builder()
-                .user(user)
-                .product(product)
-                .rating(rating)
-                .content(content)
-                .imageUrls(imageUrls)
-                .build();
+            .user(user)
+            .product(product)
+            .rating(rating)
+            .content(content)
+            .imageUrls(imageUrls)
+            .build();
     }
 
 }

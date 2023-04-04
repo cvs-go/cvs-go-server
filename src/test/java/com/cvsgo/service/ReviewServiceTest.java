@@ -93,10 +93,10 @@ class ReviewServiceTest {
     @DisplayName("해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
     void should_throw_NotFoundProductException_when_product_does_not_exist() {
         given(productRepository.findById(anyLong()))
-                .willThrow(NotFoundProductException.class);
+            .willThrow(NotFoundProductException.class);
 
         assertThrows(NotFoundProductException.class,
-                () -> reviewService.createReview(user1, 100L, createReviewRequestDto));
+            () -> reviewService.createReview(user1, 100L, createReviewRequestDto));
     }
 
     @Test
