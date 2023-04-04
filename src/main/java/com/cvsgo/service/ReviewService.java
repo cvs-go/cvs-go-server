@@ -91,8 +91,9 @@ public class ReviewService {
 
         return reviews.stream()
             .map(reviewDto -> SearchReviewResponseDto.of(reviewDto,
-                reviewImagesByReview.get(reviewDto.getReviewId()).stream()
-                    .map(ReviewImage::getImageUrl).toList(),
+                reviewImagesByReview.get(reviewDto.getReviewId()) != null
+                    ? reviewImagesByReview.get(reviewDto.getReviewId()).stream()
+                    .map(ReviewImage::getImageUrl).toList() : null,
                 userTagsByUser.get(reviewDto.getReviewer()).stream()
                     .map(userTag -> userTag.getTag().getName()).toList())
             ).toList();
