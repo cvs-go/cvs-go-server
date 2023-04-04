@@ -8,6 +8,7 @@ import com.cvsgo.exception.product.DuplicateProductLikeException;
 import com.cvsgo.exception.product.NotFoundProductBookmarkException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
+import com.cvsgo.exception.review.NotFoundReviewException;
 import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
 
@@ -23,5 +24,6 @@ public interface ExceptionConstants {
     NotFoundProductLikeException NOT_FOUND_PRODUCT_LIKE = new NotFoundProductLikeException(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
     DuplicateProductBookmarkException DUPLICATE_PRODUCT_BOOKMARK = new DuplicateProductBookmarkException(ErrorCode.DUPLICATE_PRODUCT_BOOKMARK);
     NotFoundProductBookmarkException NOT_FOUND_PRODUCT_BOOKMARK = new NotFoundProductBookmarkException(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
+    NotFoundReviewException NOT_FOUND_REVIEW = new NotFoundReviewException(ErrorCode.NOT_FOUND_REVIEW);
 
 }

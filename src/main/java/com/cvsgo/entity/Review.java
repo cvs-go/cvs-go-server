@@ -66,4 +66,22 @@ public class Review extends BaseTimeEntity {
         }
     }
 
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public void updateReviewImages(List<String> imageUrls) {
+        this.reviewImages.clear();
+        for (String imageUrl : imageUrls) {
+            this.reviewImages.add(ReviewImage.builder()
+                .review(this)
+                .imageUrl(imageUrl)
+                .build());
+        }
+    }
+
 }

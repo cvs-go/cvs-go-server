@@ -5,6 +5,7 @@ import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewResponseDto;
+import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ReviewService;
 
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,6 +45,13 @@ public class ReviewController {
     public SuccessResponse<List<SearchReviewResponseDto>> searchReviews(@LoginUser User user,
         @ModelAttribute SearchReviewRequestDto request, Pageable pageable) {
         return SuccessResponse.from(reviewService.getReviewList(user, request, pageable));
+    }
+
+    @PutMapping("/reviews/{reviewId}")
+    public SuccessResponse<Void> updateReview(@LoginUser User user, @PathVariable Long reviewId,
+        @ModelAttribute UpdateReviewRequestDto request) throws IOException {
+        reviewService.updateReview(user, reviewId, request);
+        return SuccessResponse.create();
     }
 
 }

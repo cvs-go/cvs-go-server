@@ -4,6 +4,7 @@ import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewQueryDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewResponseDto;
+import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.ReviewImage;
@@ -21,11 +22,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.cvsgo.exception.product.NotFoundProductException;
+import com.cvsgo.exception.auth.UnauthorizedUserException;
 
 import java.io.IOException;
 import java.util.List;
 
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.UNAUTHORIZED_USER;
+import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +66,31 @@ public class ReviewService {
 
         Review review = request.toEntity(user, product, imageUrls);
         reviewRepository.save(review);
+    }
+
+    /**
+     * 리뷰를 수정합니다.
+     *
+     * @param user     현재 로그인한 사용자
+     * @param reviewId 리뷰 ID
+     * @param request  수정할 리뷰 정보
+     * @throws UnauthorizedUserException 리뷰를 작성한 사용자가 아닌 경우
+     * @throws IOException               파일 접근에 실패한 경우
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateReview(User user, Long reviewId, UpdateReviewRequestDto request)
+        throws IOException {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
+
+        if (!user.equals(review.getUser())) {
+            throw UNAUTHORIZED_USER;
+        }
+
+        List<String> imageUrls = fileUploadService.upload(request.getImages(), REVIEW_DIR_NAME);
+
+        review.updateReviewImages(imageUrls);
+        review.updateContent(request.getContent());
+        review.updateRating(request.getRating());
     }
 
     /**
