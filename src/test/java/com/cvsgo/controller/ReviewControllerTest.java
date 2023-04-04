@@ -150,12 +150,13 @@ class ReviewControllerTest {
                     fieldWithPath("data[].productName").type(JsonFieldType.STRING).description("상품명"),
                     fieldWithPath("data[].productManufacturer").type(JsonFieldType.STRING).description("상품 제조사"),
                     fieldWithPath("data[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+                    fieldWithPath("data[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
                     fieldWithPath("data[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
                     fieldWithPath("data[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
                     fieldWithPath("data[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL"),
                     fieldWithPath("data[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
                     fieldWithPath("data[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
-                    fieldWithPath("data[].rating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
+                    fieldWithPath("data[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
                     fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
                     fieldWithPath("data[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
                     fieldWithPath("data[].isProductBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
@@ -237,10 +238,11 @@ class ReviewControllerTest {
         .productName("불닭볶음면큰컵")
         .productManufacturer("삼양")
         .productImageUrl("https://어쩌구저쩌구/product/불닭볶음면.jpg")
+        .reviewId(1L)
         .reviewerId(3L)
         .reviewerNickname("불닭러버")
         .reviewerProfileImageUrl("https://어쩌구저쩌구/user/불닭러버.jpg")
-        .rating(5)
+        .reviewRating(5)
         .reviewContent("맛있어요")
         .reviewLikeCount(3L)
         .isProductBookmarked(false)
@@ -254,10 +256,11 @@ class ReviewControllerTest {
         .productName("바질크림불닭우동")
         .productManufacturer("삼양")
         .productImageUrl("https://어쩌구저쩌구/product/바질크림불닭우동.jpg")
+        .reviewId(2L)
         .reviewerId(3L)
         .reviewerNickname("불닭러버")
         .reviewerProfileImageUrl("https://어쩌구저쩌구/user/불닭러버.jpg")
-        .rating(5)
+        .reviewRating(5)
         .reviewContent("이번에 신제품 출시되었다고 해서 출시되자마자 먹어봤는데 생각보다 훨씬 맛있었어요")
         .reviewImageUrls(List.of("https://어쩌구저쩌구/review/신제품너무맛있다.jpg"))
         .reviewLikeCount(1L)
