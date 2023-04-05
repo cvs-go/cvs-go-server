@@ -44,6 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -87,12 +88,14 @@ class ProductServiceTest {
             .build();
 
         given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
+        given(productRepository.countByFilter(any())).willReturn((long) getProductList().size());
         given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
-        List<ProductResponseDto> result = productService.getProductList(user, request, pageable);
-        assertEquals(result.size(), getProductList().size());
+        Page<ProductResponseDto> result = productService.getProductList(user, request, pageable);
+        assertEquals(result.getTotalElements(), getProductList().size());
 
         then(productRepository).should(times(1)).searchByFilter(any(), any(), any());
+        then(productRepository).should(times(1)).countByFilter(any());
         then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
     }
 

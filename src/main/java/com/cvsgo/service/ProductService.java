@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,10 +65,11 @@ public class ProductService {
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public List<ProductResponseDto> getProductList(User user, SearchProductRequestDto request,
+    public Page<ProductResponseDto> getProductList(User user, SearchProductRequestDto request,
         Pageable pageable) {
         List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
             request, pageable);
+        Long totalCount = productRepository.countByFilter(request);
 
         List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
             products.stream().map(SearchProductQueryDto::getProductId).toList());
@@ -75,11 +78,12 @@ public class ProductService {
             convenienceStoreEvents.stream().collect(Collectors.groupingBy(
                 ConvenienceStoreEventQueryDto::getProductId));
 
-        return products.stream().map(productDto -> ProductResponseDto.of(productDto,
-            cvsEventByProduct.get(productDto.getProductId()).stream().map(
-                    c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEventType()))
-                .toList())
-        ).toList();
+        List<ProductResponseDto> results = products.stream().map(
+            productDto -> ProductResponseDto.of(productDto,
+                cvsEventByProduct.get(productDto.getProductId()).stream().map(
+                        c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEventType()))
+                    .toList())).toList();
+        return new PageImpl<>(results, pageable, totalCount);
     }
 
     /**

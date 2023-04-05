@@ -53,6 +53,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -105,7 +107,7 @@ class ProductControllerTest {
             .highestPrice(1000)
             .build();
 
-        List<ProductResponseDto> responseDto = createProductsResponse();
+        Page<ProductResponseDto> responseDto = new PageImpl<>(createProductsResponse());
         given(productService.getProductList(any(), any(), any())).willReturn(responseDto);
 
         mockMvc.perform(get("/api/products")
@@ -125,18 +127,18 @@ class ProductControllerTest {
                     fieldWithPath("highestPrice").type(JsonFieldType.NUMBER).description("최고 가격")
                 ),
                 relaxedResponseFields(
-                    fieldWithPath("data[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                    fieldWithPath("data[].productName").type(JsonFieldType.STRING).description("상품명"),
-                    fieldWithPath("data[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
-                    fieldWithPath("data[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
-                    fieldWithPath("data[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
-                    fieldWithPath("data[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
-                    fieldWithPath("data[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
-                    fieldWithPath("data[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
-                    fieldWithPath("data[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
-                    fieldWithPath("data[].convenienceStoreEvents[].name").type(JsonFieldType.STRING).description("판매 편의점").optional(),
-                    fieldWithPath("data[].convenienceStoreEvents[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
+                    fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data.content[].productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data.content[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
+                    fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
+                    fieldWithPath("data.content[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
+                    fieldWithPath("data.content[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
+                    fieldWithPath("data.content[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
+                    fieldWithPath("data.content[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data.content[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
+                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].name").type(JsonFieldType.STRING).description("판매 편의점").optional(),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
                 )
             ));
     }

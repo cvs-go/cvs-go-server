@@ -83,6 +83,25 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
+    public Long countByFilter(SearchProductRequestDto searchFilter) {
+        return queryFactory.select(product.count())
+            .from(product)
+            .where(
+                product.in(
+                    selectDistinct(sellAt.product)
+                        .from(sellAt)
+                        .leftJoin(event).on(sellAt.product.eq(event.product))
+                        .where(
+                            convenienceStoreEq(searchFilter.getConvenienceStoreIds()),
+                            eventTypeEq(searchFilter.getEventTypes()),
+                            categoryEq(searchFilter.getCategoryIds()),
+                            priceLessOrEqual(searchFilter.getHighestPrice()),
+                            priceGreaterOrEqual(searchFilter.getLowestPrice())
+                        ))
+            )
+            .fetchFirst();
+    }
+
     public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
         List<Long> productIds) {
         return queryFactory
