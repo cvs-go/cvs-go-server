@@ -4,17 +4,17 @@ import com.cvsgo.entity.EventType;
 import lombok.Getter;
 
 @Getter
-public class EventTypeResponseDto {
+public class EventTypeDto {
 
     private final String value;
     private final String name;
 
-    private EventTypeResponseDto(EventType eventType) {
+    private EventTypeDto(EventType eventType) {
         this.value = eventType.getValue();
         this.name = eventType.getName();
     }
 
-    public static EventTypeResponseDto from(EventType eventType) {
-        return new EventTypeResponseDto(eventType);
+    public static EventTypeDto from(EventType eventType) {
+        return new EventTypeDto(eventType);
     }
 }

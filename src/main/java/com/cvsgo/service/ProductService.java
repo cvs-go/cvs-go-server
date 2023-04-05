@@ -6,11 +6,11 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 
-import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.CategoryDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
-import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreDto;
+import com.cvsgo.dto.product.EventTypeDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
@@ -192,12 +192,12 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public ProductFilterResponseDto getProductFilter() {
-        List<ConvenienceStoreResponseDto> convenienceStoreNames = convenienceStoreRepository.findAll()
-            .stream().map(ConvenienceStoreResponseDto::from).toList();
-        List<CategoryResponseDto> categoryNames = categoryRepository.findAll().stream()
-            .map(CategoryResponseDto::from).toList();
-        List<EventTypeResponseDto> eventTypes = Arrays.stream(EventType.values())
-            .map(EventTypeResponseDto::from).toList();
+        List<ConvenienceStoreDto> convenienceStoreNames = convenienceStoreRepository.findAll()
+            .stream().map(ConvenienceStoreDto::from).toList();
+        List<CategoryDto> categoryNames = categoryRepository.findAll().stream()
+            .map(CategoryDto::from).toList();
+        List<EventTypeDto> eventTypes = Arrays.stream(EventType.values())
+            .map(com.cvsgo.dto.product.EventTypeDto::from).toList();
         Integer highestPrice = productRepository.findFirstByOrderByPriceDesc().getPrice();
 
         return ProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,

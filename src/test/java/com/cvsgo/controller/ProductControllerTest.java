@@ -19,9 +19,9 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
-import com.cvsgo.dto.product.CategoryResponseDto;
-import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
-import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.CategoryDto;
+import com.cvsgo.dto.product.ConvenienceStoreDto;
+import com.cvsgo.dto.product.EventTypeDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
@@ -390,13 +390,13 @@ class ProductControllerTest {
     }
 
     private ProductFilterResponseDto getProductFilterResponse() {
-        List<ConvenienceStoreResponseDto> convenienceStores = List.of(
-            ConvenienceStoreResponseDto.from(cvs1), ConvenienceStoreResponseDto.from(cvs2),
-            ConvenienceStoreResponseDto.from(cvs3));
-        List<CategoryResponseDto> categories = List.of(CategoryResponseDto.from(category1),
-            CategoryResponseDto.from(category2));
-        List<EventTypeResponseDto> eventTypes = List.of(EventTypeResponseDto.from(EventType.BOGO),
-            EventTypeResponseDto.from(EventType.BTGO), EventTypeResponseDto.from(EventType.GIFT));
+        List<ConvenienceStoreDto> convenienceStores = List.of(
+            ConvenienceStoreDto.from(cvs1), ConvenienceStoreDto.from(cvs2),
+            ConvenienceStoreDto.from(cvs3));
+        List<CategoryDto> categories = List.of(CategoryDto.from(category1),
+            CategoryDto.from(category2));
+        List<EventTypeDto> eventTypes = List.of(com.cvsgo.dto.product.EventTypeDto.from(EventType.BOGO),
+            EventTypeDto.from(EventType.BTGO), com.cvsgo.dto.product.EventTypeDto.from(EventType.GIFT));
         Integer highestPrice = 10000;
         return ProductFilterResponseDto.of(convenienceStores, categories, eventTypes, highestPrice);
     }

@@ -1,19 +1,18 @@
 package com.cvsgo.dto.product;
 
-import com.cvsgo.entity.EventType;
 import java.util.List;
 import lombok.Getter;
 
 @Getter
 public class ProductFilterResponseDto {
 
-    private final List<ConvenienceStoreResponseDto> convenienceStores;
-    private final List<CategoryResponseDto> categories;
-    private final List<EventTypeResponseDto> eventTypes;
+    private final List<ConvenienceStoreDto> convenienceStores;
+    private final List<CategoryDto> categories;
+    private final List<EventTypeDto> eventTypes;
     private final Integer highestPrice;
 
-    private ProductFilterResponseDto(List<ConvenienceStoreResponseDto> convenienceStores,
-        List<CategoryResponseDto> categories, List<EventTypeResponseDto> eventTypes,
+    private ProductFilterResponseDto(List<ConvenienceStoreDto> convenienceStores,
+        List<CategoryDto> categories, List<EventTypeDto> eventTypes,
         Integer highestPrice) {
         this.convenienceStores = convenienceStores;
         this.categories = categories;
@@ -21,8 +20,8 @@ public class ProductFilterResponseDto {
         this.highestPrice = highestPrice;
     }
 
-    public static ProductFilterResponseDto of(List<ConvenienceStoreResponseDto> convenienceStores,
-        List<CategoryResponseDto> categories, List<EventTypeResponseDto> eventTypes,
+    public static ProductFilterResponseDto of(List<ConvenienceStoreDto> convenienceStores,
+        List<CategoryDto> categories, List<EventTypeDto> eventTypes,
         Integer highestPrice) {
         return new ProductFilterResponseDto(convenienceStores, categories, eventTypes,
             highestPrice);
