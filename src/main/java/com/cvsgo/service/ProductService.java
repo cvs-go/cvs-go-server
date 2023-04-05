@@ -7,16 +7,18 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 
 import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
 import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SellAtEventResponseDto;
-import com.cvsgo.dto.product.ConvenienceStoreEventDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.SellAtEventDto;
+import com.cvsgo.dto.product.SellAtEventQueryDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -29,11 +31,9 @@ import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
-import com.cvsgo.repository.EventRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
-import com.cvsgo.repository.SellAtRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,8 +52,6 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final EventRepository eventRepository;
-    private final SellAtRepository sellAtRepository;
     private final ConvenienceStoreRepository convenienceStoreRepository;
     private final ProductLikeRepository productLikeRepository;
     private final ProductBookmarkRepository productBookmarkRepository;
@@ -96,13 +94,15 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public ProductDetailResponseDto readProduct(User user, Long productId) {
-        ProductDetailResponseDto product = productRepository.findByProductId(user, productId)
+        SearchProductDetailQueryDto product = productRepository.findByProductId(user, productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
-        product.setSellAts(sellAtRepository.findByProductId(productId).stream().map(
-            sellAt -> SellAtEventResponseDto.of(sellAt.getConvenienceStore(),
-                eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
-                    sellAt.getConvenienceStore()))).toList());
-        return product;
+
+        List<SellAtEventQueryDto> sellAtEvents = productRepository.findSellAtEventsByProductId(
+            product.getProductId());
+
+        return ProductDetailResponseDto.of(product, sellAtEvents.stream().map(
+            s -> SellAtEventDto.of(s.getConvenienceStoreId(), s.getConvenienceStoreName(),
+                s.getEvent())).toList());
     }
 
     /**

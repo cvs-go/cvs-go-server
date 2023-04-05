@@ -2,6 +2,7 @@ package com.cvsgo.repository;
 
 import static com.cvsgo.entity.QEvent.event;
 import static com.cvsgo.entity.QManufacturer.manufacturer;
+import static com.cvsgo.entity.QConvenienceStore.convenienceStore;
 import static com.cvsgo.entity.QProduct.product;
 import static com.cvsgo.entity.QProductBookmark.productBookmark;
 import static com.cvsgo.entity.QProductLike.productLike;
@@ -10,13 +11,15 @@ import static com.cvsgo.entity.QSellAt.sellAt;
 import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.QProductDetailResponseDto;
+import com.cvsgo.dto.product.QSearchProductDetailQueryDto;
 import com.cvsgo.dto.product.QSearchProductQueryDto;
+import com.cvsgo.dto.product.QSellAtEventQueryDto;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.SellAtEventQueryDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.querydsl.core.types.OrderSpecifier;
@@ -116,21 +119,39 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Optional<ProductDetailResponseDto> findByProductId(User user, Long productId) {
+    public Optional<SearchProductDetailQueryDto> findByProductId(User loginUser, Long productId) {
         return Optional.ofNullable(queryFactory
-            .select(new QProductDetailResponseDto(
-                product.as("product"),
-                product.manufacturer.as("manufacturer"),
-                productLike.as("productLike"),
-                productBookmark.as("productBookmark")
+            .select(new QSearchProductDetailQueryDto(
+                product.id,
+                product.name,
+                product.price,
+                product.imageUrl,
+                manufacturer.name,
+                productLike,
+                productBookmark
             ))
             .from(product)
             .leftJoin(productLike)
-            .on(productLike.product.id.eq(productId).and(productLike.user.eq(user)))
+            .on(productLike.product.eq(product).and(productLikeUserEq(loginUser)))
             .leftJoin(productBookmark)
-            .on(productBookmark.product.id.eq(productId).and(productBookmark.user.eq(user)))
+            .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
+            .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(product.id.eq(productId))
             .fetchFirst());
+    }
+
+    public List<SellAtEventQueryDto> findSellAtEventsByProductId(Long productId) {
+        return queryFactory
+            .select(new QSellAtEventQueryDto(
+                sellAt.convenienceStore.id,
+                sellAt.convenienceStore.name,
+                event))
+            .from(sellAt)
+            .leftJoin(event).on(sellAt.product.eq(event.product)
+                .and(sellAt.convenienceStore.eq(event.convenienceStore)))
+            .leftJoin(convenienceStore).on(sellAt.convenienceStore.eq(convenienceStore))
+            .where(sellAt.product.id.eq(productId))
+            .fetch();
     }
 
     private static List<OrderSpecifier> sortBy(ProductSortBy sortBy, NumberPath<Double> score,

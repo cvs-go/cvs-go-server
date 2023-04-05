@@ -26,9 +26,10 @@ import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SellAtEventResponseDto;
+import com.cvsgo.dto.product.SellAtEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
@@ -166,10 +167,10 @@ class ProductControllerTest {
                     fieldWithPath("data.manufacturerName").type(JsonFieldType.STRING).description("제조사"),
                     fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
                     fieldWithPath("data.isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data.sellAts[].convenienceStoreId").type(JsonFieldType.NUMBER).description("판매 편의점 ID"),
-                    fieldWithPath("data.sellAts[].convenienceStoreName").type(JsonFieldType.STRING).description("판매 편의점 이름"),
-                    fieldWithPath("data.sellAts[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
-                    fieldWithPath("data.sellAts[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
+                    fieldWithPath("data.sellAtEvents[].convenienceStoreId").type(JsonFieldType.NUMBER).description("판매 편의점 ID"),
+                    fieldWithPath("data.sellAtEvents[].convenienceStoreName").type(JsonFieldType.STRING).description("판매 편의점 이름"),
+                    fieldWithPath("data.sellAtEvents[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
+                    fieldWithPath("data.sellAtEvents[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
                 )
             ));
     }
@@ -378,12 +379,14 @@ class ProductControllerTest {
     }
 
     private ProductDetailResponseDto getProductResponse() {
-        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1,
-            manufacturer1, productLike, productBookmark);
-        productDetailResponse.setSellAts(List.of(SellAtEventResponseDto.of(cvs1, bogoEvent),
-            SellAtEventResponseDto.of(cvs2, discountEvent),
-            SellAtEventResponseDto.of(cvs3, null)));
-        return productDetailResponse;
+        SearchProductDetailQueryDto productDetailQueryDto = new SearchProductDetailQueryDto(
+            product2.getId(), product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getManufacturer().getName(), null, null);
+        List<SellAtEventDto> sellAtEvents = List.of(
+            SellAtEventDto.of(cvs1.getId(), cvs1.getName(), giftEvent),
+            SellAtEventDto.of(cvs2.getId(), cvs2.getName(), discountEvent));
+
+        return ProductDetailResponseDto.of(productDetailQueryDto, sellAtEvents);
     }
 
     private ProductFilterResponseDto getProductFilterResponse() {
