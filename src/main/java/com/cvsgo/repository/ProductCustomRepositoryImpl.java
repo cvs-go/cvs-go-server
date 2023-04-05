@@ -1,8 +1,8 @@
 package com.cvsgo.repository;
 
+import static com.cvsgo.entity.QConvenienceStore.convenienceStore;
 import static com.cvsgo.entity.QEvent.event;
 import static com.cvsgo.entity.QManufacturer.manufacturer;
-import static com.cvsgo.entity.QConvenienceStore.convenienceStore;
 import static com.cvsgo.entity.QProduct.product;
 import static com.cvsgo.entity.QProductBookmark.productBookmark;
 import static com.cvsgo.entity.QProductLike.productLike;
@@ -15,11 +15,9 @@ import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.QSearchProductDetailQueryDto;
 import com.cvsgo.dto.product.QSearchProductQueryDto;
-import com.cvsgo.dto.product.QSellAtEventQueryDto;
 import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
-import com.cvsgo.dto.product.SellAtEventQueryDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.querydsl.core.types.OrderSpecifier;
@@ -111,7 +109,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .select(new QConvenienceStoreEventQueryDto(
                 sellAt.product.id,
                 sellAt.convenienceStore.name,
-                event.eventType))
+                event))
             .from(sellAt)
             .leftJoin(event).on(sellAt.product.eq(event.product)
                 .and(sellAt.convenienceStore.eq(event.convenienceStore)))
@@ -140,9 +138,9 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetchFirst());
     }
 
-    public List<SellAtEventQueryDto> findSellAtEventsByProductId(Long productId) {
-        return queryFactory
-            .select(new QSellAtEventQueryDto(
+    public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
+        Long productId) {
+        return queryFactory.select(new QConvenienceStoreEventQueryDto(
                 sellAt.convenienceStore.id,
                 sellAt.convenienceStore.name,
                 event))

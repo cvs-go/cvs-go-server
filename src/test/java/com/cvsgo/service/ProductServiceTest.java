@@ -16,7 +16,6 @@ import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
-import com.cvsgo.dto.product.SellAtEventQueryDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
@@ -26,7 +25,6 @@ import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
-import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.product.NotFoundProductBookmarkException;
 import com.cvsgo.exception.product.NotFoundProductException;
@@ -97,12 +95,12 @@ class ProductServiceTest {
     @DisplayName("상품을 정상적으로 조회한다")
     void succeed_to_read_product() {
         given(productRepository.findByProductId(any(), any())).willReturn(Optional.of(productDetailResponse));
-        given(productRepository.findSellAtEventsByProductId(any())).willReturn(getSellAtEventList());
+        given(productRepository.findConvenienceStoreEventsByProductId(any())).willReturn(getCvsEventList());
 
         productService.readProduct(user, 1L);
 
         then(productRepository).should(times(1)).findByProductId(any(), any());
-        then(productRepository).should(times(1)).findSellAtEventsByProductId(any());
+        then(productRepository).should(times(1)).findConvenienceStoreEventsByProductId(any());
     }
 
     @Test
@@ -298,16 +296,6 @@ class ProductServiceTest {
         .discountAmount(100)
         .build();
 
-    SellAt sellAt1 = SellAt.builder()
-        .product(product1)
-        .convenienceStore(cvs1)
-        .build();
-
-    SellAt sellAt2 = SellAt.builder()
-        .product(product1)
-        .convenienceStore(cvs2)
-        .build();
-
     User user = User.builder().build();
 
     ProductLike productLike = ProductLike.builder()
@@ -331,21 +319,15 @@ class ProductServiceTest {
 
     ConvenienceStoreEventQueryDto cvsEvent1 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
-            "GS25", EventType.BOGO);
+            "GS25", bogoEvent);
 
     ConvenienceStoreEventQueryDto cvsEvent2 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
-            "CU", EventType.DISCOUNT);
+            "CU", discountEvent);
 
     ConvenienceStoreEventQueryDto cvsEvent3 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
             "Emart24", null);
-
-    SellAtEventQueryDto sellAtEvent1 = new SellAtEventQueryDto(
-        sellAt1.getConvenienceStore().getId(), sellAt1.getConvenienceStore().getName(), bogoEvent);
-
-    SellAtEventQueryDto sellAtEvent2 = new SellAtEventQueryDto(
-        sellAt2.getConvenienceStore().getId(), sellAt2.getConvenienceStore().getName(), discountEvent);
 
     private List<SearchProductQueryDto> getProductList() {
         return List.of(productResponse1);
@@ -353,10 +335,6 @@ class ProductServiceTest {
 
     private List<ConvenienceStoreEventQueryDto> getCvsEventList() {
         return List.of(cvsEvent1, cvsEvent2, cvsEvent3);
-    }
-
-    private List<SellAtEventQueryDto> getSellAtEventList() {
-        return List.of(sellAtEvent1, sellAtEvent2);
     }
 
 }

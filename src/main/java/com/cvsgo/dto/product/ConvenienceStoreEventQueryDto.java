@@ -1,6 +1,6 @@
 package com.cvsgo.dto.product;
 
-import com.cvsgo.entity.EventType;
+import com.cvsgo.entity.Event;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
@@ -11,13 +11,12 @@ public class ConvenienceStoreEventQueryDto {
 
     private final String convenienceStoreName;
 
-    private final EventType eventType;
+    private final Event event;
 
     @QueryProjection
-    public ConvenienceStoreEventQueryDto(Long productId, String convenienceStoreName,
-        EventType eventType) {
+    public ConvenienceStoreEventQueryDto(Long productId, String convenienceStoreName, Event event) {
         this.productId = productId;
         this.convenienceStoreName = convenienceStoreName;
-        this.eventType = eventType;
+        this.event = event;
     }
 }

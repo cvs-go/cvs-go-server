@@ -4,7 +4,6 @@ import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
-import com.cvsgo.dto.product.SellAtEventQueryDto;
 import com.cvsgo.entity.User;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +21,6 @@ public interface ProductCustomRepository {
 
     Optional<SearchProductDetailQueryDto> findByProductId(User user, Long productId);
 
-    List<SellAtEventQueryDto> findSellAtEventsByProductId(Long productId);
+    List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(Long productId);
 
 }

@@ -7,9 +7,9 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 
 import com.cvsgo.dto.product.CategoryDto;
+import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.EventTypeDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
@@ -17,8 +17,6 @@ import com.cvsgo.dto.product.ProductResponseDto;
 import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
-import com.cvsgo.dto.product.SellAtEventDto;
-import com.cvsgo.dto.product.SellAtEventQueryDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -79,7 +77,7 @@ public class ProductService {
         List<ProductResponseDto> results = products.stream().map(
             productDto -> ProductResponseDto.of(productDto,
                 cvsEventByProduct.get(productDto.getProductId()).stream().map(
-                        c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEventType()))
+                        c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
                     .toList())).toList();
         return new PageImpl<>(results, pageable, totalCount);
     }
@@ -97,12 +95,11 @@ public class ProductService {
         SearchProductDetailQueryDto product = productRepository.findByProductId(user, productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        List<SellAtEventQueryDto> sellAtEvents = productRepository.findSellAtEventsByProductId(
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
             product.getProductId());
 
-        return ProductDetailResponseDto.of(product, sellAtEvents.stream().map(
-            s -> SellAtEventDto.of(s.getConvenienceStoreId(), s.getConvenienceStoreName(),
-                s.getEvent())).toList());
+        return ProductDetailResponseDto.of(product, convenienceStoreEvents.stream().map(
+            c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent())).toList());
     }
 
     /**

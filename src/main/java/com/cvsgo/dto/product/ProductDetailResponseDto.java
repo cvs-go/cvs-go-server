@@ -16,12 +16,12 @@ public class ProductDetailResponseDto {
     private final String manufacturerName;
     private final Boolean isLiked;
     private final Boolean isBookmarked;
-    private final List<SellAtEventDto> sellAtEvents;
+    private final List<ConvenienceStoreEventDto> convenienceStoreEvents;
 
     @Builder
     public ProductDetailResponseDto(Long productId, String productName, Integer productPrice,
         String productImageUrl, String manufacturerName, Boolean isLiked, Boolean isBookmarked,
-        List<SellAtEventDto> sellAtEvents) {
+        List<ConvenienceStoreEventDto> convenienceStoreEvents) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
@@ -29,12 +29,12 @@ public class ProductDetailResponseDto {
         this.manufacturerName = manufacturerName;
         this.isLiked = isLiked;
         this.isBookmarked = isBookmarked;
-        this.sellAtEvents = sellAtEvents;
+        this.convenienceStoreEvents = convenienceStoreEvents;
     }
 
     public static ProductDetailResponseDto of(
         SearchProductDetailQueryDto searchProductDetailQueryDto,
-        List<SellAtEventDto> sellAtEvents) {
+        List<ConvenienceStoreEventDto> convenienceStoreEvents) {
         return ProductDetailResponseDto.builder()
             .productId(searchProductDetailQueryDto.getProductId())
             .productName(searchProductDetailQueryDto.getProductName())
@@ -43,7 +43,7 @@ public class ProductDetailResponseDto {
             .manufacturerName(searchProductDetailQueryDto.getManufacturerName())
             .isLiked(searchProductDetailQueryDto.getIsLiked())
             .isBookmarked(searchProductDetailQueryDto.getIsBookmarked())
-            .sellAtEvents(sellAtEvents)
+            .convenienceStoreEvents(convenienceStoreEvents)
             .build();
     }
 }
