@@ -65,7 +65,7 @@ public class ProductService {
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public Page<ProductResponseDto> getProductList(User user, SearchProductRequestDto request,
+    public Page<ProductResponseDto> readProductList(User user, SearchProductRequestDto request,
         Pageable pageable) {
         List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
             request, pageable);

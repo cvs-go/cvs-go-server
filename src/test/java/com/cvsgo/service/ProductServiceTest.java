@@ -91,7 +91,7 @@ class ProductServiceTest {
         given(productRepository.countByFilter(any())).willReturn((long) getProductList().size());
         given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
-        Page<ProductResponseDto> result = productService.getProductList(user, request, pageable);
+        Page<ProductResponseDto> result = productService.readProductList(user, request, pageable);
         assertEquals(result.getTotalElements(), getProductList().size());
 
         then(productRepository).should(times(1)).searchByFilter(any(), any(), any());

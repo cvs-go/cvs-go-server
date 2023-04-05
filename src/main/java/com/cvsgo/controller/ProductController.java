@@ -30,9 +30,9 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public SuccessResponse<Page<ProductResponseDto>> getProductList(@LoginUser User user,
+    public SuccessResponse<Page<ProductResponseDto>> readProductList(@LoginUser User user,
         @ModelAttribute SearchProductRequestDto request, Pageable pageable) {
-        return SuccessResponse.from(productService.getProductList(user, request, pageable));
+        return SuccessResponse.from(productService.readProductList(user, request, pageable));
     }
 
     @GetMapping("/{productId}")

@@ -107,8 +107,8 @@ class ProductControllerTest {
             .highestPrice(1000)
             .build();
 
-        Page<ProductResponseDto> responseDto = new PageImpl<>(createProductsResponse());
-        given(productService.getProductList(any(), any(), any())).willReturn(responseDto);
+        Page<ProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
+        given(productService.readProductList(any(), any(), any())).willReturn(responseDto);
 
         mockMvc.perform(get("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -357,7 +357,7 @@ class ProductControllerTest {
         .discountAmount(300)
         .build();
 
-    private List<ProductResponseDto> createProductsResponse() {
+    private List<ProductResponseDto> getProductsResponse() {
         SearchProductQueryDto productQueryDto1 = new SearchProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
             product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark, 5L, 3.5, 4.5);
