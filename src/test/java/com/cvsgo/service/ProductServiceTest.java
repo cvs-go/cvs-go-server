@@ -315,7 +315,7 @@ class ProductServiceTest {
     SearchProductQueryDto productResponse1 = new SearchProductQueryDto(product1.getId(),
         product1.getName(), product1.getPrice(), product1.getImageUrl(),
         product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark,
-        5L, 3.5);
+        5L, 3.5, 4.5);
 
     ConvenienceStoreEventQueryDto cvsEvent1 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),

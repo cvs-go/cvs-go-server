@@ -25,6 +25,7 @@ import com.cvsgo.dto.product.EventTypeResponseDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
+import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SellAtEventResponseDto;
@@ -96,6 +97,7 @@ class ProductControllerTest {
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
         SearchProductRequestDto request = SearchProductRequestDto.builder()
+            .sortBy(ProductSortBy.SCORE)
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))
@@ -115,6 +117,7 @@ class ProductControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestFields(
+                    fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional(),
                     fieldWithPath("convenienceStoreIds").type(JsonFieldType.ARRAY).description("편의점 ID 리스트"),
                     fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("제품 카테고리 ID 리스트"),
                     fieldWithPath("eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),
@@ -355,14 +358,14 @@ class ProductControllerTest {
     private List<ProductResponseDto> createProductsResponse() {
         SearchProductQueryDto productQueryDto1 = new SearchProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
-            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark, 5L, 3.5);
+            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark, 5L, 3.5, 4.5);
         List<ConvenienceStoreEventDto> convenienceStoreEvents1 = List.of(
             ConvenienceStoreEventDto.of(cvs1.getName(), bogoEvent.getEventType()),
             ConvenienceStoreEventDto.of(cvs2.getName(), btgoEvent.getEventType()));
 
         SearchProductQueryDto productQueryDto2 = new SearchProductQueryDto(product2.getId(),
             product2.getName(), product2.getPrice(), product2.getImageUrl(),
-            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null, 5L, 4.0);
+            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null, 5L, 4.0, 4.0);
         List<ConvenienceStoreEventDto> convenienceStoreEvents2 = List.of(
             ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent.getEventType()),
             ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent.getEventType()));

@@ -11,15 +11,20 @@ import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.QProductDetailResponseDto;
 import com.cvsgo.dto.product.QSearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +39,8 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     public List<SearchProductQueryDto> searchByFilter(User loginUser,
         SearchProductRequestDto searchFilter, Pageable pageable) {
+        NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
+        NumberPath<Double> score = Expressions.numberPath(Double.class, "score");
         return queryFactory.select(new QSearchProductQueryDto(
                 product.id,
                 product.name,
@@ -44,7 +51,10 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 productLike,
                 productBookmark,
                 review.count(),
-                review.rating.avg()))
+                review.rating.avg().as("avgRating"),
+                (review.rating.coalesce(0).avg().multiply(review.count()).add(product.likeCount)).as(
+                    "score")
+            ))
             .from(product)
             .leftJoin(productLike)
             .on(productLike.product.eq(product).and(productLikeUserEq(loginUser)))
@@ -66,6 +76,8 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         ))
             )
             .groupBy(product)
+            .orderBy(
+                sortBy(searchFilter.getSortBy(), score, avgRating).toArray(OrderSpecifier[]::new))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -100,6 +112,37 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .on(productBookmark.product.id.eq(productId).and(productBookmark.user.eq(user)))
             .where(product.id.eq(productId))
             .fetchFirst());
+    }
+
+    private static List<OrderSpecifier> sortBy(ProductSortBy sortBy, NumberPath<Double> score,
+        NumberPath<Double> avgRating) {
+        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+        if (sortBy != null) {
+            switch (sortBy) {
+                case SCORE -> {
+                    orderSpecifiers.add(score.desc());
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(product.likeCount.desc());
+                    orderSpecifiers.add(product.createdAt.desc());
+                }
+                case RATING -> {
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(product.likeCount.desc());
+                    orderSpecifiers.add(product.createdAt.desc());
+                }
+                case LIKE -> {
+                    orderSpecifiers.add(product.likeCount.desc());
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(product.createdAt.desc());
+                }
+            }
+        } else {
+            orderSpecifiers.add(score.desc());
+            orderSpecifiers.add(avgRating.desc());
+            orderSpecifiers.add(product.likeCount.desc());
+            orderSpecifiers.add(product.createdAt.desc());
+        }
+        return orderSpecifiers;
     }
 
     private BooleanExpression productLikeUserEq(User user) {

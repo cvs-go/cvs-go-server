@@ -30,12 +30,14 @@ public class SearchProductQueryDto {
 
     private Double avgRating;
 
+    private Double score;
+
     private List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = new ArrayList<>();
 
     @QueryProjection
     public SearchProductQueryDto(Long productId, String productName, Integer productPrice, String productImageUrl,
         Long categoryId, String manufacturerName, ProductLike productLike,
-        ProductBookmark productBookmark, Long reviewCount, Double avgRating) {
+        ProductBookmark productBookmark, Long reviewCount, Double avgRating, Double score) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
@@ -46,5 +48,6 @@ public class SearchProductQueryDto {
         this.isBookmarked = productBookmark != null;
         this.reviewCount = reviewCount;
         this.avgRating = avgRating;
+        this.score = score;
     }
 }
