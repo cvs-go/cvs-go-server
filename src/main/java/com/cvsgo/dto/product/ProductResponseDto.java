@@ -15,7 +15,7 @@ public class ProductResponseDto {
     private final String manufacturerName;
     private final Boolean isLiked;
     private final Boolean isBookmarked;
-    private final Integer reviewCount;
+    private final Long reviewCount;
     private final String reviewRating;
     private final List<ConvenienceStoreEventDto> convenienceStoreEvents;
 
@@ -31,7 +31,7 @@ public class ProductResponseDto {
         this.categoryId = categoryId;
         this.manufacturerName = manufacturerName;
         this.isLiked = isLiked;
-        this.reviewCount = reviewCount.intValue();
+        this.reviewCount = reviewCount;
         this.isBookmarked = isBookmarked;
         this.reviewRating = reviewRating(reviewRating);
         this.convenienceStoreEvents = convenienceStoreEvents;
