@@ -1,10 +1,5 @@
 package com.cvsgo.dto.product;
 
-import com.cvsgo.entity.Manufacturer;
-import com.cvsgo.entity.Product;
-import com.cvsgo.entity.ProductBookmark;
-import com.cvsgo.entity.ProductLike;
-import com.querydsl.core.annotations.QueryProjection;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,28 +16,34 @@ public class ProductDetailResponseDto {
     private final String manufacturerName;
     private final Boolean isLiked;
     private final Boolean isBookmarked;
-    private List<SellAtEventResponseDto> sellAts;
+    private final List<ConvenienceStoreEventDto> convenienceStoreEvents;
 
     @Builder
-    @QueryProjection
-    public ProductDetailResponseDto(Product product, Manufacturer manufacturer,
-        ProductLike productLike, ProductBookmark productBookmark) {
-        this.productId = product.getId();
-        this.productName = product.getName();
-        this.productPrice = product.getPrice();
-        this.productImageUrl = product.getImageUrl();
-        this.manufacturerName = manufacturer.getName();
-        this.isLiked = productLike != null;
-        this.isBookmarked = productBookmark != null;
+    public ProductDetailResponseDto(Long productId, String productName, Integer productPrice,
+        String productImageUrl, String manufacturerName, Boolean isLiked, Boolean isBookmarked,
+        List<ConvenienceStoreEventDto> convenienceStoreEvents) {
+        this.productId = productId;
+        this.productName = productName;
+        this.productPrice = productPrice;
+        this.productImageUrl = productImageUrl;
+        this.manufacturerName = manufacturerName;
+        this.isLiked = isLiked;
+        this.isBookmarked = isBookmarked;
+        this.convenienceStoreEvents = convenienceStoreEvents;
     }
 
-    public static ProductDetailResponseDto of(Product product, Manufacturer manufacturer,
-        ProductLike productLike, ProductBookmark productBookmark) {
+    public static ProductDetailResponseDto of(
+        SearchProductDetailQueryDto searchProductDetailQueryDto,
+        List<ConvenienceStoreEventDto> convenienceStoreEvents) {
         return ProductDetailResponseDto.builder()
-            .product(product)
-            .manufacturer(manufacturer)
-            .productLike(productLike)
-            .productBookmark(productBookmark)
+            .productId(searchProductDetailQueryDto.getProductId())
+            .productName(searchProductDetailQueryDto.getProductName())
+            .productPrice(searchProductDetailQueryDto.getProductPrice())
+            .productImageUrl(searchProductDetailQueryDto.getProductImageUrl())
+            .manufacturerName(searchProductDetailQueryDto.getManufacturerName())
+            .isLiked(searchProductDetailQueryDto.getIsLiked())
+            .isBookmarked(searchProductDetailQueryDto.getIsBookmarked())
+            .convenienceStoreEvents(convenienceStoreEvents)
             .build();
     }
 }

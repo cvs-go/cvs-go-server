@@ -5,11 +5,11 @@ import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -30,9 +30,9 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public SuccessResponse<List<ProductResponseDto>> getProductList(@LoginUser User user,
-        @ModelAttribute ProductSearchRequestDto request, Pageable pageable) {
-        return SuccessResponse.from(productService.getProductList(user, request, pageable));
+    public SuccessResponse<Page<ProductResponseDto>> readProductList(@LoginUser User user,
+        @ModelAttribute SearchProductRequestDto request, Pageable pageable) {
+        return SuccessResponse.from(productService.readProductList(user, request, pageable));
     }
 
     @GetMapping("/{productId}")

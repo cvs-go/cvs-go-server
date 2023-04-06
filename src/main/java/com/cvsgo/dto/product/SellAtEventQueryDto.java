@@ -5,17 +5,17 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
-public class ConvenienceStoreEventQueryDto {
+public class SellAtEventQueryDto {
 
-    private final Long productId;
+    private final Long convenienceStoreId;
 
     private final String convenienceStoreName;
 
     private final Event event;
 
     @QueryProjection
-    public ConvenienceStoreEventQueryDto(Long productId, String convenienceStoreName, Event event) {
-        this.productId = productId;
+    public SellAtEventQueryDto(Long convenienceStoreId, String convenienceStoreName, Event event) {
+        this.convenienceStoreId = convenienceStoreId;
         this.convenienceStoreName = convenienceStoreName;
         this.event = event;
     }

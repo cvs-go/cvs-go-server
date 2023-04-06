@@ -8,18 +8,27 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class ProductSearchRequestDto {
+public class SearchProductRequestDto {
+
+    @Enumerated(EnumType.STRING)
+    private final ProductSortBy sortBy;
 
     private List<Long> convenienceStoreIds;
+
     private List<Long> categoryIds;
+
     @Enumerated(EnumType.STRING)
     private List<EventType> eventTypes;
+
     private Integer lowestPrice;
+
     private Integer highestPrice;
 
     @Builder
-    public ProductSearchRequestDto(List<Long> convenienceStoreIds, List<Long> categoryIds,
-        List<EventType> eventTypes, Integer lowestPrice, Integer highestPrice) {
+    public SearchProductRequestDto(ProductSortBy sortBy, List<Long> convenienceStoreIds,
+        List<Long> categoryIds, List<EventType> eventTypes, Integer lowestPrice,
+        Integer highestPrice) {
+        this.sortBy = sortBy;
         this.convenienceStoreIds = convenienceStoreIds;
         this.categoryIds = categoryIds;
         this.eventTypes = eventTypes;

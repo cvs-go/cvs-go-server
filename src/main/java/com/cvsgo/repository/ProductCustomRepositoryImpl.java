@@ -1,5 +1,6 @@
 package com.cvsgo.repository;
 
+import static com.cvsgo.entity.QConvenienceStore.convenienceStore;
 import static com.cvsgo.entity.QEvent.event;
 import static com.cvsgo.entity.QManufacturer.manufacturer;
 import static com.cvsgo.entity.QProduct.product;
@@ -10,16 +11,21 @@ import static com.cvsgo.entity.QSellAt.sellAt;
 import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.QProductDetailResponseDto;
+import com.cvsgo.dto.product.QSearchProductDetailQueryDto;
 import com.cvsgo.dto.product.QSearchProductQueryDto;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +38,11 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<SearchProductQueryDto> searchByFilter(User user,
-        ProductSearchRequestDto filter, Pageable pageable) {
+    public List<SearchProductQueryDto> searchByFilter(User loginUser,
+        SearchProductRequestDto searchFilter, Pageable pageable) {
+        NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
+        NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
+        NumberPath<Double> score = Expressions.numberPath(Double.class, "score");
         return queryFactory.select(new QSearchProductQueryDto(
                 product.id,
                 product.name,
@@ -43,13 +52,16 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 manufacturer.name,
                 productLike,
                 productBookmark,
-                review.count(),
-                review.rating.avg()))
+                review.count().as("reviewCount"),
+                review.rating.avg().as("avgRating"),
+                (review.rating.coalesce(0).avg().multiply(review.count()).add(product.likeCount)).as(
+                    "score")
+            ))
             .from(product)
             .leftJoin(productLike)
-            .on(productLike.product.eq(product).and(eqProductLikeUser(user)))
+            .on(productLike.product.eq(product).and(productLikeUserEq(loginUser)))
             .leftJoin(productBookmark)
-            .on(productBookmark.product.eq(product).and(eqProductBookmarkUser(user)))
+            .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
             .leftJoin(review).on(review.product.eq(product))
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(
@@ -58,17 +70,38 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         .from(sellAt)
                         .leftJoin(event).on(sellAt.product.eq(event.product))
                         .where(
-                            eqConvenienceStore(filter.getConvenienceStoreIds()),
-                            eqEventType(filter.getEventTypes()),
-                            eqCategory(filter.getCategoryIds()),
-                            priceLessOrEqual(filter.getHighestPrice()),
-                            priceGreaterOrEqual(filter.getLowestPrice())
+                            convenienceStoreEq(searchFilter.getConvenienceStoreIds()),
+                            eventTypeEq(searchFilter.getEventTypes()),
+                            categoryEq(searchFilter.getCategoryIds()),
+                            priceLessOrEqual(searchFilter.getHighestPrice()),
+                            priceGreaterOrEqual(searchFilter.getLowestPrice())
                         ))
             )
             .groupBy(product)
+            .orderBy(
+                sortBy(searchFilter.getSortBy(), score, avgRating, reviewCount).toArray(OrderSpecifier[]::new))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
+    }
+
+    public Long countByFilter(SearchProductRequestDto searchFilter) {
+        return queryFactory.select(product.count())
+            .from(product)
+            .where(
+                product.in(
+                    selectDistinct(sellAt.product)
+                        .from(sellAt)
+                        .leftJoin(event).on(sellAt.product.eq(event.product))
+                        .where(
+                            convenienceStoreEq(searchFilter.getConvenienceStoreIds()),
+                            eventTypeEq(searchFilter.getEventTypes()),
+                            categoryEq(searchFilter.getCategoryIds()),
+                            priceLessOrEqual(searchFilter.getHighestPrice()),
+                            priceGreaterOrEqual(searchFilter.getLowestPrice())
+                        ))
+            )
+            .fetchOne();
     }
 
     public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
@@ -77,7 +110,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .select(new QConvenienceStoreEventQueryDto(
                 sellAt.product.id,
                 sellAt.convenienceStore.name,
-                event.eventType))
+                event))
             .from(sellAt)
             .leftJoin(event).on(sellAt.product.eq(event.product)
                 .and(sellAt.convenienceStore.eq(event.convenienceStore)))
@@ -85,45 +118,98 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Optional<ProductDetailResponseDto> findByProductId(User user, Long productId) {
+    public Optional<SearchProductDetailQueryDto> findByProductId(User loginUser, Long productId) {
         return Optional.ofNullable(queryFactory
-            .select(new QProductDetailResponseDto(
-                product.as("product"),
-                product.manufacturer.as("manufacturer"),
-                productLike.as("productLike"),
-                productBookmark.as("productBookmark")
+            .select(new QSearchProductDetailQueryDto(
+                product.id,
+                product.name,
+                product.price,
+                product.imageUrl,
+                manufacturer.name,
+                productLike,
+                productBookmark
             ))
             .from(product)
             .leftJoin(productLike)
-            .on(productLike.product.id.eq(productId).and(productLike.user.eq(user)))
+            .on(productLike.product.eq(product).and(productLikeUserEq(loginUser)))
             .leftJoin(productBookmark)
-            .on(productBookmark.product.id.eq(productId).and(productBookmark.user.eq(user)))
+            .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
+            .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(product.id.eq(productId))
-            .fetchFirst());
+            .fetchOne());
     }
 
-    private BooleanExpression eqProductLikeUser(User user) {
+    public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
+        Long productId) {
+        return queryFactory.select(new QConvenienceStoreEventQueryDto(
+                sellAt.convenienceStore.id,
+                sellAt.convenienceStore.name,
+                event))
+            .from(sellAt)
+            .leftJoin(event).on(sellAt.product.eq(event.product)
+                .and(sellAt.convenienceStore.eq(event.convenienceStore)))
+            .leftJoin(convenienceStore).on(sellAt.convenienceStore.eq(convenienceStore))
+            .where(sellAt.product.id.eq(productId))
+            .fetch();
+    }
+
+    private static List<OrderSpecifier<?>> sortBy(ProductSortBy sortBy, NumberPath<Double> score,
+        NumberPath<Double> avgRating, NumberPath<Long> reviewCount) {
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
+        if (sortBy != null) {
+            switch (sortBy) {
+                case SCORE -> {
+                    orderSpecifiers.add(score.desc());
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(reviewCount.desc());
+                    orderSpecifiers.add(product.likeCount.desc());
+                    orderSpecifiers.add(product.createdAt.desc());
+                }
+                case RATING -> {
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(reviewCount.desc());
+                    orderSpecifiers.add(product.likeCount.desc());
+                    orderSpecifiers.add(product.createdAt.desc());
+                }
+                case LIKE -> {
+                    orderSpecifiers.add(product.likeCount.desc());
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(reviewCount.desc());
+                    orderSpecifiers.add(product.createdAt.desc());
+                }
+            }
+        } else {
+            orderSpecifiers.add(score.desc());
+            orderSpecifiers.add(avgRating.desc());
+            orderSpecifiers.add(reviewCount.desc());
+            orderSpecifiers.add(product.likeCount.desc());
+            orderSpecifiers.add(product.createdAt.desc());
+        }
+        return orderSpecifiers;
+    }
+
+    private BooleanExpression productLikeUserEq(User user) {
         return user != null ? productLike.user.eq(user) : null;
     }
 
-    private BooleanExpression eqProductBookmarkUser(User user) {
+    private BooleanExpression productBookmarkUserEq(User user) {
         return user != null ? productBookmark.user.eq(user) : null;
     }
 
-    private BooleanExpression eqConvenienceStore(List<Long> convenienceStoreIds) {
-        return convenienceStoreIds != null && convenienceStoreIds.size() > 0
+    private BooleanExpression convenienceStoreEq(List<Long> convenienceStoreIds) {
+        return convenienceStoreIds != null && !convenienceStoreIds.isEmpty()
             ? sellAt.convenienceStore.id.in(convenienceStoreIds)
             : null;
     }
 
-    private BooleanExpression eqCategory(List<Long> categoryIds) {
-        return categoryIds != null && categoryIds.size() > 0
+    private BooleanExpression categoryEq(List<Long> categoryIds) {
+        return categoryIds != null && !categoryIds.isEmpty()
             ? product.category.id.in(categoryIds)
             : null;
     }
 
-    private BooleanExpression eqEventType(List<EventType> eventTypes) {
-        return eventTypes != null && eventTypes.size() > 0
+    private BooleanExpression eventTypeEq(List<EventType> eventTypes) {
+        return eventTypes != null && !eventTypes.isEmpty()
             ? event.eventType.in(eventTypes)
             : null;
     }

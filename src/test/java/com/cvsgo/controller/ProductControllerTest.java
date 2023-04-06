@@ -19,15 +19,17 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
-import com.cvsgo.dto.product.CategoryResponseDto;
-import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
-import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.CategoryDto;
+import com.cvsgo.dto.product.ConvenienceStoreDto;
+import com.cvsgo.dto.product.ConvenienceStoreEventDto;
+import com.cvsgo.dto.product.EventTypeDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
-import com.cvsgo.dto.product.SellAtEventResponseDto;
-import com.cvsgo.dto.product.SellAtResponseDto;
+import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
+import com.cvsgo.dto.product.SearchProductQueryDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
@@ -51,6 +53,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -94,7 +98,8 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
-        ProductSearchRequestDto request = ProductSearchRequestDto.builder()
+        SearchProductRequestDto request = SearchProductRequestDto.builder()
+            .sortBy(ProductSortBy.SCORE)
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))
@@ -102,8 +107,8 @@ class ProductControllerTest {
             .highestPrice(1000)
             .build();
 
-        List<ProductResponseDto> responseDto = createProductsResponse();
-        given(productService.getProductList(any(), any(), any())).willReturn(responseDto);
+        Page<ProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
+        given(productService.readProductList(any(), any(), any())).willReturn(responseDto);
 
         mockMvc.perform(get("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,6 +119,7 @@ class ProductControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 requestFields(
+                    fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional(),
                     fieldWithPath("convenienceStoreIds").type(JsonFieldType.ARRAY).description("편의점 ID 리스트"),
                     fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("제품 카테고리 ID 리스트"),
                     fieldWithPath("eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),
@@ -121,18 +127,19 @@ class ProductControllerTest {
                     fieldWithPath("highestPrice").type(JsonFieldType.NUMBER).description("최고 가격")
                 ),
                 relaxedResponseFields(
-                    fieldWithPath("data[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                    fieldWithPath("data[].productName").type(JsonFieldType.STRING).description("상품명"),
-                    fieldWithPath("data[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
-                    fieldWithPath("data[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
-                    fieldWithPath("data[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
-                    fieldWithPath("data[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
-                    fieldWithPath("data[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
-                    fieldWithPath("data[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
-                    fieldWithPath("data[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
-                    fieldWithPath("data[].sellAt[].name").type(JsonFieldType.STRING).description("판매 편의점"),
-                    fieldWithPath("data[].sellAt[].event").type(JsonFieldType.STRING).description("행사 정보").optional()
+                    fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data.content[].productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data.content[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
+                    fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
+                    fieldWithPath("data.content[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
+                    fieldWithPath("data.content[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
+                    fieldWithPath("data.content[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
+                    fieldWithPath("data.content[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data.content[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
+                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].name").type(JsonFieldType.STRING).description("판매 편의점 이름"),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
                 )
             ));
     }
@@ -160,22 +167,21 @@ class ProductControllerTest {
                     fieldWithPath("data.manufacturerName").type(JsonFieldType.STRING).description("제조사"),
                     fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
                     fieldWithPath("data.isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data.sellAts[].convenienceStoreId").type(JsonFieldType.NUMBER).description("판매 편의점 ID"),
-                    fieldWithPath("data.sellAts[].convenienceStoreName").type(JsonFieldType.STRING).description("판매 편의점 이름"),
-                    fieldWithPath("data.sellAts[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
-                    fieldWithPath("data.sellAts[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
+                    fieldWithPath("data.convenienceStoreEvents[].name").type(JsonFieldType.STRING).description("판매 편의점 이름"),
+                    fieldWithPath("data.convenienceStoreEvents[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
+                    fieldWithPath("data.convenienceStoreEvents[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
                 )
             ));
     }
 
     @Test
-    @DisplayName("해당 ID를 가진 상품이 존재하지 않으면 상품 상세 조회 API 호출시 HTTP 400를 응답한다")
-    void respond_400_when_product_does_not_exist() throws Exception {
+    @DisplayName("해당 ID를 가진 상품이 존재하지 않으면 상품 상세 조회 API 호출시 HTTP 404를 응답한다")
+    void respond_404_when_product_does_not_exist() throws Exception {
         given(productService.readProduct(any(), any())).willThrow(ExceptionConstants.NOT_FOUND_PRODUCT);
 
         mockMvc.perform(get("/api/products/{productId}", 1000L)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest())
+            .andExpect(status().isNotFound())
             .andDo(print());
     }
 
@@ -351,34 +357,45 @@ class ProductControllerTest {
         .discountAmount(300)
         .build();
 
-    private List<ProductResponseDto> createProductsResponse() {
-        ProductResponseDto productResponse1 = ProductResponseDto.of(product1, false, false, 15L, 2.5,
-            List.of(SellAtResponseDto.of(cvs1.getName(), bogoEvent.getEventType()),
-                SellAtResponseDto.of(cvs2.getName(), btgoEvent.getEventType()),
-                SellAtResponseDto.of(cvs3.getName(), null)));
-        ProductResponseDto productResponse2 = ProductResponseDto.of(product2, false, true, 1L, 5.0,
-            List.of(SellAtResponseDto.of(cvs1.getName(), giftEvent.getEventType()),
-                SellAtResponseDto.of(cvs2.getName(), discountEvent.getEventType())));
+    private List<ProductResponseDto> getProductsResponse() {
+        SearchProductQueryDto productQueryDto1 = new SearchProductQueryDto(product1.getId(),
+            product1.getName(), product1.getPrice(), product1.getImageUrl(),
+            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark, 5L, 3.5, 4.5);
+        List<ConvenienceStoreEventDto> convenienceStoreEvents1 = List.of(
+            ConvenienceStoreEventDto.of(cvs1.getName(), bogoEvent),
+            ConvenienceStoreEventDto.of(cvs2.getName(), btgoEvent));
+
+        SearchProductQueryDto productQueryDto2 = new SearchProductQueryDto(product2.getId(),
+            product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null, 5L, 4.0, 4.0);
+        List<ConvenienceStoreEventDto> convenienceStoreEvents2 = List.of(
+            ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent),
+            ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent));
+
+        ProductResponseDto productResponse1 = ProductResponseDto.of(productQueryDto1, convenienceStoreEvents1);
+        ProductResponseDto productResponse2 = ProductResponseDto.of(productQueryDto2, convenienceStoreEvents2);
         return List.of(productResponse1, productResponse2);
     }
 
     private ProductDetailResponseDto getProductResponse() {
-        ProductDetailResponseDto productDetailResponse = ProductDetailResponseDto.of(product1,
-            manufacturer1, productLike, productBookmark);
-        productDetailResponse.setSellAts(List.of(SellAtEventResponseDto.of(cvs1, bogoEvent),
-            SellAtEventResponseDto.of(cvs2, discountEvent),
-            SellAtEventResponseDto.of(cvs3, null)));
-        return productDetailResponse;
+        SearchProductDetailQueryDto productDetailQueryDto = new SearchProductDetailQueryDto(
+            product2.getId(), product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getManufacturer().getName(), null, null);
+        List<ConvenienceStoreEventDto> convenienceStoreEvents = List.of(
+            ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent),
+            ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent));
+
+        return ProductDetailResponseDto.of(productDetailQueryDto, convenienceStoreEvents);
     }
 
     private ProductFilterResponseDto getProductFilterResponse() {
-        List<ConvenienceStoreResponseDto> convenienceStores = List.of(
-            ConvenienceStoreResponseDto.from(cvs1), ConvenienceStoreResponseDto.from(cvs2),
-            ConvenienceStoreResponseDto.from(cvs3));
-        List<CategoryResponseDto> categories = List.of(CategoryResponseDto.from(category1),
-            CategoryResponseDto.from(category2));
-        List<EventTypeResponseDto> eventTypes = List.of(EventTypeResponseDto.from(EventType.BOGO),
-            EventTypeResponseDto.from(EventType.BTGO), EventTypeResponseDto.from(EventType.GIFT));
+        List<ConvenienceStoreDto> convenienceStores = List.of(
+            ConvenienceStoreDto.from(cvs1), ConvenienceStoreDto.from(cvs2),
+            ConvenienceStoreDto.from(cvs3));
+        List<CategoryDto> categories = List.of(CategoryDto.from(category1),
+            CategoryDto.from(category2));
+        List<EventTypeDto> eventTypes = List.of(com.cvsgo.dto.product.EventTypeDto.from(EventType.BOGO),
+            EventTypeDto.from(EventType.BTGO), com.cvsgo.dto.product.EventTypeDto.from(EventType.GIFT));
         Integer highestPrice = 10000;
         return ProductFilterResponseDto.of(convenienceStores, categories, eventTypes, highestPrice);
     }

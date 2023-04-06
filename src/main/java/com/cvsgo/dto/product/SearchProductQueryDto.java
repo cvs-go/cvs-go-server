@@ -3,9 +3,6 @@ package com.cvsgo.dto.product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.querydsl.core.annotations.QueryProjection;
-import java.util.ArrayList;
-import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -31,13 +28,12 @@ public class SearchProductQueryDto {
 
     private Double avgRating;
 
-    private List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = new ArrayList<>();
+    private Double score;
 
-    @Builder
     @QueryProjection
     public SearchProductQueryDto(Long productId, String productName, Integer productPrice, String productImageUrl,
         Long categoryId, String manufacturerName, ProductLike productLike,
-        ProductBookmark productBookmark, Long reviewCount, Double avgRating) {
+        ProductBookmark productBookmark, Long reviewCount, Double avgRating, Double score) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
@@ -48,5 +44,6 @@ public class SearchProductQueryDto {
         this.isBookmarked = productBookmark != null;
         this.reviewCount = reviewCount;
         this.avgRating = avgRating;
+        this.score = score;
     }
 }

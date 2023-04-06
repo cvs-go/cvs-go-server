@@ -4,38 +4,36 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
+import com.cvsgo.entity.DiscountEvent;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
-import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.product.NotFoundProductBookmarkException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
-import com.cvsgo.repository.EventRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
-import com.cvsgo.repository.SellAtRepository;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -44,6 +42,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -52,12 +51,6 @@ class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
-
-    @Mock
-    private EventRepository eventRepository;
-
-    @Mock
-    private SellAtRepository sellAtRepository;
 
     @Mock
     private ConvenienceStoreRepository convenienceStoreRepository;
@@ -78,7 +71,7 @@ class ProductServiceTest {
     @DisplayName("상품 목록을 정상적으로 조회한다")
     void succeed_to_read_product_list() {
         Pageable pageable = PageRequest.of(0, 20);
-        ProductSearchRequestDto request = ProductSearchRequestDto.builder()
+        SearchProductRequestDto request = SearchProductRequestDto.builder()
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))
@@ -87,29 +80,27 @@ class ProductServiceTest {
             .build();
 
         given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
+        given(productRepository.countByFilter(any())).willReturn((long) getProductList().size());
         given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
-        List<ProductResponseDto> result = productService.getProductList(user, request, pageable);
-        assertEquals(result.size(), getProductList().size());
+        Page<ProductResponseDto> result = productService.readProductList(user, request, pageable);
+        assertEquals(result.getTotalElements(), getProductList().size());
 
         then(productRepository).should(times(1)).searchByFilter(any(), any(), any());
+        then(productRepository).should(times(1)).countByFilter(any());
         then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
     }
 
     @Test
     @DisplayName("상품을 정상적으로 조회한다")
     void succeed_to_read_product() {
-        given(productRepository.findByProductId(any(), any())).willReturn(
-            Optional.of(ProductDetailResponseDto.of(product1, manufacturer1, productLike,
-                productBookmark)));
-        given(sellAtRepository.findByProductId(any())).willReturn(List.of(sellAt1));
-        given(eventRepository.findByProductAndConvenienceStore(any(), any())).willReturn(bogoEvent);
+        given(productRepository.findByProductId(any(), any())).willReturn(Optional.of(productDetailResponse));
+        given(productRepository.findConvenienceStoreEventsByProductId(any())).willReturn(getCvsEventList());
 
         productService.readProduct(user, 1L);
 
         then(productRepository).should(times(1)).findByProductId(any(), any());
-        then(sellAtRepository).should(times(1)).findByProductId(any());
-        then(eventRepository).should(times(1)).findByProductAndConvenienceStore(any(), any());
+        then(productRepository).should(times(1)).findConvenienceStoreEventsByProductId(any());
     }
 
     @Test
@@ -290,14 +281,19 @@ class ProductServiceTest {
         .name("CU")
         .build();
 
+    ConvenienceStore cvs2 = ConvenienceStore.builder()
+        .name("GS25")
+        .build();
+
     BogoEvent bogoEvent = BogoEvent.builder()
         .product(product1)
         .convenienceStore(cvs1)
         .build();
 
-    SellAt sellAt1 = SellAt.builder()
+    DiscountEvent discountEvent = DiscountEvent.builder()
         .product(product1)
-        .convenienceStore(cvs1)
+        .convenienceStore(cvs2)
+        .discountAmount(100)
         .build();
 
     User user = User.builder().build();
@@ -312,23 +308,22 @@ class ProductServiceTest {
         .product(product1)
         .build();
 
-    SearchProductQueryDto productResponse1 = SearchProductQueryDto.builder()
-        .productId(13L)
-        .productName(product1.getName())
-        .productBookmark(productBookmark)
-        .productLike(productLike)
-        .productImageUrl(product1.getImageUrl())
-        .reviewCount(13L)
-        .avgRating(2.5)
-        .build();
+    SearchProductQueryDto productResponse1 = new SearchProductQueryDto(product1.getId(),
+        product1.getName(), product1.getPrice(), product1.getImageUrl(),
+        product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark,
+        5L, 3.5, 4.5);
+
+    SearchProductDetailQueryDto productDetailResponse = new SearchProductDetailQueryDto(product1.getId(),
+        product1.getName(), product1.getPrice(), product1.getImageUrl(),
+        product1.getManufacturer().getName(), productLike, productBookmark);
 
     ConvenienceStoreEventQueryDto cvsEvent1 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
-            "GS25", EventType.BOGO);
+            "GS25", bogoEvent);
 
     ConvenienceStoreEventQueryDto cvsEvent2 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
-            "CU", EventType.DISCOUNT);
+            "CU", discountEvent);
 
     ConvenienceStoreEventQueryDto cvsEvent3 =
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),

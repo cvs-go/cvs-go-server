@@ -6,20 +6,17 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 
-import com.cvsgo.dto.product.CategoryResponseDto;
+import com.cvsgo.dto.product.CategoryDto;
+import com.cvsgo.dto.product.ConvenienceStoreDto;
+import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ConvenienceStoreResponseDto;
-import com.cvsgo.dto.product.EventTypeResponseDto;
+import com.cvsgo.dto.product.EventTypeDto;
 import com.cvsgo.dto.product.ProductDetailResponseDto;
 import com.cvsgo.dto.product.ProductFilterResponseDto;
 import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.ProductSearchFilter;
-import com.cvsgo.dto.product.ProductSearchRequestDto;
+import com.cvsgo.dto.product.SearchProductDetailQueryDto;
 import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SellAtEventResponseDto;
-import com.cvsgo.dto.product.SellAtResponseDto;
-import com.cvsgo.entity.Category;
-import com.cvsgo.entity.ConvenienceStore;
+import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -32,17 +29,17 @@ import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.product.NotFoundProductLikeException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
-import com.cvsgo.repository.EventRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
-import com.cvsgo.repository.SellAtRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +50,6 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final EventRepository eventRepository;
-    private final SellAtRepository sellAtRepository;
     private final ConvenienceStoreRepository convenienceStoreRepository;
     private final ProductLikeRepository productLikeRepository;
     private final ProductBookmarkRepository productBookmarkRepository;
@@ -66,35 +61,25 @@ public class ProductService {
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public List<ProductResponseDto> getProductList(User user, ProductSearchRequestDto request,
+    public Page<ProductResponseDto> readProductList(User user, SearchProductRequestDto request,
         Pageable pageable) {
         List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
             request, pageable);
-        List<Long> productIds = products.stream().map(SearchProductQueryDto::getProductId).toList();
+        Long totalCount = productRepository.countByFilter(request);
 
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents =
-            productRepository.findConvenienceStoreEventsByProductIds(productIds);
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
+            products.stream().map(SearchProductQueryDto::getProductId).toList());
 
-        Map<Long, List<ConvenienceStoreEventQueryDto>> productCvsEventsMap =
+        Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventsByProduct =
             convenienceStoreEvents.stream().collect(Collectors.groupingBy(
                 ConvenienceStoreEventQueryDto::getProductId));
 
-        return products.stream().map(p -> ProductResponseDto.builder()
-            .productId(p.getProductId())
-            .productName(p.getProductName())
-            .productPrice(p.getProductPrice())
-            .productImageUrl(p.getProductImageUrl())
-            .categoryId(p.getCategoryId())
-            .manufacturerName(p.getManufacturerName())
-            .isLiked(p.getIsLiked())
-            .isBookmarked(p.getIsBookmarked())
-            .reviewCount(p.getReviewCount())
-            .reviewRating(p.getAvgRating())
-            .sellAt(productCvsEventsMap.get(p.getProductId()).stream()
-                .map(c -> SellAtResponseDto.of(c.getConvenienceStoreName(), c.getEventType()))
-                .toList())
-            .build()
-        ).toList();
+        List<ProductResponseDto> results = products.stream().map(
+            productDto -> ProductResponseDto.of(productDto,
+                cvsEventsByProduct.get(productDto.getProductId()).stream().map(
+                        c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
+                    .toList())).toList();
+        return new PageImpl<>(results, pageable, totalCount);
     }
 
     /**
@@ -107,13 +92,14 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public ProductDetailResponseDto readProduct(User user, Long productId) {
-        ProductDetailResponseDto product = productRepository.findByProductId(user, productId)
+        SearchProductDetailQueryDto product = productRepository.findByProductId(user, productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
-        product.setSellAts(sellAtRepository.findByProductId(productId).stream().map(
-            sellAt -> SellAtEventResponseDto.of(sellAt.getConvenienceStore(),
-                eventRepository.findByProductAndConvenienceStore(sellAt.getProduct(),
-                    sellAt.getConvenienceStore()))).toList());
-        return product;
+
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
+            product.getProductId());
+
+        return ProductDetailResponseDto.of(product, convenienceStoreEvents.stream().map(
+            c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent())).toList());
     }
 
     /**
@@ -203,24 +189,16 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public ProductFilterResponseDto getProductFilter() {
-        List<ConvenienceStoreResponseDto> convenienceStoreNames = convenienceStoreRepository.findAll()
-            .stream().map(ConvenienceStoreResponseDto::from).toList();
-        List<CategoryResponseDto> categoryNames = categoryRepository.findAll().stream()
-            .map(CategoryResponseDto::from).toList();
-        List<EventTypeResponseDto> eventTypes = Arrays.stream(EventType.values())
-            .map(EventTypeResponseDto::from).toList();
+        List<ConvenienceStoreDto> convenienceStoreNames = convenienceStoreRepository.findAll()
+            .stream().map(ConvenienceStoreDto::from).toList();
+        List<CategoryDto> categoryNames = categoryRepository.findAll().stream()
+            .map(CategoryDto::from).toList();
+        List<EventTypeDto> eventTypes = Arrays.stream(EventType.values())
+            .map(com.cvsgo.dto.product.EventTypeDto::from).toList();
         Integer highestPrice = productRepository.findFirstByOrderByPriceDesc().getPrice();
 
         return ProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
             highestPrice);
-    }
-
-    private ProductSearchFilter convertRequestToFilter(ProductSearchRequestDto request) {
-        List<ConvenienceStore> convenienceStores = convenienceStoreRepository.findAllById(
-            request.getConvenienceStoreIds());
-        List<Category> categories = categoryRepository.findAllById(request.getCategoryIds());
-        return ProductSearchFilter.of(convenienceStores, categories, request.getEventTypes(),
-            request.getLowestPrice(), request.getHighestPrice());
     }
 
 }
