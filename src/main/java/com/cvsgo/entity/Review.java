@@ -44,7 +44,7 @@ public class Review extends BaseTimeEntity {
     private Product product;
 
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReviewImage> reviewImages = new ArrayList<>();
+    private final List<ReviewImage> reviewImages = new ArrayList<>();
 
     @NotNull
     @ColumnDefault("0")
@@ -58,12 +58,30 @@ public class Review extends BaseTimeEntity {
         this.rating = rating;
         this.user = user;
         this.product = product;
-        this.reviewImages = imageUrls.stream()
-            .map(url -> ReviewImage.builder()
+        for (String imageUrl : imageUrls) {
+            this.reviewImages.add(ReviewImage.builder()
                 .review(this)
-                .imageUrl(url)
-                .build())
-            .toList();
+                .imageUrl(imageUrl)
+                .build());
+        }
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateRating(Integer rating) {
+        this.rating = rating;
+    }
+
+    public void updateReviewImages(List<String> imageUrls) {
+        this.reviewImages.clear();
+        for (String imageUrl : imageUrls) {
+            this.reviewImages.add(ReviewImage.builder()
+                .review(this)
+                .imageUrl(imageUrl)
+                .build());
+        }
     }
 
 }

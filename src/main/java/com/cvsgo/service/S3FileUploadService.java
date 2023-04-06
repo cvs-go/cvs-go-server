@@ -34,9 +34,11 @@ public class S3FileUploadService implements FileUploadService {
     public List<String> upload(List<MultipartFile> files, String dirName) throws IOException {
         List<String> urls = new ArrayList<>();
 
-        for (MultipartFile file : files) {
-            String url = upload(file, dirName);
-            urls.add(url);
+        if (files != null) {
+            for (MultipartFile file : files) {
+                String url = upload(file, dirName);
+                urls.add(url);
+            }
         }
         return urls;
     }

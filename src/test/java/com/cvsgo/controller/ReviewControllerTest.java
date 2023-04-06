@@ -5,6 +5,8 @@ import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewResponseDto;
+import com.cvsgo.dto.review.UpdateReviewRequestDto;
+import com.cvsgo.exception.review.NotFoundReviewException;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
@@ -44,10 +47,14 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,6 +81,8 @@ class ReviewControllerTest {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String CREATE_REVIEW_API_PATH = "/api/products/{productId}/reviews";
+
+    private static final String UPDATE_REVIEW_API_PATH = "/api/reviews/{reviewId}";
 
     private static final String SEARCH_REVIEW_API_PATH = "/api/reviews";
 
@@ -106,15 +115,15 @@ class ReviewControllerTest {
             .andDo(document(documentIdentifier,
                 getDocumentRequest(),
                 getDocumentResponse(),
-                RequestDocumentation.pathParameters(
-                    RequestDocumentation.parameterWithName("productId").description("상품 ID")
+                pathParameters(
+                    parameterWithName("productId").description("상품 ID")
                 ),
                 RequestDocumentation.requestParts(
                     RequestDocumentation.partWithName("images").description("리뷰 이미지")
                 ),
                 RequestDocumentation.formParameters(
-                    RequestDocumentation.parameterWithName("content").description("리뷰 내용"),
-                    RequestDocumentation.parameterWithName("rating").description("별점")
+                    parameterWithName("content").description("리뷰 내용"),
+                    parameterWithName("rating").description("별점")
                 )
             ));
     }
@@ -150,17 +159,42 @@ class ReviewControllerTest {
                     fieldWithPath("data[].productName").type(JsonFieldType.STRING).description("상품명"),
                     fieldWithPath("data[].productManufacturer").type(JsonFieldType.STRING).description("상품 제조사"),
                     fieldWithPath("data[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+                    fieldWithPath("data[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
                     fieldWithPath("data[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
                     fieldWithPath("data[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
                     fieldWithPath("data[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL"),
                     fieldWithPath("data[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
                     fieldWithPath("data[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
-                    fieldWithPath("data[].rating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
+                    fieldWithPath("data[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
                     fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
                     fieldWithPath("data[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
                     fieldWithPath("data[].isProductBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
                     fieldWithPath("data[].reviewImageUrls").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록").optional(),
                     fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("리뷰 수정에 성공하면 HTTP 200을 응답한다.")
+    void respond_200_when_success_to_update_review() throws Exception {
+        UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(5, "맛있어요",
+            List.of());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.put(UPDATE_REVIEW_API_PATH, 1)
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isOk()).andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 ID")
+                ),
+                requestFields(
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("rating").type(JsonFieldType.NUMBER).description("별점"),
+                    fieldWithPath("images").type(JsonFieldType.ARRAY).description("리뷰 이미지")
                 )
             ));
     }
@@ -237,10 +271,11 @@ class ReviewControllerTest {
         .productName("불닭볶음면큰컵")
         .productManufacturer("삼양")
         .productImageUrl("https://어쩌구저쩌구/product/불닭볶음면.jpg")
+        .reviewId(1L)
         .reviewerId(3L)
         .reviewerNickname("불닭러버")
         .reviewerProfileImageUrl("https://어쩌구저쩌구/user/불닭러버.jpg")
-        .rating(5)
+        .reviewRating(5)
         .reviewContent("맛있어요")
         .reviewLikeCount(3L)
         .isProductBookmarked(false)
@@ -254,10 +289,11 @@ class ReviewControllerTest {
         .productName("바질크림불닭우동")
         .productManufacturer("삼양")
         .productImageUrl("https://어쩌구저쩌구/product/바질크림불닭우동.jpg")
+        .reviewId(2L)
         .reviewerId(3L)
         .reviewerNickname("불닭러버")
         .reviewerProfileImageUrl("https://어쩌구저쩌구/user/불닭러버.jpg")
-        .rating(5)
+        .reviewRating(5)
         .reviewContent("이번에 신제품 출시되었다고 해서 출시되자마자 먹어봤는데 생각보다 훨씬 맛있었어요")
         .reviewImageUrls(List.of("https://어쩌구저쩌구/review/신제품너무맛있다.jpg"))
         .reviewLikeCount(1L)

@@ -17,6 +17,8 @@ public class SearchReviewResponseDto {
 
     private final String productImageUrl;
 
+    private final Long reviewId;
+
     private final Long reviewerId;
 
     private final String reviewerNickname;
@@ -27,7 +29,7 @@ public class SearchReviewResponseDto {
 
     private final Long reviewLikeCount;
 
-    private final Integer rating;
+    private final Integer reviewRating;
 
     private final String reviewContent;
 
@@ -42,20 +44,21 @@ public class SearchReviewResponseDto {
 
     @Builder
     public SearchReviewResponseDto(Long productId, String productName, String productManufacturer,
-        String productImageUrl, Long reviewerId, String reviewerNickname,
+        String productImageUrl, Long reviewId, Long reviewerId, String reviewerNickname,
         String reviewerProfileImageUrl, List<String> reviewerTags,
-        Long reviewLikeCount, Integer rating, String reviewContent, LocalDateTime createdAt,
+        Long reviewLikeCount, Integer reviewRating, String reviewContent, LocalDateTime createdAt,
         Boolean isReviewLiked, Boolean isProductBookmarked, List<String> reviewImageUrls) {
         this.productId = productId;
         this.productName = productName;
         this.productManufacturer = productManufacturer;
         this.productImageUrl = productImageUrl;
+        this.reviewId = reviewId;
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
         this.reviewerProfileImageUrl = reviewerProfileImageUrl;
         this.reviewerTags = reviewerTags;
         this.reviewLikeCount = reviewLikeCount;
-        this.rating = rating;
+        this.reviewRating = reviewRating;
         this.reviewContent = reviewContent;
         this.createdAt = createdAt;
         this.isReviewLiked = isReviewLiked;
@@ -71,10 +74,11 @@ public class SearchReviewResponseDto {
             .reviewContent(searchReviewQueryDto.getReviewContent())
             .productImageUrl(searchReviewQueryDto.getProductImageUrl())
             .productManufacturer(searchReviewQueryDto.getManufacturerName())
+            .reviewId(searchReviewQueryDto.getReviewId())
             .reviewerId(searchReviewQueryDto.getReviewer().getId())
             .reviewerNickname(searchReviewQueryDto.getReviewer().getNickname())
             .reviewerProfileImageUrl(searchReviewQueryDto.getReviewer().getProfileImageUrl())
-            .rating(searchReviewQueryDto.getRating())
+            .reviewRating(searchReviewQueryDto.getRating())
             .reviewLikeCount(searchReviewQueryDto.getLikeCount())
             .createdAt(searchReviewQueryDto.getCreatedAt())
             .isProductBookmarked(searchReviewQueryDto.getIsProductBookmarked())
