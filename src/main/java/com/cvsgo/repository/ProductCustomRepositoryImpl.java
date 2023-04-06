@@ -152,9 +152,9 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    private static List<OrderSpecifier> sortBy(ProductSortBy sortBy, NumberPath<Double> score,
+    private static List<OrderSpecifier<?>> sortBy(ProductSortBy sortBy, NumberPath<Double> score,
         NumberPath<Double> avgRating) {
-        List<OrderSpecifier> orderSpecifiers = new ArrayList<>();
+        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
         if (sortBy != null) {
             switch (sortBy) {
                 case SCORE -> {
