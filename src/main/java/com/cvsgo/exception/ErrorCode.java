@@ -20,6 +20,7 @@ public enum ErrorCode {
 
     INVALID_PASSWORD("INVALID_PASSWORD", "비밀번호가 일치하지 않습니다."),
     UNAUTHORIZED_USER("UNAUTHORIZED_USER", "권한이 없는 사용자입니다."),
+    FORBIDDEN_USER("FORBIDDEN_USER", "권한이 없는 사용자입니다."),
     EXPIRED_TOKEN("EXPIRED_TOKEN", "만료된 토큰입니다.");
 
     private final String code;

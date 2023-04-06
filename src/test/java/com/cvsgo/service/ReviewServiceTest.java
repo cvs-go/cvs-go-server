@@ -13,6 +13,7 @@ import com.cvsgo.entity.UserTag;
 import com.cvsgo.exception.auth.UnauthorizedUserException;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.review.NotFoundReviewException;
+import com.cvsgo.exception.user.ForbiddenUserException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
@@ -110,12 +111,12 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("해당 리뷰 작성자 본인이 아닌 사용자가 리뷰 수정을 시도할 경우 UnauthorizedUserException이 발생한다")
-    void should_throw_UnauthorizedUserException_when_user_is_not_the_reviewer() {
+    @DisplayName("해당 리뷰 작성자 본인이 아닌 사용자가 리뷰 수정을 시도할 경우 ForbiddenUserException이 발생한다")
+    void should_throw_ForbiddenUserException_when_user_is_not_the_reviewer() {
         given(reviewRepository.findById(anyLong()))
             .willReturn(Optional.of(review));
 
-        assertThrows(UnauthorizedUserException.class,
+        assertThrows(ForbiddenUserException.class,
             () -> reviewService.updateReview(user1, 100L, updateReviewRequestDto));
     }
 

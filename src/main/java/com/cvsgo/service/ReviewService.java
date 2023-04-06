@@ -27,6 +27,7 @@ import com.cvsgo.exception.auth.UnauthorizedUserException;
 import java.io.IOException;
 import java.util.List;
 
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.UNAUTHORIZED_USER;
@@ -83,7 +84,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
 
         if (!user.equals(review.getUser())) {
-            throw UNAUTHORIZED_USER;
+            throw FORBIDDEN_USER;
         }
 
         List<String> imageUrls = fileUploadService.upload(request.getImages(), REVIEW_DIR_NAME);

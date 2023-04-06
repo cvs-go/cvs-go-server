@@ -21,4 +21,10 @@ public class UserExceptionHandler {
         return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenUserException.class)
+    public ErrorResponse handleForbiddentUserException(ForbiddenUserException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
+    }
+
 }
