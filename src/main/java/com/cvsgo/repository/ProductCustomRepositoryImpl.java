@@ -101,7 +101,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                             priceGreaterOrEqual(searchFilter.getLowestPrice())
                         ))
             )
-            .fetchFirst();
+            .fetchOne();
     }
 
     public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
@@ -136,7 +136,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(product.id.eq(productId))
-            .fetchFirst());
+            .fetchOne());
     }
 
     public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
