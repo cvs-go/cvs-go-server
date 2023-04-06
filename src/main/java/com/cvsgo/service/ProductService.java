@@ -70,13 +70,13 @@ public class ProductService {
         List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
             products.stream().map(SearchProductQueryDto::getProductId).toList());
 
-        Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventByProduct =
+        Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventsByProduct =
             convenienceStoreEvents.stream().collect(Collectors.groupingBy(
                 ConvenienceStoreEventQueryDto::getProductId));
 
         List<ProductResponseDto> results = products.stream().map(
             productDto -> ProductResponseDto.of(productDto,
-                cvsEventByProduct.get(productDto.getProductId()).stream().map(
+                cvsEventsByProduct.get(productDto.getProductId()).stream().map(
                         c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
                     .toList())).toList();
         return new PageImpl<>(results, pageable, totalCount);
