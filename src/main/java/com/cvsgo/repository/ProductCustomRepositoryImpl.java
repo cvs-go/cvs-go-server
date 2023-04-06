@@ -40,6 +40,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     public List<SearchProductQueryDto> searchByFilter(User loginUser,
         SearchProductRequestDto searchFilter, Pageable pageable) {
+        NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
         NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
         NumberPath<Double> score = Expressions.numberPath(Double.class, "score");
         return queryFactory.select(new QSearchProductQueryDto(
@@ -51,7 +52,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                 manufacturer.name,
                 productLike,
                 productBookmark,
-                review.count(),
+                review.count().as("reviewCount"),
                 review.rating.avg().as("avgRating"),
                 (review.rating.coalesce(0).avg().multiply(review.count()).add(product.likeCount)).as(
                     "score")
@@ -78,7 +79,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             )
             .groupBy(product)
             .orderBy(
-                sortBy(searchFilter.getSortBy(), score, avgRating).toArray(OrderSpecifier[]::new))
+                sortBy(searchFilter.getSortBy(), score, avgRating, reviewCount).toArray(OrderSpecifier[]::new))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -153,30 +154,34 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
     }
 
     private static List<OrderSpecifier<?>> sortBy(ProductSortBy sortBy, NumberPath<Double> score,
-        NumberPath<Double> avgRating) {
+        NumberPath<Double> avgRating, NumberPath<Long> reviewCount) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
         if (sortBy != null) {
             switch (sortBy) {
                 case SCORE -> {
                     orderSpecifiers.add(score.desc());
                     orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(reviewCount.desc());
                     orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
                 case RATING -> {
                     orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(reviewCount.desc());
                     orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
                 case LIKE -> {
                     orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(reviewCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
             }
         } else {
             orderSpecifiers.add(score.desc());
             orderSpecifiers.add(avgRating.desc());
+            orderSpecifiers.add(reviewCount.desc());
             orderSpecifiers.add(product.likeCount.desc());
             orderSpecifiers.add(product.createdAt.desc());
         }
