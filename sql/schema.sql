@@ -108,9 +108,9 @@ create table review (
                         created_at datetime,
                         modified_at datetime,
                         content TEXT not null,
-                        rating integer,
-                        product_id bigint,
-                        user_id bigint,
+                        rating integer not null,
+                        product_id bigint not null,
+                        user_id bigint not null,
                         like_count bigint default 0 not null,
                         primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
