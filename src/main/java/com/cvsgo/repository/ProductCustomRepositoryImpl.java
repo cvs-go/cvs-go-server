@@ -20,10 +20,12 @@ import com.cvsgo.dto.product.SearchProductQueryDto;
 import com.cvsgo.dto.product.SearchProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,12 +76,15 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                             eventTypeEq(searchFilter.getEventTypes()),
                             categoryEq(searchFilter.getCategoryIds()),
                             priceLessOrEqual(searchFilter.getHighestPrice()),
-                            priceGreaterOrEqual(searchFilter.getLowestPrice())
+                            priceGreaterOrEqual(searchFilter.getLowestPrice()),
+                            searchKeyword(searchFilter.getKeyword(),
+                                product.name.concat(product.manufacturer.name))
                         ))
             )
             .groupBy(product)
             .orderBy(
-                sortBy(searchFilter.getSortBy(), score, avgRating, reviewCount).toArray(OrderSpecifier[]::new))
+                sortBy(searchFilter.getSortBy(), score, avgRating, reviewCount).toArray(
+                    OrderSpecifier[]::new))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -88,6 +93,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
     public Long countByFilter(SearchProductRequestDto searchFilter) {
         return queryFactory.select(product.count())
             .from(product)
+            .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(
                 product.in(
                     selectDistinct(sellAt.product)
@@ -98,7 +104,9 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                             eventTypeEq(searchFilter.getEventTypes()),
                             categoryEq(searchFilter.getCategoryIds()),
                             priceLessOrEqual(searchFilter.getHighestPrice()),
-                            priceGreaterOrEqual(searchFilter.getLowestPrice())
+                            priceGreaterOrEqual(searchFilter.getLowestPrice()),
+                            searchKeyword(searchFilter.getKeyword(),
+                                product.name.concat(product.manufacturer.name))
                         ))
             )
             .fetchOne();
@@ -220,6 +228,18 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private BooleanExpression priceGreaterOrEqual(Integer lowestPrice) {
         return lowestPrice != null ? product.price.goe(lowestPrice) : null;
+    }
+
+    private BooleanBuilder searchKeyword(String keyword,
+        StringExpression productAndManufacturerName) {
+        BooleanBuilder builder = new BooleanBuilder();
+        if (keyword != null) {
+            String[] keywords = keyword.replace(" ", "").split("");
+            for (String k : keywords) {
+                builder.and(productAndManufacturerName.contains(k));
+            }
+        }
+        return builder;
     }
 
 }

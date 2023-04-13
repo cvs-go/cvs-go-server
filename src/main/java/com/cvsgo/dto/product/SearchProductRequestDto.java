@@ -24,15 +24,18 @@ public class SearchProductRequestDto {
 
     private Integer highestPrice;
 
+    private String keyword;
+
     @Builder
     public SearchProductRequestDto(ProductSortBy sortBy, List<Long> convenienceStoreIds,
         List<Long> categoryIds, List<EventType> eventTypes, Integer lowestPrice,
-        Integer highestPrice) {
+        Integer highestPrice, String keyword) {
         this.sortBy = sortBy;
         this.convenienceStoreIds = convenienceStoreIds;
         this.categoryIds = categoryIds;
         this.eventTypes = eventTypes;
         this.lowestPrice = lowestPrice;
         this.highestPrice = highestPrice;
+        this.keyword = keyword;
     }
 }

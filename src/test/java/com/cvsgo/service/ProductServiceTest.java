@@ -77,6 +77,7 @@ class ProductServiceTest {
             .eventTypes(List.of(EventType.BOGO))
             .lowestPrice(0)
             .highestPrice(1000)
+            .keyword(null)
             .build();
 
         given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
