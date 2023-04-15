@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.cvsgo.exception.product.NotFoundProductException;
 import com.cvsgo.exception.auth.UnauthorizedUserException;
+import com.cvsgo.exception.user.ForbiddenUserException;
 
 import java.io.IOException;
 import java.util.List;
@@ -142,6 +143,7 @@ public class ReviewService {
      * @param request   필터 정보
      * @param pageable  페이지 정보
      * @return 리뷰 목록
+     * @throws ForbiddenUserException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
      */
     @Transactional(readOnly = true)
     public List<ReadReviewResponseDto> getProductReviewList(User user, Long productId,
