@@ -3,6 +3,8 @@ package com.cvsgo.controller;
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.review.CreateReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewResponseDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewResponseDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
@@ -45,6 +47,14 @@ public class ReviewController {
     public SuccessResponse<List<SearchReviewResponseDto>> searchReviews(@LoginUser User user,
         @ModelAttribute SearchReviewRequestDto request, Pageable pageable) {
         return SuccessResponse.from(reviewService.getReviewList(user, request, pageable));
+    }
+
+    @GetMapping("/products/{productId}/reviews")
+    public SuccessResponse<List<ReadReviewResponseDto>> searchReviews(@LoginUser User user,
+        @PathVariable Long productId, @ModelAttribute ReadReviewRequestDto request,
+        Pageable pageable) {
+        return SuccessResponse.from(
+            reviewService.getProductReviewList(user, productId, request, pageable));
     }
 
     @PutMapping("/reviews/{reviewId}")

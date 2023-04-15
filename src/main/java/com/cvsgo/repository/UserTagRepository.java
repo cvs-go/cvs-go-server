@@ -11,4 +11,7 @@ public interface UserTagRepository extends JpaRepository<UserTag, Long> {
     @EntityGraph(attributePaths = "tag")
     List<UserTag> findByUserIn(List<User> users);
 
+    @EntityGraph(attributePaths = {"user", "tag"})
+    List<UserTag> findByUserIdIn(List<Long> userIds);
+
 }

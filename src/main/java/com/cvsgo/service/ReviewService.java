@@ -1,6 +1,9 @@
 package com.cvsgo.service;
 
 import com.cvsgo.dto.review.CreateReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewResponseDto;
 import com.cvsgo.dto.review.SearchReviewQueryDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewResponseDto;
@@ -8,6 +11,7 @@ import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.ReviewImage;
+import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserTag;
 import com.cvsgo.repository.ProductRepository;
@@ -18,6 +22,7 @@ import com.cvsgo.util.FileConstants;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +35,6 @@ import java.util.List;
 import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.UNAUTHORIZED_USER;
 import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
 
 @Service
@@ -128,6 +132,37 @@ public class ReviewService {
                 userTagsByUser.get(reviewDto.getReviewer()).stream()
                     .map(userTag -> userTag.getTag().getName()).toList())
             ).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReadReviewResponseDto> getProductReviewList(User user, Long productId,
+        ReadReviewRequestDto request, Pageable pageable) {
+
+        if (user == null || user.getRole() != Role.REGULAR) {
+            if (pageable.getPageNumber() > 0) {
+                throw FORBIDDEN_USER;
+            } else {
+                pageable = PageRequest.of(pageable.getPageNumber(), 5);
+            }
+        }
+
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, productId,
+            request, pageable);
+
+        Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImageRepository.findByReviewIdIn(
+                reviews.stream().map(
+                    ReadReviewQueryDto::getReviewId).distinct().toList())
+            .stream()
+            .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
+
+        Map<Long, List<UserTag>> userTagsByUser =
+            userTagRepository.findByUserIdIn(
+                    reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList())
+                .stream().collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
+
+        return reviews.stream().map(reviewDto -> ReadReviewResponseDto.of(reviewDto, user,
+            reviewImagesByReview.get(reviewDto.getReviewId()),
+            userTagsByUser.get(reviewDto.getReviewerId()))).toList();
     }
 
 }

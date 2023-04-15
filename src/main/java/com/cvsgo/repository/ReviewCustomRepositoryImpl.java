@@ -1,9 +1,15 @@
 package com.cvsgo.repository;
 
+import static com.cvsgo.entity.QProduct.product;
 import static com.cvsgo.entity.QProductBookmark.productBookmark;
 import static com.cvsgo.entity.QReview.review;
+import static com.cvsgo.entity.QUser.user;
+import static com.cvsgo.entity.QUserFollow.userFollow;
 
+import com.cvsgo.dto.review.QReadReviewQueryDto;
 import com.cvsgo.dto.review.QSearchReviewQueryDto;
+import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.SearchReviewQueryDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
@@ -58,7 +64,32 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .fetch();
     }
 
-    private static OrderSpecifier<?> sortBy(ReviewSortBy sortBy) {
+    public List<ReadReviewQueryDto> findAllByFilter(User loginUser, Long productId,
+        ReadReviewRequestDto filter, Pageable pageable) {
+        return queryFactory.select(new QReadReviewQueryDto(user, userFollow, review))
+            .from(review)
+            .join(user).on(user.eq(review.user))
+            .join(product).on(review.product.eq(product))
+            .leftJoin(userFollow)
+            .on(review.user.eq(userFollow.following).and(userFollowingEq(loginUser)))
+            .where(
+                review.product.id.eq(productId),
+                ratingIn(filter.getRatings()),
+                userTagIn(filter.getTagIds())
+            )
+            .orderBy(sortBy(filter.getSortBy()))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
+
+    private BooleanExpression userTagIn(List<Long> tagIds) {
+        return tagIds != null && !tagIds.isEmpty() ?
+            user.in(selectDistinct(userTag.user).from(userTag).where(userTag.tag.id.in(tagIds)))
+            : null;
+    }
+
+    private OrderSpecifier<?> sortBy(ReviewSortBy sortBy) {
         return sortBy != null ?
             switch (sortBy) {
                 case RATING -> review.rating.desc();
@@ -76,6 +107,10 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
     BooleanExpression reviewLikeUserEq(User user) {
         return user != null ? reviewLike.user.eq(user) : null;
+    }
+
+    private BooleanExpression userFollowingEq(User user) {
+        return userFollow.follower.id.eq(user == null ? -1L : user.getId());
     }
 
     BooleanExpression productBookmarkUserEq(User user) {
