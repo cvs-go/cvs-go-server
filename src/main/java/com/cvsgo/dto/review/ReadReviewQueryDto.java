@@ -15,6 +15,8 @@ public class ReadReviewQueryDto {
 
     private final String reviewerNickname;
 
+    private final String reviewerProfileImageUrl;
+
     private final boolean isFollowing;
 
     private final String content;
@@ -28,6 +30,7 @@ public class ReadReviewQueryDto {
         this.reviewerId = reviewer.getId();
         this.reviewId = review.getId();
         this.reviewerNickname = reviewer.getNickname();
+        this.reviewerProfileImageUrl = reviewer.getProfileImageUrl();
         this.isFollowing = userFollow != null;
         this.content = review.getContent();
         this.rating = review.getRating();

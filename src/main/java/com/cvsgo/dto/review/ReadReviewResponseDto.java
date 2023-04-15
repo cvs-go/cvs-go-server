@@ -16,6 +16,8 @@ public class ReadReviewResponseDto {
 
     private final String reviewerNickname;
 
+    private final String reviewerProfileImageUrl;
+
     private final Boolean isFollowingUser;
 
     private final Boolean isMe;
@@ -32,11 +34,13 @@ public class ReadReviewResponseDto {
 
     @Builder
     private ReadReviewResponseDto(Long reviewId, Long reviewerId, String reviewerNickname,
-        Boolean isFollowingUser, String reviewContent, Integer reviewRating, Long reviewLikeCount,
-        boolean isMe, List<String> tags, List<String> reviewImages) {
+        String reviewerProfileImageUrl, Boolean isFollowingUser, String reviewContent,
+        Integer reviewRating, Long reviewLikeCount, boolean isMe, List<String> tags,
+        List<String> reviewImages) {
         this.reviewId = reviewId;
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
+        this.reviewerProfileImageUrl = reviewerProfileImageUrl;
         this.isFollowingUser = isFollowingUser;
         this.isMe = isMe;
         this.reviewContent = reviewContent;
@@ -63,6 +67,7 @@ public class ReadReviewResponseDto {
             .isFollowingUser(queryDto.isFollowing())
             .isMe(loginUser != null && loginUser.getId() == queryDto.getReviewerId())
             .reviewerNickname(queryDto.getReviewerNickname())
+            .reviewerProfileImageUrl(queryDto.getReviewerProfileImageUrl())
             .reviewImages(reviewImageUrls)
             .tags(tags)
             .build();
