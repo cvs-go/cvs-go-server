@@ -134,6 +134,15 @@ public class ReviewService {
             ).toList();
     }
 
+    /**
+     * 특정 상품의 리뷰 목록을 조회합니다.
+     *
+     * @param user      현재 로그인한 사용자
+     * @param productId 상품 ID
+     * @param request   필터 정보
+     * @param pageable  페이지 정보
+     * @return 리뷰 목록
+     */
     @Transactional(readOnly = true)
     public List<ReadReviewResponseDto> getProductReviewList(User user, Long productId,
         ReadReviewRequestDto request, Pageable pageable) {
