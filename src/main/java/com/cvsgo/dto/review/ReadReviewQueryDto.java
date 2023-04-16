@@ -26,7 +26,7 @@ public class ReadReviewQueryDto {
 
     private final long likeCount;
 
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     @QueryProjection
     public ReadReviewQueryDto(User reviewer, UserFollow userFollow, Review review) {
