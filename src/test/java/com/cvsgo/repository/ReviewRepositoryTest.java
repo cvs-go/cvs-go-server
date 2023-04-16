@@ -62,7 +62,7 @@ class ReviewRepositoryTest {
             .price(1800)
             .build();
         productRepository.save(product1);
-        review = Review.builder()
+        review1 = Review.builder()
             .user(user1)
             .product(product1)
             .content("맛있어요")
@@ -76,23 +76,23 @@ class ReviewRepositoryTest {
             .content("맛없어요")
             .imageUrls(List.of("https://blahblah/review/image1.png"))
             .build();
-        reviewRepository.saveAll(List.of(review, review2));
+        reviewRepository.saveAll(List.of(review1, review2));
     }
 
     @Test
     @DisplayName("리뷰 ID로 리뷰를 조회한다")
     void succeed_to_find_review_by_id() {
         reviewRepository.flush();
-        Review foundReview = reviewRepository.findById(review.getId()).orElseThrow();
-        assertThat(foundReview).isEqualTo(review);
+        Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
+        assertThat(foundReview).isEqualTo(review1);
     }
 
     @Test
     @DisplayName("5점이었던 리뷰를 4점으로 수정한 후 해당 리뷰를 조회하면 4점이어야 한다")
     void succeed_to_update_review_rating() {
-        review.updateRating(4);
-        reviewRepository.saveAndFlush(review);
-        Review foundReview = reviewRepository.findById(review.getId()).orElseThrow();
+        review1.updateRating(4);
+        reviewRepository.saveAndFlush(review1);
+        Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
         assertThat(foundReview.getRating()).isEqualTo(4);
     }
 
@@ -100,9 +100,9 @@ class ReviewRepositoryTest {
     @DisplayName("리뷰 내용을 수정한 후 해당 리뷰를 조회하면 수정 내용이 반영되어 있어야 한다")
     void succeed_to_update_review_content() {
         final String content = "진짜 맛있어요!!";
-        review.updateContent(content);
-        reviewRepository.saveAndFlush(review);
-        Review foundReview = reviewRepository.findById(review.getId()).orElseThrow();
+        review1.updateContent(content);
+        reviewRepository.saveAndFlush(review1);
+        Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
         assertThat(foundReview.getContent()).isEqualTo(content);
     }
 
@@ -112,9 +112,9 @@ class ReviewRepositoryTest {
         List<String> imageUrls = new ArrayList<>();
         imageUrls.add("https://blahblah/review/불닭볶음면1.png");
         imageUrls.add("https://blahblah/review/불닭볶음면2.png");
-        review.updateReviewImages(imageUrls);
-        reviewRepository.saveAndFlush(review);
-        Review foundReview = reviewRepository.findById(review.getId()).orElseThrow();
+        review1.updateReviewImages(imageUrls);
+        reviewRepository.saveAndFlush(review1);
+        Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
         assertThat(foundReview.getReviewImages().size()).isEqualTo(imageUrls.size());
     }
 
@@ -166,7 +166,7 @@ class ReviewRepositoryTest {
             .compareTo(reviews.get(reviews.size() - 1).getCreatedAt())).isGreaterThanOrEqualTo(0);
     }
 
-    private Review review;
+    private Review review1;
     private Review review2;
 
     private Product product1;
