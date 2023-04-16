@@ -4,6 +4,7 @@ import com.cvsgo.entity.Review;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.querydsl.core.annotations.QueryProjection;
+import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
@@ -25,6 +26,8 @@ public class ReadReviewQueryDto {
 
     private final long likeCount;
 
+    private LocalDateTime createdAt;
+
     @QueryProjection
     public ReadReviewQueryDto(User reviewer, UserFollow userFollow, Review review) {
         this.reviewerId = reviewer.getId();
@@ -35,5 +38,6 @@ public class ReadReviewQueryDto {
         this.content = review.getContent();
         this.rating = review.getRating();
         this.likeCount = review.getLikeCount();
+        this.createdAt = review.getCreatedAt();
     }
 }

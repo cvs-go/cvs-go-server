@@ -3,6 +3,8 @@ package com.cvsgo.dto.review;
 import com.cvsgo.entity.ReviewImage;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserTag;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,11 +34,14 @@ public class ReadReviewResponseDto {
 
     private final List<String> reviewImages;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+    private final LocalDateTime createdAt;
+
     @Builder
     private ReadReviewResponseDto(Long reviewId, Long reviewerId, String reviewerNickname,
         String reviewerProfileImageUrl, Boolean isFollowingUser, String reviewContent,
         Integer reviewRating, Long reviewLikeCount, boolean isMe, List<String> tags,
-        List<String> reviewImages) {
+        List<String> reviewImages, LocalDateTime createdAt) {
         this.reviewId = reviewId;
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
@@ -48,6 +53,7 @@ public class ReadReviewResponseDto {
         this.reviewLikeCount = reviewLikeCount;
         this.reviewerTags = tags;
         this.reviewImages = reviewImages;
+        this.createdAt = createdAt;
     }
 
     public static ReadReviewResponseDto of(ReadReviewQueryDto queryDto, User loginUser,
@@ -69,6 +75,7 @@ public class ReadReviewResponseDto {
             .reviewerNickname(queryDto.getReviewerNickname())
             .reviewerProfileImageUrl(queryDto.getReviewerProfileImageUrl())
             .reviewImages(reviewImageUrls)
+            .createdAt(queryDto.getCreatedAt())
             .tags(tags)
             .build();
     }
