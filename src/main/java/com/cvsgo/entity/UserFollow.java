@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,7 @@ public class UserFollow extends BaseTimeEntity {
     @JoinColumn(name = "follower_id")
     private User follower;
 
+    @Builder
     public UserFollow(Long id, User following, User follower) {
         this.id = id;
         this.following = following;
