@@ -19,7 +19,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private final AuthService authService;
 
-    AntPathMatcher pathMatcher = new AntPathMatcher();
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
