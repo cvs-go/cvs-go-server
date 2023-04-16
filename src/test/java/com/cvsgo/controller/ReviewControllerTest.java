@@ -216,7 +216,7 @@ class ReviewControllerTest {
                     fieldWithPath("data[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
                     fieldWithPath("data[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
                     fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
-                    fieldWithPath("data[].isFollowingUser").type(JsonFieldType.BOOLEAN).description("리뷰 작성자를 사용자가 팔로우하는지 여부"),
+                    fieldWithPath("data[].isFollowingUser").type(JsonFieldType.BOOLEAN).description("사용자가 리뷰 작성자를 팔로우하는지 여부"),
                     fieldWithPath("data[].reviewImages").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록"),
                     fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간").optional()
                 )
