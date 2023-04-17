@@ -101,7 +101,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     }
 
     BooleanExpression reviewLikeUserEq(User user) {
-        return user != null ? reviewLike.user.eq(user) : null;
+        return reviewLike.user.id.eq(user == null ? -1L : user.getId());
     }
 
     private BooleanExpression userFollowingEq(User user) {
