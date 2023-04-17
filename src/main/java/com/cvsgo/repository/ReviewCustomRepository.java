@@ -14,4 +14,6 @@ public interface ReviewCustomRepository {
     List<ReadReviewQueryDto> findAllByFilter(User loginUser, Long productId,
         ReadReviewRequestDto filter, Pageable pageable);
 
+    Long countByProductIdAndFilter(Long productId, ReadReviewRequestDto filter);
+
 }

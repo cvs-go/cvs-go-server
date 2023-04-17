@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,7 +51,7 @@ public class ReviewController {
     }
 
     @GetMapping("/products/{productId}/reviews")
-    public SuccessResponse<List<ReadReviewResponseDto>> readReviews(@LoginUser User user,
+    public SuccessResponse<Page<ReadReviewResponseDto>> readReviews(@LoginUser User user,
         @PathVariable Long productId, @ModelAttribute ReadReviewRequestDto request,
         Pageable pageable) {
         return SuccessResponse.from(

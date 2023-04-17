@@ -166,6 +166,15 @@ class ReviewRepositoryTest {
             .compareTo(reviews.get(reviews.size() - 1).getCreatedAt())).isGreaterThanOrEqualTo(0);
     }
 
+    @Test
+    @DisplayName("필터를 적용한 특정 상품의 리뷰 개수를 조회한다")
+    void succeed_to_get_total_count() {
+        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(), List.of(), null);
+        Long totalCount = reviewRepository.countByProductIdAndFilter(product1.getId(), requestDto);
+
+        assertThat(totalCount).isEqualTo(2L);
+    }
+
     private Review review1;
     private Review review2;
 

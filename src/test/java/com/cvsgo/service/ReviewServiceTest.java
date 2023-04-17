@@ -107,23 +107,26 @@ class ReviewServiceTest {
 
         given(reviewRepository.findAllByFilter(any(), anyLong(), any(), any()))
             .willReturn(List.of(queryDto1));
+        given(reviewRepository.countByProductIdAndFilter(anyLong(), any()))
+            .willReturn(1L);
         given(userTagRepository.findByUserIdIn(anyList()))
             .willReturn(List.of(userTag));
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
         List<ReadReviewResponseDto> reviews = reviewService.getProductReviewList(user2, 1L,
-            requestDto, PageRequest.of(0, 20));
+            requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(1);
         then(reviewRepository).should(times(1)).findAllByFilter(any(), anyLong(), any(), any());
+        then(reviewRepository).should(times(1)).countByProductIdAndFilter(anyLong(), any());
         then(userTagRepository).should(times(1)).findByUserIdIn(any());
         then(reviewImageRepository).should(times(1)).findByReviewIdIn(any());
     }
 
     @Test
     @DisplayName("준회원인 사용자가 특정 상품의 리뷰 0페이지를 조회하면 5개만 조회된다")
-    void should_throw_ForbiddenUserException_when_associate_user_read_first_page_of_product_reviews() {
+    void should_get_only_five_reviews_when_associate_user_read_first_page_of_product_reviews() {
         ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1, userFollow, null, review);
         ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user1, userFollow, null, review);
         ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user1, userFollow, null, review);
@@ -139,16 +142,18 @@ class ReviewServiceTest {
         lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size20)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4, queryDto5,
                 queryDto6)); // page size가 20인 경우 6개
+        lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(6L);
         lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size5)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4,
                 queryDto5)); // page size가 5인 경우 5개
+        lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(5L);
         given(userTagRepository.findByUserIdIn(anyList()))
             .willReturn(List.of(userTag));
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
         List<ReadReviewResponseDto> reviews = reviewService.getProductReviewList(user1, 1L,
-            requestDto, PageRequest.of(0, 20));
+            requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isLessThanOrEqualTo(5); // user1은 준회원이기 때문에 최대 5개까지만 조회됨
         then(reviewRepository).should(times(1)).findAllByFilter(any(), anyLong(), any(), any());
@@ -174,16 +179,18 @@ class ReviewServiceTest {
         lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size20)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4, queryDto5,
                 queryDto6)); // page size가 20인 경우 6개
+        lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(6L);
         lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size5)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4,
                 queryDto5)); // page size가 5인 경우 5개
+        lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(5L);
         given(userTagRepository.findByUserIdIn(anyList()))
             .willReturn(List.of(userTag));
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
         List<ReadReviewResponseDto> reviews = reviewService.getProductReviewList(user2, 1L,
-            requestDto, PageRequest.of(0, 20));
+            requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(6); // user2는 정회원이므로 6개가 조회됨
         then(reviewRepository).should(times(1)).findAllByFilter(any(), anyLong(), any(), any());

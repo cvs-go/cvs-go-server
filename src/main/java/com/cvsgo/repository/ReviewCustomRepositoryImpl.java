@@ -84,6 +84,19 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .fetch();
     }
 
+    public Long countByProductIdAndFilter(Long productId, ReadReviewRequestDto filter) {
+        return queryFactory.select(review.count())
+            .from(review)
+            .join(user).on(user.eq(review.user))
+            .join(product).on(review.product.eq(product))
+            .where(
+                review.product.id.eq(productId),
+                ratingIn(filter.getRatings()),
+                userIn(filter.getTagIds())
+            )
+            .fetchOne();
+    }
+
     private OrderSpecifier<?> sortBy(ReviewSortBy sortBy) {
         return sortBy != null ?
             switch (sortBy) {

@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -193,7 +194,7 @@ class ReviewControllerTest {
             List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
 
         given(reviewService.getProductReviewList(any(), anyLong(), any(), any()))
-            .willReturn(List.of(responseDto));
+            .willReturn(new PageImpl<>(List.of(responseDto)));
 
         mockMvc.perform(get(PRODUCT_REVIEW_API_PATH, 1)
                 .content(objectMapper.writeValueAsString(requestDto))
@@ -208,19 +209,19 @@ class ReviewControllerTest {
                     fieldWithPath("ratings").type(JsonFieldType.ARRAY).description("별점 목록").optional()
                 ),
                 relaxedResponseFields(
-                    fieldWithPath("data[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
-                    fieldWithPath("data[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
-                    fieldWithPath("data[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
-                    fieldWithPath("data[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL").optional(),
-                    fieldWithPath("data[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
-                    fieldWithPath("data[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
-                    fieldWithPath("data[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
-                    fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
-                    fieldWithPath("data[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
-                    fieldWithPath("data[].isFollowingUser").type(JsonFieldType.BOOLEAN).description("사용자가 리뷰 작성자를 팔로우하는지 여부"),
-                    fieldWithPath("data[].isMe").type(JsonFieldType.BOOLEAN).description("로그인한 사용자가 리뷰 작성자인지 여부"),
-                    fieldWithPath("data[].reviewImages").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록"),
-                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간").optional()
+                    fieldWithPath("data.content[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.content[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
+                    fieldWithPath("data.content[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
+                    fieldWithPath("data.content[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL").optional(),
+                    fieldWithPath("data.content[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
+                    fieldWithPath("data.content[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
+                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
+                    fieldWithPath("data.content[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("data.content[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
+                    fieldWithPath("data.content[].isFollowingUser").type(JsonFieldType.BOOLEAN).description("사용자가 리뷰 작성자를 팔로우하는지 여부"),
+                    fieldWithPath("data.content[].isMe").type(JsonFieldType.BOOLEAN).description("로그인한 사용자가 리뷰 작성자인지 여부"),
+                    fieldWithPath("data.content[].reviewImages").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록"),
+                    fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간").optional()
                 )
             ));
     }

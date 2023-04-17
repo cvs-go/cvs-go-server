@@ -22,6 +22,8 @@ import com.cvsgo.util.FileConstants;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -146,7 +148,7 @@ public class ReviewService {
      * @throws ForbiddenUserException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
      */
     @Transactional(readOnly = true)
-    public List<ReadReviewResponseDto> getProductReviewList(User user, Long productId,
+    public Page<ReadReviewResponseDto> getProductReviewList(User user, Long productId,
         ReadReviewRequestDto request, Pageable pageable) {
 
         if (user == null || user.getRole() != Role.REGULAR) {
@@ -160,6 +162,8 @@ public class ReviewService {
         List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, productId,
             request, pageable);
 
+        Long totalCount = reviewRepository.countByProductIdAndFilter(productId, request);
+
         Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImageRepository.findByReviewIdIn(
                 reviews.stream().map(
                     ReadReviewQueryDto::getReviewId).distinct().toList())
@@ -171,9 +175,12 @@ public class ReviewService {
                     reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList())
                 .stream().collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
 
-        return reviews.stream().map(reviewDto -> ReadReviewResponseDto.of(reviewDto, user,
-            reviewImagesByReview.get(reviewDto.getReviewId()),
-            userTagsByUser.get(reviewDto.getReviewerId()))).toList();
+        List<ReadReviewResponseDto> results = reviews.stream()
+            .map(reviewDto -> ReadReviewResponseDto.of(reviewDto, user,
+                reviewImagesByReview.get(reviewDto.getReviewId()),
+                userTagsByUser.get(reviewDto.getReviewerId()))).toList();
+
+        return new PageImpl<>(results, pageable, totalCount);
     }
 
 }
