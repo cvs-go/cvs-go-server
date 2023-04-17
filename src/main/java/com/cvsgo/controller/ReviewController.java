@@ -50,7 +50,7 @@ public class ReviewController {
     }
 
     @GetMapping("/products/{productId}/reviews")
-    public SuccessResponse<List<ReadReviewResponseDto>> searchReviews(@LoginUser User user,
+    public SuccessResponse<List<ReadReviewResponseDto>> readReviews(@LoginUser User user,
         @PathVariable Long productId, @ModelAttribute ReadReviewRequestDto request,
         Pageable pageable) {
         return SuccessResponse.from(
