@@ -105,7 +105,7 @@ class ReviewServiceTest {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
-        given(reviewRepository.findAllByFilter(any(), anyLong(), any(), any()))
+        given(reviewRepository.findAllByProductIdAndFilter(any(), anyLong(), any(), any()))
             .willReturn(List.of(queryDto1));
         given(reviewRepository.countByProductIdAndFilter(anyLong(), any()))
             .willReturn(1L);
@@ -118,7 +118,8 @@ class ReviewServiceTest {
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(1);
-        then(reviewRepository).should(times(1)).findAllByFilter(any(), anyLong(), any(), any());
+        then(reviewRepository).should(times(1))
+            .findAllByProductIdAndFilter(any(), anyLong(), any(), any());
         then(reviewRepository).should(times(1)).countByProductIdAndFilter(anyLong(), any());
         then(userTagRepository).should(times(1)).findByUserIdIn(any());
         then(reviewImageRepository).should(times(1)).findByReviewIdIn(any());
@@ -139,11 +140,13 @@ class ReviewServiceTest {
         PageRequest size20 = PageRequest.of(0, 20);
         PageRequest size5 = PageRequest.of(0, 5);
 
-        lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size20)))
+        lenient().when(
+                reviewRepository.findAllByProductIdAndFilter(any(), anyLong(), any(), eq(size20)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4, queryDto5,
                 queryDto6)); // page size가 20인 경우 6개
         lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(6L);
-        lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size5)))
+        lenient().when(
+                reviewRepository.findAllByProductIdAndFilter(any(), anyLong(), any(), eq(size5)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4,
                 queryDto5)); // page size가 5인 경우 5개
         lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(5L);
@@ -156,7 +159,8 @@ class ReviewServiceTest {
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isLessThanOrEqualTo(5); // user1은 준회원이기 때문에 최대 5개까지만 조회됨
-        then(reviewRepository).should(times(1)).findAllByFilter(any(), anyLong(), any(), any());
+        then(reviewRepository).should(times(1))
+            .findAllByProductIdAndFilter(any(), anyLong(), any(), any());
         then(userTagRepository).should(times(1)).findByUserIdIn(any());
         then(reviewImageRepository).should(times(1)).findByReviewIdIn(any());
     }
@@ -176,11 +180,13 @@ class ReviewServiceTest {
         PageRequest size20 = PageRequest.of(0, 20);
         PageRequest size5 = PageRequest.of(0, 5);
 
-        lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size20)))
+        lenient().when(
+                reviewRepository.findAllByProductIdAndFilter(any(), anyLong(), any(), eq(size20)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4, queryDto5,
                 queryDto6)); // page size가 20인 경우 6개
         lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(6L);
-        lenient().when(reviewRepository.findAllByFilter(any(), anyLong(), any(), eq(size5)))
+        lenient().when(
+                reviewRepository.findAllByProductIdAndFilter(any(), anyLong(), any(), eq(size5)))
             .thenReturn(List.of(queryDto1, queryDto2, queryDto3, queryDto4,
                 queryDto5)); // page size가 5인 경우 5개
         lenient().when(reviewRepository.countByProductIdAndFilter(anyLong(), any())).thenReturn(5L);
@@ -193,7 +199,8 @@ class ReviewServiceTest {
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(6); // user2는 정회원이므로 6개가 조회됨
-        then(reviewRepository).should(times(1)).findAllByFilter(any(), anyLong(), any(), any());
+        then(reviewRepository).should(times(1))
+            .findAllByProductIdAndFilter(any(), anyLong(), any(), any());
         then(userTagRepository).should(times(1)).findByUserIdIn(any());
         then(reviewImageRepository).should(times(1)).findByReviewIdIn(any());
     }

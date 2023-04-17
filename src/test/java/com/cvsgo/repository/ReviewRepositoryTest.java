@@ -122,8 +122,8 @@ class ReviewRepositoryTest {
     @DisplayName("필터를 적용하지 않고 특정 상품의 리뷰를 조회하면 특정 상품의 모든 리뷰가 검색된다")
     void should_return_all_reviews_of_the_product() {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(), List.of(), null);
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, product1.getId(),
-            requestDto, PageRequest.of(0, 20));
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+            product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.size()).isEqualTo(2);
     }
@@ -133,8 +133,8 @@ class ReviewRepositoryTest {
     void success_to_read_product_reviews() {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(
             List.of(tag1.getId(), tag2.getId(), tag3.getId()), List.of(5), null);
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, product1.getId(),
-            requestDto, PageRequest.of(0, 20));
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+            product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.size()).isEqualTo(1);
         assertThat(reviews.get(0).getRating()).isEqualTo(5);
@@ -146,8 +146,8 @@ class ReviewRepositoryTest {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(
             List.of(tag1.getId(), tag2.getId(), tag3.getId()), List.of(5), ReviewSortBy.RATING);
 
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, product1.getId(),
-            requestDto, PageRequest.of(0, 20));
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+            product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.get(0).getRating()).isGreaterThanOrEqualTo(
             reviews.get(reviews.size() - 1).getRating());
@@ -159,8 +159,8 @@ class ReviewRepositoryTest {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(
             List.of(tag1.getId(), tag2.getId(), tag3.getId()), List.of(5), ReviewSortBy.LATEST);
 
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, product1.getId(),
-            requestDto, PageRequest.of(0, 20));
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+            product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.get(0).getCreatedAt()
             .compareTo(reviews.get(reviews.size() - 1).getCreatedAt())).isGreaterThanOrEqualTo(0);

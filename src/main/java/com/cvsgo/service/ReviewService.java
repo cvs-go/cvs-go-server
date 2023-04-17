@@ -159,8 +159,8 @@ public class ReviewService {
             }
         }
 
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, productId,
-            request, pageable);
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user,
+            productId, request, pageable);
 
         Long totalCount = reviewRepository.countByProductIdAndFilter(productId, request);
 
