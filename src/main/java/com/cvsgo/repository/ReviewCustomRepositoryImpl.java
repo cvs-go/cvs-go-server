@@ -75,18 +75,12 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .where(
                 review.product.id.eq(productId),
                 ratingIn(filter.getRatings()),
-                userTagIn(filter.getTagIds())
+                userIn(filter.getTagIds())
             )
             .orderBy(sortBy(filter.getSortBy()))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
-    }
-
-    private BooleanExpression userTagIn(List<Long> tagIds) {
-        return tagIds != null && !tagIds.isEmpty() ?
-            user.in(selectDistinct(userTag.user).from(userTag).where(userTag.tag.id.in(tagIds)))
-            : null;
     }
 
     private OrderSpecifier<?> sortBy(ReviewSortBy sortBy) {
