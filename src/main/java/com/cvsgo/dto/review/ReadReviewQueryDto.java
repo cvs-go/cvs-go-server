@@ -1,6 +1,7 @@
 package com.cvsgo.dto.review;
 
 import com.cvsgo.entity.Review;
+import com.cvsgo.entity.ReviewLike;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.querydsl.core.annotations.QueryProjection;
@@ -24,17 +25,21 @@ public class ReadReviewQueryDto {
 
     private final int rating;
 
+    private final boolean isReviewLiked;
+
     private final long likeCount;
 
     private final LocalDateTime createdAt;
 
     @QueryProjection
-    public ReadReviewQueryDto(User reviewer, UserFollow userFollow, Review review) {
+    public ReadReviewQueryDto(User reviewer, UserFollow userFollow, ReviewLike reviewLike,
+        Review review) {
         this.reviewerId = reviewer.getId();
         this.reviewId = review.getId();
         this.reviewerNickname = reviewer.getNickname();
         this.reviewerProfileImageUrl = reviewer.getProfileImageUrl();
         this.isFollowing = userFollow != null;
+        this.isReviewLiked = reviewLike != null;
         this.content = review.getContent();
         this.rating = review.getRating();
         this.likeCount = review.getLikeCount();

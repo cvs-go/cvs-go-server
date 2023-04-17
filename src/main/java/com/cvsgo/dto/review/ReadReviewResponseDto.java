@@ -28,6 +28,8 @@ public class ReadReviewResponseDto {
 
     private final Integer reviewRating;
 
+    private final Boolean isReviewLiked;
+
     private final Long reviewLikeCount;
 
     private final List<String> reviewerTags;
@@ -40,8 +42,8 @@ public class ReadReviewResponseDto {
     @Builder
     private ReadReviewResponseDto(Long reviewId, Long reviewerId, String reviewerNickname,
         String reviewerProfileImageUrl, Boolean isFollowingUser, String reviewContent,
-        Integer reviewRating, Long reviewLikeCount, boolean isMe, List<String> tags,
-        List<String> reviewImages, LocalDateTime createdAt) {
+        Integer reviewRating, Boolean isReviewLiked, Long reviewLikeCount, boolean isMe,
+        List<String> tags, List<String> reviewImages, LocalDateTime createdAt) {
         this.reviewId = reviewId;
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
@@ -50,6 +52,7 @@ public class ReadReviewResponseDto {
         this.isMe = isMe;
         this.reviewContent = reviewContent;
         this.reviewRating = reviewRating;
+        this.isReviewLiked = isReviewLiked;
         this.reviewLikeCount = reviewLikeCount;
         this.reviewerTags = tags;
         this.reviewImages = reviewImages;
@@ -69,6 +72,7 @@ public class ReadReviewResponseDto {
             .reviewId(queryDto.getReviewId())
             .reviewerId(queryDto.getReviewerId())
             .reviewRating(queryDto.getRating())
+            .isReviewLiked(queryDto.isReviewLiked())
             .reviewLikeCount(queryDto.getLikeCount())
             .isFollowingUser(queryDto.isFollowing())
             .isMe(loginUser != null && loginUser.getId() == queryDto.getReviewerId())
