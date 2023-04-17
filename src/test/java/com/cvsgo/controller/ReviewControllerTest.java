@@ -188,7 +188,7 @@ class ReviewControllerTest {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L), List.of(4, 5), ReviewSortBy.LATEST);
         User reviewer = User.builder().id(1L).userId("abc@naver.com").role(Role.REGULAR).nickname("닉네임").build();
         Review review = Review.builder().id(1L).rating(4).content("맛있어요").user(reviewer).imageUrls(List.of()).build();
-        ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(reviewer, null, review);
+        ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(reviewer, null, null, review);
         ReadReviewResponseDto responseDto = ReadReviewResponseDto.of(readReviewQueryDto, reviewer,
             List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
 
