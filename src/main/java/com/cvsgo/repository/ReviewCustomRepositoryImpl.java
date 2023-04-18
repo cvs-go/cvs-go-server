@@ -66,7 +66,17 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
     public List<ReadReviewQueryDto> findAllByProductIdAndFilter(User loginUser, Long productId,
         ReadReviewRequestDto filter, Pageable pageable) {
-        return queryFactory.select(new QReadReviewQueryDto(user, userFollow, reviewLike, review))
+        return queryFactory.select(new QReadReviewQueryDto(
+                user.id,
+                review.id,
+                user.nickname,
+                user.profileImageUrl,
+                userFollow,
+                review.content,
+                review.rating,
+                reviewLike,
+                review.likeCount,
+                review.createdAt))
             .from(review)
             .join(user).on(user.eq(review.user))
             .join(product).on(review.product.eq(product))

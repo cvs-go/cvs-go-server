@@ -1,8 +1,6 @@
 package com.cvsgo.dto.review;
 
-import com.cvsgo.entity.Review;
 import com.cvsgo.entity.ReviewLike;
-import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
@@ -32,17 +30,18 @@ public class ReadReviewQueryDto {
     private final LocalDateTime createdAt;
 
     @QueryProjection
-    public ReadReviewQueryDto(User reviewer, UserFollow userFollow, ReviewLike reviewLike,
-        Review review) {
-        this.reviewerId = reviewer.getId();
-        this.reviewId = review.getId();
-        this.reviewerNickname = reviewer.getNickname();
-        this.reviewerProfileImageUrl = reviewer.getProfileImageUrl();
+    public ReadReviewQueryDto(long reviewerId, long reviewId, String reviewerNickname,
+        String reviewerProfileImageUrl, UserFollow userFollow, String content, int rating,
+        ReviewLike reviewLike, long likeCount, LocalDateTime createdAt) {
+        this.reviewerId = reviewerId;
+        this.reviewId = reviewId;
+        this.reviewerNickname = reviewerNickname;
+        this.reviewerProfileImageUrl = reviewerProfileImageUrl;
         this.isFollowing = userFollow != null;
+        this.content = content;
+        this.rating = rating;
         this.isReviewLiked = reviewLike != null;
-        this.content = review.getContent();
-        this.rating = review.getRating();
-        this.likeCount = review.getLikeCount();
-        this.createdAt = review.getCreatedAt();
+        this.likeCount = likeCount;
+        this.createdAt = createdAt;
     }
 }
