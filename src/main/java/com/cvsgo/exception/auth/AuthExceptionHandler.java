@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class AuthExceptionHandler {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundUserException.class)
     public ErrorResponse handleUserNotFoundException(NotFoundUserException e) {
         return ErrorResponse.of(e.getMessage(), e.getCode());
