@@ -3,9 +3,14 @@ package com.cvsgo.controller;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.exception.ExceptionConstants.BAD_REQUEST_USER_FOLLOW;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_USER_FOLLOW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -44,6 +49,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -285,6 +291,55 @@ class UserControllerTest {
         mockMvc.perform(get("/api/users/emails/{email}/exists", email).contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(content().string(containsString("false")))
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원 팔로우 생성에 성공하면 HTTP 201을 응답한다")
+    void respond_201_when_create_user_follow_succeed() throws Exception {
+        mockMvc.perform(RestDocumentationRequestBuilders.post("/api/users/{userId}/followers", 2L)
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userId").description("팔로우할 회원 ID")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("본인을 팔로우하는 경우 HTTP 400을 응답한다")
+    void respond_400_when_bad_request_user_follow() throws Exception {
+        willThrow(BAD_REQUEST_USER_FOLLOW).given(userService).createUserFollow(any(), anyLong());
+
+        mockMvc.perform(post("/api/users/{userId}/followers", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("해당하는 아이디를 가진 사용자가 없는 경우 HTTP 404을 응답한다")
+    void respond_404_when_not_found_user() throws Exception {
+        willThrow(NOT_FOUND_USER).given(userService).createUserFollow(any(), anyLong());
+
+        mockMvc.perform(post("/api/users/{userId}/followers", 10000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("이미 해당하는 회원 팔로우가 존재하는 경우 HTTP 409을 응답한다")
+    void respond_409_when_duplicate_user_follow() throws Exception {
+        willThrow(DUPLICATE_USER_FOLLOW).given(userService).createUserFollow(any(), anyLong());
+
+        mockMvc.perform(post("/api/users/{userId}/followers", 2L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isConflict())
             .andDo(print());
     }
 
