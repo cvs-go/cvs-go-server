@@ -17,12 +17,14 @@ import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.cvsgo.entity.UserTag;
 import com.cvsgo.exception.product.NotFoundProductException;
+import com.cvsgo.exception.review.DuplicateReviewException;
 import com.cvsgo.exception.review.NotFoundReviewException;
 import com.cvsgo.exception.user.ForbiddenUserException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.UserTagRepository;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,7 @@ import static org.mockito.Mockito.times;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,6 +72,9 @@ class ReviewServiceTest {
     @InjectMocks
     ReviewService reviewService;
 
+    @Mock
+    private EntityManager entityManager;
+
     @Test
     @DisplayName("리뷰를 정상적으로 추가한다")
     void succeed_to_create_review() throws Exception {
@@ -79,6 +85,21 @@ class ReviewServiceTest {
 
         then(productRepository).should(times(1)).findById(1L);
         then(reviewRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("사용자가 해당 상품의 리뷰를 이미 작성한 경우 DuplicateReviewException이 발생한다")
+    void should_throw_DuplicateReviewException_when_user_has_already_written_review() {
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
+        given(reviewRepository.save(any())).willThrow(DataIntegrityViolationException.class);
+        given(reviewRepository.existsByProductAndUser(any(), any())).willReturn(true);
+
+        assertThrows(DuplicateReviewException.class,
+            () -> reviewService.createReview(user1, 1L, createReviewRequestDto));
+
+        then(productRepository).should(times(1)).findById(1L);
+        then(reviewRepository).should(times(1)).save(any());
+        then(reviewRepository).should(times(1)).existsByProductAndUser(any(), any());
     }
 
     @Test

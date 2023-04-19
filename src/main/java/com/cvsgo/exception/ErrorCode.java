@@ -11,6 +11,7 @@ public enum ErrorCode {
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", "중복된 닉네임입니다."),
     DUPLICATE_PRODUCT_LIKE("DUPLICATE_PRODUCT_LIKE", "중복된 상품 좋아요입니다."),
     DUPLICATE_PRODUCT_BOOKMARK("DUPLICATE_PRODUCT_BOOKMARK", "중복된 상품 북마크입니다."),
+    DUPLICATE_REVIEW("DUPLICATE_REVIEW", "한 상품에 대한 리뷰는 한 번만 작성할 수 있습니다."),
 
     NOT_FOUND_USER("NOT_FOUND_USER", "존재하지 않는 사용자입니다."),
     NOT_FOUND_PRODUCT("NOT_FOUND_PRODUCT", "존재하지 않는 상품입니다."),
