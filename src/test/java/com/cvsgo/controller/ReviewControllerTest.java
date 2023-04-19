@@ -186,10 +186,16 @@ class ReviewControllerTest {
     @Test
     @DisplayName("특정 상품의 리뷰 목록 조회에 성공하면 HTTP 200을 응답한다.")
     void respond_200_when_success_to_read_product_reviews() throws Exception {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L), List.of(4, 5), ReviewSortBy.LATEST);
-        User reviewer = User.builder().id(1L).userId("abc@naver.com").role(Role.REGULAR).nickname("닉네임").build();
-        Review review = Review.builder().id(1L).rating(4).content("맛있어요").user(reviewer).imageUrls(List.of()).build();
-        ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(reviewer, null, null, review);
+        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+            List.of(4, 5), ReviewSortBy.LATEST);
+        User reviewer = User.builder().id(1L).userId("abc@naver.com").role(Role.REGULAR)
+            .nickname("닉네임").build();
+        Review review = Review.builder().id(1L).rating(4).content("맛있어요").user(reviewer)
+            .imageUrls(List.of()).build();
+        ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(reviewer.getId(),
+            review.getId(), reviewer.getNickname(), reviewer.getProfileImageUrl(), null,
+            review.getContent(), review.getRating(), null, review.getLikeCount(),
+            LocalDateTime.now());
         ReadReviewResponseDto responseDto = ReadReviewResponseDto.of(readReviewQueryDto, reviewer,
             List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
 

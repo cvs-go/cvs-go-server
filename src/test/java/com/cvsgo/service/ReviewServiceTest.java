@@ -23,6 +23,7 @@ import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.UserTagRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -101,7 +102,9 @@ class ReviewServiceTest {
     @Test
     @DisplayName("특정 상품의 리뷰를 정상적으로 조회한다")
     void succeed_to_read_product_review() {
-        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1, userFollow, null, review);
+        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
@@ -128,12 +131,24 @@ class ReviewServiceTest {
     @Test
     @DisplayName("준회원인 사용자가 특정 상품의 리뷰 0페이지를 조회하면 5개만 조회된다")
     void should_get_only_five_reviews_when_associate_user_read_first_page_of_product_reviews() {
-        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1, userFollow, null, review);
-        ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user1, userFollow, null, review);
-        ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user1, userFollow, null, review);
-        ReadReviewQueryDto queryDto4 = new ReadReviewQueryDto(user1, userFollow, null, review);
-        ReadReviewQueryDto queryDto5 = new ReadReviewQueryDto(user1, userFollow, null, review);
-        ReadReviewQueryDto queryDto6 = new ReadReviewQueryDto(user1, userFollow, null, review);
+        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto4 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto5 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto6 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+            user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
@@ -168,12 +183,24 @@ class ReviewServiceTest {
     @Test
     @DisplayName("정회원인 사용자가 특정 상품의 리뷰 0페이지를 조회하면 정상적으로 조회된다")
     void should_throw_ForbiddenUserException_when_regular_user_read_first_page_of_product_reviews() {
-        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user2, userFollow, null, review);
-        ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user2, userFollow, null, review);
-        ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user2, userFollow, null, review);
-        ReadReviewQueryDto queryDto4 = new ReadReviewQueryDto(user2, userFollow, null, review);
-        ReadReviewQueryDto queryDto5 = new ReadReviewQueryDto(user2, userFollow, null, review);
-        ReadReviewQueryDto queryDto6 = new ReadReviewQueryDto(user2, userFollow, null, review);
+        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+            user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+            user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+            user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto4 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+            user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto5 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+            user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
+        ReadReviewQueryDto queryDto6 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+            user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
+            review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
