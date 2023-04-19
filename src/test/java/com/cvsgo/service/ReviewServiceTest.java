@@ -103,6 +103,21 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("사용자가 리뷰를 5개 작성하면 정회원이 된다")
+    void should_be_upgraded_to_regular_member_when_user_write_5_reviews() throws Exception {
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
+        given(reviewRepository.save(any())).willReturn(any());
+        given(reviewRepository.countByUser(user1)).willReturn(5L);
+
+        reviewService.createReview(user1, 1L, createReviewRequestDto);
+
+        assertThat(user1.getRole()).isEqualTo(Role.REGULAR);
+        then(productRepository).should(times(1)).findById(anyLong());
+        then(reviewRepository).should(times(1)).save(any());
+        then(reviewRepository).should(times(1)).countByUser(any());
+    }
+
+    @Test
     @DisplayName("리뷰를 정상적으로 조회한다")
     void succeed_to_read_review() {
         given(reviewRepository.searchByFilter(any(), any(), any()))

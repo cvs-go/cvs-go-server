@@ -8,4 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewCustomRepository {
 
     boolean existsByProductAndUser(Product product, User user);
+
+    long countByUser(User user);
+
 }

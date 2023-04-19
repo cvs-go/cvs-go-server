@@ -86,4 +86,8 @@ public class User extends BaseTimeEntity {
         userTags.add(userTag);
     }
 
+    public void updateRole(Role role) {
+        this.role = role;
+    }
+
 }

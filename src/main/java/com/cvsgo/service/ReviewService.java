@@ -90,6 +90,9 @@ public class ReviewService {
             }
             throw e;
         }
+        if (reviewRepository.countByUser(user) == 5) {
+            user.updateRole(Role.REGULAR);
+        }
     }
 
     /**
