@@ -57,14 +57,11 @@ class UserServiceTest {
             .tagIds(Arrays.asList(1L, 2L, 3L))
             .build();
 
-        given(userRepository.findByNickname(nickname))
-            .willReturn(Optional.of(user));
-        given(userRepository.save(any()))
-            .willThrow(DataIntegrityViolationException.class);
+        given(userRepository.findByNickname(nickname)).willReturn(Optional.of(user));
+        given(userRepository.save(any())).willThrow(DataIntegrityViolationException.class);
 
         assertThrows(DuplicateNicknameException.class, () -> userService.signUp(signUpRequest));
-        then(userRepository)
-            .should(times(1)).findByNickname(nickname);
+        then(userRepository).should(times(1)).findByNickname(nickname);
     }
 
 
@@ -79,14 +76,11 @@ class UserServiceTest {
             .tagIds(Arrays.asList(1L, 2L, 3L))
             .build();
 
-        given(userRepository.findByUserId(email))
-            .willReturn(Optional.of(user));
-        given(userRepository.save(any()))
-            .willThrow(DataIntegrityViolationException.class);
+        given(userRepository.findByUserId(email)).willReturn(Optional.of(user));
+        given(userRepository.save(any())).willThrow(DataIntegrityViolationException.class);
 
         assertThrows(DuplicateEmailException.class, () -> userService.signUp(signUpRequest));
-        then(userRepository)
-            .should(times(1)).findByUserId(email);
+        then(userRepository).should(times(1)).findByUserId(email);
     }
 
     @Test
@@ -103,8 +97,7 @@ class UserServiceTest {
 
         // then
         assertTrue(result);
-        then(userRepository)
-            .should(atLeastOnce()).findByUserId(email);
+        then(userRepository).should(atLeastOnce()).findByUserId(email);
     }
 
     @Test
@@ -113,16 +106,14 @@ class UserServiceTest {
         final String email = "abc@naver.com";
 
         // given
-        given(userRepository.findByUserId(email))
-            .willReturn(Optional.empty());
+        given(userRepository.findByUserId(email)).willReturn(Optional.empty());
 
         // when
         boolean result = userService.isDuplicatedEmail(email);
 
         // then
         assertFalse(result);
-        then(userRepository)
-            .should(atLeastOnce()).findByUserId(email);
+        then(userRepository).should(atLeastOnce()).findByUserId(email);
     }
 
     @Test
@@ -139,8 +130,7 @@ class UserServiceTest {
 
         // then
         assertTrue(result);
-        then(userRepository)
-            .should(atLeastOnce()).findByNickname(nickname);
+        then(userRepository).should(atLeastOnce()).findByNickname(nickname);
     }
 
     @Test
@@ -149,20 +139,16 @@ class UserServiceTest {
         final String nickname = "닉네임";
 
         // given
-        given(userRepository.findByNickname(nickname))
-            .willReturn(Optional.empty());
+        given(userRepository.findByNickname(nickname)).willReturn(Optional.empty());
 
         // when
         boolean result = userService.isDuplicatedNickname(nickname);
 
         // then
         assertFalse(result);
-        then(userRepository)
-            .should(atLeastOnce()).findByNickname(nickname);
+        then(userRepository).should(atLeastOnce()).findByNickname(nickname);
     }
 
-
     private User user = User.create("abc@naver.com", "password1!", "닉네임", List.of());
-
 
 }
