@@ -6,12 +6,14 @@ import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Arrays;
@@ -41,6 +43,9 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private EntityManager entityManager;
+
     @Test
     @DisplayName("이미 존재하는 닉네임이면 회원가입시 DuplicateNicknameException이 발생한다")
     void should_throw_DuplicateEmailException_when_nickname_is_duplicate() {
@@ -52,27 +57,21 @@ class UserServiceTest {
                 .tagIds(Arrays.asList(1L, 2L, 3L))
                 .build();
 
-        // given
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.empty())
                 .willReturn(Optional.of(User.builder().build()));
         given(userRepository.save(any()))
-                .willReturn(User.builder().build());
+                .willThrow(DataIntegrityViolationException.class);
 
-        // when
-        userService.signUp(signUpRequest);
-
-        // then
         assertThrows(DuplicateNicknameException.class, () -> userService.signUp(signUpRequest));
         then(userRepository)
-                .should(times(2)).findByNickname(nickname);
+                .should(times(1)).findByNickname(nickname);
     }
 
 
     @Test
     @DisplayName("이미 존재하는 이메일이면 회원가입시 DuplicateEmailException이 발생한다")
     void should_throw_DuplicateNicknameException_when_email_is_duplicate() {
-        final String email = "abcd@naver.com";
+        final String email = "abc@naver.com";
         SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
                 .email(email)
                 .password("111111111a!")
@@ -80,20 +79,14 @@ class UserServiceTest {
                 .tagIds(Arrays.asList(1L, 2L, 3L))
                 .build();
 
-        // given
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.empty())
                 .willReturn(Optional.of(User.builder().build()));
         given(userRepository.save(any()))
-                .willReturn(User.builder().build());
+                .willThrow(DataIntegrityViolationException.class);
 
-        // when
-        userService.signUp(signUpRequest);
-
-        // then
         assertThrows(DuplicateEmailException.class, () -> userService.signUp(signUpRequest));
         then(userRepository)
-                .should(times(2)).findByUserId(email);
+                .should(times(1)).findByUserId(email);
     }
 
     @Test
