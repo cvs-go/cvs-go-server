@@ -7,6 +7,7 @@ import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,7 +59,7 @@ class UserServiceTest {
                 .build();
 
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.of(User.builder().build()));
+                .willReturn(Optional.of(user));
         given(userRepository.save(any()))
                 .willThrow(DataIntegrityViolationException.class);
 
@@ -80,7 +81,7 @@ class UserServiceTest {
                 .build();
 
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.of(User.builder().build()));
+                .willReturn(Optional.of(user));
         given(userRepository.save(any()))
                 .willThrow(DataIntegrityViolationException.class);
 
@@ -96,7 +97,7 @@ class UserServiceTest {
 
         // given
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.of(User.builder().build()));
+                .willReturn(Optional.of(user));
 
         // when
         boolean result = userService.isDuplicatedEmail(email);
@@ -132,7 +133,7 @@ class UserServiceTest {
 
         // given
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.of(User.builder().build()));
+                .willReturn(Optional.of(user));
 
         // when
         boolean result = userService.isDuplicatedNickname(nickname);
@@ -160,5 +161,9 @@ class UserServiceTest {
         then(userRepository)
                 .should(atLeastOnce()).findByNickname(nickname);
     }
+
+
+    private User user = User.create("abc@naver.com", "password1!", "닉네임", List.of());
+
 
 }
