@@ -1,26 +1,32 @@
 package com.cvsgo.service;
 
+import static com.cvsgo.exception.ExceptionConstants.BAD_REQUEST_USER_FOLLOW;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_EMAIL;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_NICKNAME;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_USER_FOLLOW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
+
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
-import com.cvsgo.repository.TagRepository;
-import com.cvsgo.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
+import com.cvsgo.entity.UserFollow;
+import com.cvsgo.exception.auth.NotFoundUserException;
+import com.cvsgo.exception.user.BadRequestUserFollowException;
 import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
+import com.cvsgo.exception.user.DuplicateUserFollowException;
+import com.cvsgo.repository.TagRepository;
+import com.cvsgo.repository.UserFollowRepository;
+import com.cvsgo.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_EMAIL;
-import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_NICKNAME;
 
 @Slf4j
 @Service
@@ -30,6 +36,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final TagRepository tagRepository;
+
+    private final UserFollowRepository userFollowRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -85,4 +93,35 @@ public class UserService {
     public boolean isDuplicatedNickname(String nickname) {
         return userRepository.findByNickname(nickname).isPresent();
     }
+
+    /**
+     * 회원 팔로우를 생성한다.
+     *
+     * @param user   로그인한 사용자
+     * @param userId 팔로잉할 사용자 ID
+     * @throws NotFoundUserException         해당하는 아이디를 가진 사용자가 없는 경우
+     * @throws BadRequestUserFollowException 본인을 팔로우하는 경우
+     * @throws DuplicateUserFollowException  이미 해당하는 회원 팔로우가 존재하는 경우
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void createUserFollow(User user, Long userId) {
+        User followingUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+        if (user.equals(followingUser)) {
+            throw BAD_REQUEST_USER_FOLLOW;
+        }
+
+        UserFollow userFollow = UserFollow.create(followingUser, user);
+        try {
+            userFollowRepository.save(userFollow);
+        } catch (DataIntegrityViolationException e) {
+            entityManager.clear();
+            if (Boolean.TRUE.equals(
+                userFollowRepository.existsByUserAndFollower(followingUser, user))) {
+                log.info("중복된 회원 팔로우: {} '{}'", user, followingUser);
+                throw DUPLICATE_USER_FOLLOW;
+            }
+            throw e;
+        }
+    }
+
 }

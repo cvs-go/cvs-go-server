@@ -38,4 +38,11 @@ public class UserFollow extends BaseTimeEntity {
         this.user = user;
         this.follower = follower;
     }
+
+    public static UserFollow create(User user, User follower) {
+        return UserFollow.builder()
+            .user(user)
+            .follower(follower)
+            .build();
+    }
 }

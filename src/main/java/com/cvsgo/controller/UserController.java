@@ -1,8 +1,10 @@
 package com.cvsgo.controller;
 
+import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
+import com.cvsgo.entity.User;
 import com.cvsgo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,14 @@ public class UserController {
     @GetMapping("/nicknames/{nickname}/exists")
     public SuccessResponse<Boolean> checkNicknameExists(@PathVariable String nickname) {
         return SuccessResponse.from(userService.isDuplicatedNickname(nickname));
+    }
+
+    @PostMapping("/{userId}/followers")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SuccessResponse<Void> createUserFollow(@LoginUser User user,
+        @PathVariable Long userId) {
+        userService.createUserFollow(user, userId);
+        return SuccessResponse.create();
     }
 
 }
