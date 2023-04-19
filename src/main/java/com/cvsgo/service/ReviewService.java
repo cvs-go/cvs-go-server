@@ -148,7 +148,7 @@ public class ReviewService {
      * @throws ForbiddenUserException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
      */
     @Transactional(readOnly = true)
-    public Page<ReadReviewResponseDto> getProductReviewList(User user, Long productId,
+    public Page<ReadReviewResponseDto> readProductReviewList(User user, Long productId,
         ReadReviewRequestDto request, Pageable pageable) {
 
         if (user == null || user.getRole() != Role.REGULAR) {

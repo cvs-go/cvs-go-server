@@ -114,7 +114,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        List<ReadReviewResponseDto> reviews = reviewService.getProductReviewList(user2, 1L,
+        List<ReadReviewResponseDto> reviews = reviewService.readProductReviewList(user2, 1L,
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(1);
@@ -155,7 +155,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        List<ReadReviewResponseDto> reviews = reviewService.getProductReviewList(user1, 1L,
+        List<ReadReviewResponseDto> reviews = reviewService.readProductReviewList(user1, 1L,
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isLessThanOrEqualTo(5); // user1은 준회원이기 때문에 최대 5개까지만 조회됨
@@ -195,7 +195,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        List<ReadReviewResponseDto> reviews = reviewService.getProductReviewList(user2, 1L,
+        List<ReadReviewResponseDto> reviews = reviewService.readProductReviewList(user2, 1L,
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(6); // user2는 정회원이므로 6개가 조회됨
@@ -212,7 +212,7 @@ class ReviewServiceTest {
             List.of(4, 5), ReviewSortBy.LATEST);
 
         assertThrows(ForbiddenUserException.class,
-            () -> reviewService.getProductReviewList(user1, 1L, requestDto, PageRequest.of(1, 20)));
+            () -> reviewService.readProductReviewList(user1, 1L, requestDto, PageRequest.of(1, 20)));
     }
 
     @Test
@@ -222,7 +222,7 @@ class ReviewServiceTest {
             List.of(4, 5), null);
 
         assertThrows(ForbiddenUserException.class,
-            () -> reviewService.getProductReviewList(null, 1L, requestDto, PageRequest.of(1, 20)));
+            () -> reviewService.readProductReviewList(null, 1L, requestDto, PageRequest.of(1, 20)));
     }
 
     @Test

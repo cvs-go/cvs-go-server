@@ -193,7 +193,7 @@ class ReviewControllerTest {
         ReadReviewResponseDto responseDto = ReadReviewResponseDto.of(readReviewQueryDto, reviewer,
             List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
 
-        given(reviewService.getProductReviewList(any(), anyLong(), any(), any()))
+        given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
             .willReturn(new PageImpl<>(List.of(responseDto)));
 
         mockMvc.perform(get(PRODUCT_REVIEW_API_PATH, 1)
@@ -230,7 +230,7 @@ class ReviewControllerTest {
     @DisplayName("권한이 없는 사용자가 특정 상품 리뷰를 조회하면 HTTP 403을 응답한다.")
     void respond_403_when_associate_member_try_to_read_product_reviews() throws Exception {
 
-        given(reviewService.getProductReviewList(any(), anyLong(), any(), any()))
+        given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
             .willThrow(FORBIDDEN_USER);
 
         mockMvc.perform(get(PRODUCT_REVIEW_API_PATH, 1)

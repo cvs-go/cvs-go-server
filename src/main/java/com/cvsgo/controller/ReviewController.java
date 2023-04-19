@@ -55,7 +55,7 @@ public class ReviewController {
         @PathVariable Long productId, @ModelAttribute ReadReviewRequestDto request,
         Pageable pageable) {
         return SuccessResponse.from(
-            reviewService.getProductReviewList(user, productId, request, pageable));
+            reviewService.readProductReviewList(user, productId, request, pageable));
     }
 
     @PutMapping("/reviews/{reviewId}")
