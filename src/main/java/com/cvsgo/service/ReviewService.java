@@ -165,18 +165,15 @@ public class ReviewService {
         Long totalCount = reviewRepository.countByProductIdAndFilter(productId, request);
 
         Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImageRepository.findByReviewIdIn(
-                reviews.stream().map(
-                    ReadReviewQueryDto::getReviewId).distinct().toList())
-            .stream()
+                reviews.stream().map(ReadReviewQueryDto::getReviewId).distinct().toList()).stream()
             .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
 
-        Map<Long, List<UserTag>> userTagsByUser =
-            userTagRepository.findByUserIdIn(
-                    reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList())
-                .stream().collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
+        Map<Long, List<UserTag>> userTagsByUser = userTagRepository.findByUserIdIn(
+                reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList()).stream()
+            .collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
 
-        List<ReadReviewResponseDto> results = reviews.stream()
-            .map(reviewDto -> ReadReviewResponseDto.of(reviewDto, user,
+        List<ReadReviewResponseDto> results = reviews.stream().map(
+            reviewDto -> ReadReviewResponseDto.of(reviewDto, user,
                 reviewImagesByReview.get(reviewDto.getReviewId()),
                 userTagsByUser.get(reviewDto.getReviewerId()))).toList();
 
