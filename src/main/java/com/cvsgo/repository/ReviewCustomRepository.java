@@ -1,5 +1,7 @@
 package com.cvsgo.repository;
 
+import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewQueryDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.entity.User;
@@ -8,5 +10,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReviewCustomRepository {
     List<SearchReviewQueryDto> searchByFilter(User user, SearchReviewRequestDto request, Pageable pageable);
+
+    List<ReadReviewQueryDto> findAllByProductIdAndFilter(User loginUser, Long productId,
+        ReadReviewRequestDto filter, Pageable pageable);
+
+    Long countByProductIdAndFilter(Long productId, ReadReviewRequestDto filter);
 
 }

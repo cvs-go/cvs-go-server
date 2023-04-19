@@ -2,11 +2,19 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
+import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewResponseDto;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.SearchReviewResponseDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
-import com.cvsgo.exception.review.NotFoundReviewException;
+import com.cvsgo.entity.Review;
+import com.cvsgo.entity.ReviewImage;
+import com.cvsgo.entity.Role;
+import com.cvsgo.entity.Tag;
+import com.cvsgo.entity.User;
+import com.cvsgo.entity.UserTag;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.RestDocumentationContextProvider;
@@ -33,6 +42,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -47,14 +57,12 @@ import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -80,7 +88,7 @@ class ReviewControllerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private static final String CREATE_REVIEW_API_PATH = "/api/products/{productId}/reviews";
+    private static final String PRODUCT_REVIEW_API_PATH = "/api/products/{productId}/reviews";
 
     private static final String UPDATE_REVIEW_API_PATH = "/api/reviews/{reviewId}";
 
@@ -105,7 +113,7 @@ class ReviewControllerTest {
         MockMultipartFile image2 = new MockMultipartFile("images", "sample_image2.png",
             MediaType.IMAGE_PNG_VALUE, "image 2".getBytes());
 
-        mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
                 .file(image1)
                 .file(image2)
                 .param("content", "진짜 맛있어요")
@@ -176,6 +184,67 @@ class ReviewControllerTest {
     }
 
     @Test
+    @DisplayName("특정 상품의 리뷰 목록 조회에 성공하면 HTTP 200을 응답한다.")
+    void respond_200_when_success_to_read_product_reviews() throws Exception {
+        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+            List.of(4, 5), ReviewSortBy.LATEST);
+        User reviewer = User.builder().id(1L).userId("abc@naver.com").role(Role.REGULAR)
+            .nickname("닉네임").build();
+        Review review = Review.builder().id(1L).rating(4).content("맛있어요").user(reviewer)
+            .imageUrls(List.of()).build();
+        ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(reviewer.getId(),
+            review.getId(), reviewer.getNickname(), reviewer.getProfileImageUrl(), null,
+            review.getContent(), review.getRating(), null, review.getLikeCount(),
+            LocalDateTime.now());
+        ReadReviewResponseDto responseDto = ReadReviewResponseDto.of(readReviewQueryDto, reviewer,
+            List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
+
+        given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
+            .willReturn(new PageImpl<>(List.of(responseDto)));
+
+        mockMvc.perform(get(PRODUCT_REVIEW_API_PATH, 1)
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk()).andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                requestFields(
+                    fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional(),
+                    fieldWithPath("tagIds").type(JsonFieldType.ARRAY).description("태그 ID 목록").optional(),
+                    fieldWithPath("ratings").type(JsonFieldType.ARRAY).description("별점 목록").optional()
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data.content[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.content[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
+                    fieldWithPath("data.content[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
+                    fieldWithPath("data.content[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL").optional(),
+                    fieldWithPath("data.content[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
+                    fieldWithPath("data.content[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
+                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
+                    fieldWithPath("data.content[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("data.content[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
+                    fieldWithPath("data.content[].isFollowingUser").type(JsonFieldType.BOOLEAN).description("사용자가 리뷰 작성자를 팔로우하는지 여부"),
+                    fieldWithPath("data.content[].isMe").type(JsonFieldType.BOOLEAN).description("로그인한 사용자가 리뷰 작성자인지 여부"),
+                    fieldWithPath("data.content[].reviewImages").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록"),
+                    fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간").optional()
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("권한이 없는 사용자가 특정 상품 리뷰를 조회하면 HTTP 403을 응답한다.")
+    void respond_403_when_associate_member_try_to_read_product_reviews() throws Exception {
+
+        given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
+            .willThrow(FORBIDDEN_USER);
+
+        mockMvc.perform(get(PRODUCT_REVIEW_API_PATH, 1)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden()).andDo(print());
+    }
+
+    @Test
     @DisplayName("리뷰 수정에 성공하면 HTTP 200을 응답한다.")
     void respond_200_when_success_to_update_review() throws Exception {
         UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(5, "맛있어요",
@@ -204,7 +273,7 @@ class ReviewControllerTest {
     @ValueSource(ints = {0, 6, 7, 8, 9, 10, 100})
     void respond_400_when_rating_is_not_range_1_to_5(Integer rating) throws Exception {
 
-        mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
                 .param("content", "맛있어요")
                 .param("rating", String.valueOf(rating))
                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -217,7 +286,7 @@ class ReviewControllerTest {
     @DisplayName("리뷰 내용이 없으면 HTTP 400을 응답한다.")
     void respond_400_when_review_content_is_empty() throws Exception {
 
-        mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
                 .param("content", "")
                 .param("rating", "5")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -231,7 +300,7 @@ class ReviewControllerTest {
     @DisplayName("리뷰 내용이 1000글자를 초과하면 HTTP 400을 응답한다.")
     void respond_400_when_review_content_exceed_1000_letters() throws Exception {
 
-        mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
                 .param("content", "내용".repeat(501))
                 .param("rating", "5")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -244,7 +313,7 @@ class ReviewControllerTest {
     @DisplayName("리뷰 내용이 1000글자이면 HTTP 201을 응답한다.")
     void respond_201_when_review_content_does_not_exceed_1000_letters() throws Exception {
 
-        mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
                 .param("content", "내용".repeat(500))
                 .param("rating", "5")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
@@ -258,13 +327,25 @@ class ReviewControllerTest {
 
         willThrow(IOException.class).given(reviewService).createReview(any(), anyLong(), any());
 
-        mockMvc.perform(multipart(CREATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
                 .param("content", "맛있어요")
                 .param("rating", "5")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
             .andExpect(status().isInternalServerError())
             .andDo(print());
     }
+
+    User user = User.create("abc@naver.com", "password1!", "닉네임", List.of(Tag.builder().name("맵부심").build()));
+    Tag tag1 = Tag.builder().name("맵부심").build();
+    Tag tag2 = Tag.builder().name("초코러버").build();
+    Tag tag3 = Tag.builder().name("소식가").build();
+
+    UserTag userTag1 = UserTag.builder().user(user).tag(tag1).build();
+    UserTag userTag2 = UserTag.builder().user(user).tag(tag2).build();
+    UserTag userTag3 = UserTag.builder().user(user).tag(tag3).build();
+
+    ReviewImage reviewImage1 = ReviewImage.builder().imageUrl("리뷰 이미지 URL 1").build();
+    ReviewImage reviewImage2 = ReviewImage.builder().imageUrl("리뷰 이미지 URL 2").build();
 
     SearchReviewResponseDto responseDto1 = SearchReviewResponseDto.builder()
         .productId(13L)
