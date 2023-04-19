@@ -1,25 +1,5 @@
 package com.cvsgo.service;
 
-import com.cvsgo.dto.user.SignUpRequestDto;
-import com.cvsgo.entity.User;
-import com.cvsgo.exception.user.DuplicateEmailException;
-import com.cvsgo.exception.user.DuplicateNicknameException;
-import com.cvsgo.repository.TagRepository;
-import com.cvsgo.repository.UserRepository;
-import jakarta.persistence.EntityManager;
-import java.util.List;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +8,25 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
+
+import com.cvsgo.dto.user.SignUpRequestDto;
+import com.cvsgo.entity.User;
+import com.cvsgo.exception.user.DuplicateEmailException;
+import com.cvsgo.exception.user.DuplicateNicknameException;
+import com.cvsgo.repository.TagRepository;
+import com.cvsgo.repository.UserRepository;
+import jakarta.persistence.EntityManager;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -52,20 +51,20 @@ class UserServiceTest {
     void should_throw_DuplicateEmailException_when_nickname_is_duplicate() {
         final String nickname = "닉네임";
         SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
-                .email("abc@naver.com")
-                .password("111111111a!")
-                .nickname(nickname)
-                .tagIds(Arrays.asList(1L, 2L, 3L))
-                .build();
+            .email("abc@naver.com")
+            .password("111111111a!")
+            .nickname(nickname)
+            .tagIds(Arrays.asList(1L, 2L, 3L))
+            .build();
 
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.of(user));
+            .willReturn(Optional.of(user));
         given(userRepository.save(any()))
-                .willThrow(DataIntegrityViolationException.class);
+            .willThrow(DataIntegrityViolationException.class);
 
         assertThrows(DuplicateNicknameException.class, () -> userService.signUp(signUpRequest));
         then(userRepository)
-                .should(times(1)).findByNickname(nickname);
+            .should(times(1)).findByNickname(nickname);
     }
 
 
@@ -74,20 +73,20 @@ class UserServiceTest {
     void should_throw_DuplicateNicknameException_when_email_is_duplicate() {
         final String email = "abc@naver.com";
         SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
-                .email(email)
-                .password("111111111a!")
-                .nickname("닉네임")
-                .tagIds(Arrays.asList(1L, 2L, 3L))
-                .build();
+            .email(email)
+            .password("111111111a!")
+            .nickname("닉네임")
+            .tagIds(Arrays.asList(1L, 2L, 3L))
+            .build();
 
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.of(user));
+            .willReturn(Optional.of(user));
         given(userRepository.save(any()))
-                .willThrow(DataIntegrityViolationException.class);
+            .willThrow(DataIntegrityViolationException.class);
 
         assertThrows(DuplicateEmailException.class, () -> userService.signUp(signUpRequest));
         then(userRepository)
-                .should(times(1)).findByUserId(email);
+            .should(times(1)).findByUserId(email);
     }
 
     @Test
@@ -97,7 +96,7 @@ class UserServiceTest {
 
         // given
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.of(user));
+            .willReturn(Optional.of(user));
 
         // when
         boolean result = userService.isDuplicatedEmail(email);
@@ -105,7 +104,7 @@ class UserServiceTest {
         // then
         assertTrue(result);
         then(userRepository)
-                .should(atLeastOnce()).findByUserId(email);
+            .should(atLeastOnce()).findByUserId(email);
     }
 
     @Test
@@ -115,7 +114,7 @@ class UserServiceTest {
 
         // given
         given(userRepository.findByUserId(email))
-                .willReturn(Optional.empty());
+            .willReturn(Optional.empty());
 
         // when
         boolean result = userService.isDuplicatedEmail(email);
@@ -123,7 +122,7 @@ class UserServiceTest {
         // then
         assertFalse(result);
         then(userRepository)
-                .should(atLeastOnce()).findByUserId(email);
+            .should(atLeastOnce()).findByUserId(email);
     }
 
     @Test
@@ -133,7 +132,7 @@ class UserServiceTest {
 
         // given
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.of(user));
+            .willReturn(Optional.of(user));
 
         // when
         boolean result = userService.isDuplicatedNickname(nickname);
@@ -141,7 +140,7 @@ class UserServiceTest {
         // then
         assertTrue(result);
         then(userRepository)
-                .should(atLeastOnce()).findByNickname(nickname);
+            .should(atLeastOnce()).findByNickname(nickname);
     }
 
     @Test
@@ -151,7 +150,7 @@ class UserServiceTest {
 
         // given
         given(userRepository.findByNickname(nickname))
-                .willReturn(Optional.empty());
+            .willReturn(Optional.empty());
 
         // when
         boolean result = userService.isDuplicatedNickname(nickname);
@@ -159,7 +158,7 @@ class UserServiceTest {
         // then
         assertFalse(result);
         then(userRepository)
-                .should(atLeastOnce()).findByNickname(nickname);
+            .should(atLeastOnce()).findByNickname(nickname);
     }
 
 
