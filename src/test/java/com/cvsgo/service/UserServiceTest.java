@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
@@ -97,7 +96,7 @@ class UserServiceTest {
 
         // then
         assertTrue(result);
-        then(userRepository).should(atLeastOnce()).findByUserId(email);
+        then(userRepository).should(times(1)).findByUserId(email);
     }
 
     @Test
@@ -113,7 +112,7 @@ class UserServiceTest {
 
         // then
         assertFalse(result);
-        then(userRepository).should(atLeastOnce()).findByUserId(email);
+        then(userRepository).should(times(1)).findByUserId(email);
     }
 
     @Test
@@ -130,7 +129,7 @@ class UserServiceTest {
 
         // then
         assertTrue(result);
-        then(userRepository).should(atLeastOnce()).findByNickname(nickname);
+        then(userRepository).should(times(1)).findByNickname(nickname);
     }
 
     @Test
@@ -146,7 +145,7 @@ class UserServiceTest {
 
         // then
         assertFalse(result);
-        then(userRepository).should(atLeastOnce()).findByNickname(nickname);
+        then(userRepository).should(times(1)).findByNickname(nickname);
     }
 
     private User user = User.create("abc@naver.com", "password1!", "닉네임", List.of());
