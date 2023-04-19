@@ -338,8 +338,8 @@ class ReviewServiceTest {
         .build();
 
     UserFollow userFollow = UserFollow.builder()
-        .following(user1)
-        .follower(user2)
+        .user(user2)
+        .follower(user1)
         .build();
 
 }

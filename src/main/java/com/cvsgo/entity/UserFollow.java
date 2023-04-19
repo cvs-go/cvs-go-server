@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"following_id", "follower_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "follower_id"})})
 public class UserFollow extends BaseTimeEntity {
 
     @Id
@@ -25,17 +25,17 @@ public class UserFollow extends BaseTimeEntity {
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "following_id")
-    private User following;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "follower_id")
     private User follower;
 
     @Builder
-    public UserFollow(Long id, User following, User follower) {
+    public UserFollow(Long id, User user, User follower) {
         this.id = id;
-        this.following = following;
+        this.user = user;
         this.follower = follower;
     }
 }

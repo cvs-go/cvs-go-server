@@ -3,8 +3,11 @@ package com.cvsgo.repository;
 import static com.cvsgo.entity.QProduct.product;
 import static com.cvsgo.entity.QProductBookmark.productBookmark;
 import static com.cvsgo.entity.QReview.review;
+import static com.cvsgo.entity.QReviewLike.reviewLike;
 import static com.cvsgo.entity.QUser.user;
 import static com.cvsgo.entity.QUserFollow.userFollow;
+import static com.cvsgo.entity.QUserTag.userTag;
+import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 
 import com.cvsgo.dto.review.QReadReviewQueryDto;
 import com.cvsgo.dto.review.QSearchReviewQueryDto;
@@ -13,11 +16,6 @@ import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.SearchReviewQueryDto;
 import com.cvsgo.dto.review.SearchReviewRequestDto;
-
-import static com.cvsgo.entity.QReviewLike.reviewLike;
-import static com.cvsgo.entity.QUserTag.userTag;
-import static com.querydsl.jpa.JPAExpressions.selectDistinct;
-
 import com.cvsgo.entity.User;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -81,7 +79,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .join(user).on(user.eq(review.user))
             .join(product).on(review.product.eq(product))
             .leftJoin(userFollow)
-            .on(review.user.eq(userFollow.following).and(userFollowingEq(loginUser)))
+            .on(review.user.eq(userFollow.user).and(userFollowingEq(loginUser)))
             .leftJoin(reviewLike).on(reviewLike.review.eq(review).and(reviewLikeUserEq(loginUser)))
             .where(
                 review.product.id.eq(productId),
