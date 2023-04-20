@@ -8,7 +8,6 @@ import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.product.DuplicateProductLikeException;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;

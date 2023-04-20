@@ -1,9 +1,17 @@
 package com.cvsgo.service;
 
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
+import static com.cvsgo.exception.ExceptionConstants.UNAUTHORIZED_USER;
+import static com.cvsgo.util.AuthConstants.ACCESS_TOKEN_TTL_MILLISECOND;
+import static com.cvsgo.util.AuthConstants.REFRESH_TOKEN_TTL_MILLISECOND;
+import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
+
 import com.cvsgo.dto.auth.LoginRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.exception.UnauthorizedException;
 import com.cvsgo.repository.RefreshTokenRepository;
 import com.cvsgo.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,23 +19,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import com.cvsgo.exception.auth.NotFoundUserException;
-import com.cvsgo.exception.auth.InvalidPasswordException;
-import com.cvsgo.exception.auth.UnauthorizedUserException;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
-
-import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
-import static com.cvsgo.exception.ExceptionConstants.UNAUTHORIZED_USER;
-import static com.cvsgo.util.AuthConstants.ACCESS_TOKEN_TTL_MILLISECOND;
-import static com.cvsgo.util.AuthConstants.REFRESH_TOKEN_TTL_MILLISECOND;
-import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -50,10 +48,11 @@ public class AuthService {
 
     /**
      * 로그인을 진행한다.
+     *
      * @param request 로그인 요청 정보
-     * @throws NotFoundUserException 해당하는 아이디를 가진 사용자가 없는 경우
-     * @throws InvalidPasswordException 비밀번호가 일치하지 않는 경우
      * @return 토큰 정보
+     * @throws NotFoundException     해당하는 아이디를 가진 사용자가 없는 경우
+     * @throws UnauthorizedException 비밀번호가 일치하지 않는 경우
      */
     @Transactional
     public TokenDto login(LoginRequestDto request) {
@@ -74,8 +73,9 @@ public class AuthService {
 
     /**
      * DB에 저장되어 있는 사용자의 리프레시 토큰을 삭제하여 로그아웃 처리를 한다.
+     *
      * @param token 리프레시 토큰
-     * @throws UnauthorizedUserException 토큰이 유효하지 않은 경우
+     * @throws UnauthorizedException 토큰이 유효하지 않은 경우
      */
     @Transactional
     public void logout(String token) {
@@ -85,9 +85,10 @@ public class AuthService {
 
     /**
      * 액세스 토큰과 리프레시 토큰을 재발급한다.
+     *
      * @param token 리프레시 토큰
      * @return 토큰 정보
-     * @throws UnauthorizedUserException 토큰이 유효하지 않은 경우
+     * @throws UnauthorizedException 토큰이 유효하지 않은 경우
      */
     @Transactional
     public TokenDto reissueToken(String token) {
@@ -116,8 +117,9 @@ public class AuthService {
 
     /**
      * 토큰 타입 부분을 제거하고 토큰 문자열만 분리하여 꺼낸다.
+     *
      * @param authorizationHeaderValue Authorization 헤더
-     * @param tokenType 토큰 타입
+     * @param tokenType                토큰 타입
      * @return 토큰 문자열
      */
     public String extractToken(String authorizationHeaderValue, String tokenType) {
@@ -130,9 +132,10 @@ public class AuthService {
 
     /**
      * 해당 토큰이 유효한지 검사한다.
+     *
      * @param token 유효성 검사하려는 토큰
      * @throws ExpiredJwtException 토큰이 만료된 경우
-     * @throws SignatureException 토큰의 시그니처가 다른 경우
+     * @throws SignatureException  토큰의 시그니처가 다른 경우
      */
     public void validateToken(String token) {
         Jwts.parserBuilder()

@@ -12,12 +12,9 @@ import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
-import com.cvsgo.exception.auth.NotFoundUserException;
-import com.cvsgo.exception.user.BadRequestUserFollowException;
-import com.cvsgo.exception.user.DuplicateEmailException;
-import com.cvsgo.exception.user.DuplicateNicknameException;
-import com.cvsgo.exception.user.DuplicateUserFollowException;
-import com.cvsgo.exception.user.NotFoundUserFollowException;
+import com.cvsgo.exception.BadRequestException;
+import com.cvsgo.exception.DuplicateException;
+import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
@@ -50,8 +47,8 @@ public class UserService {
      *
      * @param request 등록할 사용자의 정보
      * @return 등록된 사용자 정보
-     * @throws DuplicateEmailException    이메일이 중복된 경우
-     * @throws DuplicateNicknameException 닉네임이 중복된 경우
+     * @throws DuplicateException 이메일이 중복된 경우
+     * @throws DuplicateException 닉네임이 중복된 경우
      */
     @Transactional
     public SignUpResponseDto signUp(SignUpRequestDto request) {
@@ -101,9 +98,9 @@ public class UserService {
      *
      * @param user   로그인한 사용자
      * @param userId 팔로잉할 사용자 ID
-     * @throws NotFoundUserException         해당하는 아이디를 가진 사용자가 없는 경우
-     * @throws BadRequestUserFollowException 본인을 팔로우하는 경우
-     * @throws DuplicateUserFollowException  이미 해당하는 회원 팔로우가 존재하는 경우
+     * @throws NotFoundException   해당하는 아이디를 가진 사용자가 없는 경우
+     * @throws BadRequestException 본인을 팔로우하는 경우
+     * @throws DuplicateException  이미 해당하는 회원 팔로우가 존재하는 경우
      */
     @Transactional
     public void createUserFollow(User user, Long userId) {
@@ -118,7 +115,7 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             entityManager.clear();
             if (userFollowRepository.existsByUserAndFollower(user, followee)) {
-                log.info("중복된 회원 팔로우: {} '{}'", user.getId(), followee.getId());
+                log.info("중복된 회원 팔로우: {} -> {}", user.getId(), followee.getId());
                 throw DUPLICATE_USER_FOLLOW;
             }
             throw e;
@@ -130,8 +127,8 @@ public class UserService {
      *
      * @param user   로그인한 사용자
      * @param userId 언팔로우할 사용자 ID
-     * @throws NotFoundUserException       해당하는 아이디를 가진 사용자가 없는 경우
-     * @throws NotFoundUserFollowException 해당하는 팔로우가 없는 경우
+     * @throws NotFoundException 해당하는 아이디를 가진 사용자가 없는 경우
+     * @throws NotFoundException 해당하는 팔로우가 없는 경우
      */
     @Transactional
     public void deleteUserFollow(User user, Long userId) {

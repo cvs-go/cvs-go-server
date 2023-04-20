@@ -26,9 +26,7 @@ import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.product.NotFoundProductBookmarkException;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.product.NotFoundProductLikeException;
+import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
@@ -105,11 +103,11 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 상품이면 NotFoundProductException이 발생한다")
-    void should_throw_NotFoundProductException_when_product_does_not_exist() {
+    @DisplayName("상품 조회 시 존재하지 않는 상품이면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_read_product_but_product_does_not_exist() {
         given(productRepository.findByProductId(any(), any())).willReturn(Optional.empty());
 
-        assertThrows(NotFoundProductException.class, () -> productService.readProduct(user, 1000L));
+        assertThrows(NotFoundException.class, () -> productService.readProduct(user, 1000L));
 
         then(productRepository).should(times(1)).findByProductId(any(), any());
     }
@@ -130,12 +128,11 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 좋아요 생성 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
-    void should_throw_NotFoundProductException_when_create_product_like_and_product_does_not_exist() {
-        given(productRepository.findByIdWithOptimisticLock(anyLong())).willThrow(NotFoundProductException.class);
+    @DisplayName("상품 좋아요 생성 시 해당 ID의 상품이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_create_product_like_but_product_does_not_exist() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundProductException.class,
-            () -> productService.createProductLike(user, 1000L));
+        assertThrows(NotFoundException.class, () -> productService.createProductLike(user, 1000L));
 
         then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
     }
@@ -158,26 +155,24 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 좋아요 삭제 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
-    void should_throw_NotFoundProductException_when_delete_product_like_and_product_does_not_exist() {
-        given(productRepository.findByIdWithOptimisticLock(anyLong())).willThrow(NotFoundProductException.class);
+    @DisplayName("상품 좋아요 삭제 시 해당 ID의 상품이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_product_like_but_product_does_not_exist() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundProductException.class,
-            () -> productService.deleteProductLike(user, 1000L));
+        assertThrows(NotFoundException.class, () -> productService.deleteProductLike(user, 1000L));
 
         then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
     }
 
 
     @Test
-    @DisplayName("해당하는 상품 좋아요가 없는 경우 NotFoundProductLikeException이 발생한다")
-    void should_throw_NotFoundProductLikeException_when_product_like_does_not_exist() {
+    @DisplayName("상품 좋아요 삭제 시 해당하는 상품 좋아요가 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_product_like_but_product_like_does_not_exist() {
         given(productRepository.findByIdWithOptimisticLock(anyLong())).willReturn(Optional.of(product1));
         given(productLikeRepository.findByProductAndUser(any(), any())).willReturn(
             Optional.empty());
 
-        assertThrows(NotFoundProductLikeException.class,
-            () -> productService.deleteProductLike(user, 1L));
+        assertThrows(NotFoundException.class, () -> productService.deleteProductLike(user, 1L));
 
         then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
         then(productLikeRepository).should(times(1)).findByProductAndUser(any(), any());
@@ -196,12 +191,11 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 북마크 생성 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
-    void should_throw_NotFoundProductException_when_create_product_bookmark_and_product_does_not_exist() {
-        given(productRepository.findById(anyLong())).willThrow(NotFoundProductException.class);
+    @DisplayName("상품 북마크 생성 시 해당 ID의 상품이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_create_product_bookmark_but_product_does_not_exist() {
+        given(productRepository.findById(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundProductException.class,
-            () -> productService.createProductBookmark(user, 1000L));
+        assertThrows(NotFoundException.class, () -> productService.createProductBookmark(user, 1000L));
 
         then(productRepository).should(times(1)).findById(any());
     }
@@ -221,11 +215,11 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품 북마크 삭제 API를 조회했을 때 해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
-    void should_throw_NotFoundProductException_when_delete_product_bookmark_and_product_does_not_exist() {
-        given(productRepository.findById(anyLong())).willThrow(NotFoundProductException.class);
+    @DisplayName("상품 북마크 삭제 시 해당 ID의 상품이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_product_bookmark_but_product_does_not_exist() {
+        given(productRepository.findById(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundProductException.class,
+        assertThrows(NotFoundException.class,
             () -> productService.deleteProductBookmark(user, 1000L));
 
         then(productRepository).should(times(1)).findById(any());
@@ -233,14 +227,13 @@ class ProductServiceTest {
 
 
     @Test
-    @DisplayName("해당하는 상품 북마크가 없는 경우 NotFoundProductBookmarkException이 발생한다")
-    void should_throw_NotFoundProductBookmarkException_when_product_bookmark_does_not_exist() {
+    @DisplayName("상품 북마크 삭제 시 해당하는 상품 북마크가 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_product_bookmark_but_product_bookmark_does_not_exist() {
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
         given(productBookmarkRepository.findByProductAndUser(any(), any())).willReturn(
             Optional.empty());
 
-        assertThrows(NotFoundProductBookmarkException.class,
-            () -> productService.deleteProductBookmark(user, 1L));
+        assertThrows(NotFoundException.class, () -> productService.deleteProductBookmark(user, 1L));
 
         then(productRepository).should(times(1)).findById(any());
         then(productBookmarkRepository).should(times(1)).findByProductAndUser(any(), any());

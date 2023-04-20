@@ -4,9 +4,8 @@ import com.cvsgo.dto.auth.LoginRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.auth.InvalidPasswordException;
-import com.cvsgo.exception.auth.NotFoundUserException;
-import com.cvsgo.exception.auth.UnauthorizedUserException;
+import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.exception.UnauthorizedException;
 import com.cvsgo.repository.RefreshTokenRepository;
 import com.cvsgo.repository.UserRepository;
 import io.jsonwebtoken.io.Decoders;
@@ -79,8 +78,8 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 사용자이면 NotFoundUserException이 발생한다")
-    void should_throw_NotFoundUserException_when_user_does_not_exist() {
+    @DisplayName("존재하지 않는 사용자이면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_user_tries_to_login_but_user_does_not_exist() {
         LoginRequestDto loginRequestDto = LoginRequestDto.builder()
                 .email("abc@naver.com")
                 .password("password1!")
@@ -89,14 +88,14 @@ class AuthServiceTest {
         given(userRepository.findByUserId(loginRequestDto.getEmail()))
                 .willReturn(Optional.empty());
 
-        assertThrows(NotFoundUserException.class, () -> authService.login(loginRequestDto));
+        assertThrows(NotFoundException.class, () -> authService.login(loginRequestDto));
 
         then(userRepository).should(times(1)).findByUserId(any());
     }
 
     @Test
-    @DisplayName("비밀번호가 일치하지 않으면 InvalidPasswordException이 발생한다")
-    void should_throw_InvalidPasswordException_when_password_is_not_correct() {
+    @DisplayName("비밀번호가 일치하지 않으면 UnauthorizedException이 발생한다")
+    void should_throw_UnauthorizedException_when_password_is_not_correct() {
         LoginRequestDto loginRequestDto = LoginRequestDto.builder()
                 .email("abc@naver.com")
                 .password("different1!") // 잘못된 비밀번호
@@ -109,14 +108,14 @@ class AuthServiceTest {
         given(userRepository.findByUserId(loginRequestDto.getEmail()))
                 .willReturn(Optional.of(user));
 
-        assertThrows(InvalidPasswordException.class, () -> authService.login(loginRequestDto));
+        assertThrows(UnauthorizedException.class, () -> authService.login(loginRequestDto));
 
         then(userRepository).should(times(1)).findByUserId(any());
     }
 
     @Test
     @DisplayName("로그아웃에 성공한다")
-    void should_throw_nothing_when_succeed_to_logout() {
+    void should_success_to_logout_when_succeed_to_logout() {
         User user = User.builder()
                 .userId("abc@naver.com")
                 .password(passwordEncoder.encode("password1!"))
@@ -133,12 +132,12 @@ class AuthServiceTest {
 
     @Test
     @DisplayName("유효하지 않은 토큰으로 로그아웃 시도시 로그아웃에 실패한다")
-    void should_throw_UnauthorizedUserException_when_try_to_logout_with_invalid_token() {
+    void should_throw_UnauthorizedException_when_try_to_logout_with_invalid_token() {
 
         given(refreshTokenRepository.findByToken(anyString()))
                 .willReturn(Optional.empty());
 
-        assertThrows(UnauthorizedUserException.class, () -> authService.logout(anyString()));
+        assertThrows(UnauthorizedException.class, () -> authService.logout(anyString()));
 
         then(refreshTokenRepository).should(times(1)).findByToken(any());
     }
@@ -163,12 +162,12 @@ class AuthServiceTest {
     }
 
     @Test
-    @DisplayName("유효하지 않은 리프레시 토큰으로 토큰 재발급을 시도하면 UnauthorizedUserException이 발생한다")
-    void should_throw_UnauthorizedUserException_when_token_is_invalid() {
+    @DisplayName("유효하지 않은 리프레시 토큰으로 토큰 재발급을 시도하면 UnauthorizedException이 발생한다")
+    void should_throw_UnauthorizedException_when_reissue_token_but_token_is_invalid() {
         given(refreshTokenRepository.findByToken(anyString()))
                 .willReturn(Optional.empty());
 
-        assertThrows(UnauthorizedUserException.class, () -> authService.reissueToken(anyString()));
+        assertThrows(UnauthorizedException.class, () -> authService.reissueToken(anyString()));
 
         then(refreshTokenRepository).should(times(1)).findByToken(any());
     }

@@ -1,5 +1,16 @@
 package com.cvsgo.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
+
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
@@ -16,10 +27,9 @@ import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.cvsgo.entity.UserTag;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.review.DuplicateReviewException;
-import com.cvsgo.exception.review.NotFoundReviewException;
-import com.cvsgo.exception.user.ForbiddenUserException;
+import com.cvsgo.exception.DuplicateException;
+import com.cvsgo.exception.ForbiddenException;
+import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
@@ -28,26 +38,13 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
-
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 
@@ -88,13 +85,13 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 해당 상품의 리뷰를 이미 작성한 경우 DuplicateReviewException이 발생한다")
-    void should_throw_DuplicateReviewException_when_user_has_already_written_review() {
+    @DisplayName("사용자가 해당 상품의 리뷰를 이미 작성한 경우 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_write_review_but_user_has_already_written_review() {
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product));
         given(reviewRepository.save(any())).willThrow(DataIntegrityViolationException.class);
         given(reviewRepository.existsByProductAndUser(any(), any())).willReturn(true);
 
-        assertThrows(DuplicateReviewException.class,
+        assertThrows(DuplicateException.class,
             () -> reviewService.createReview(user1, 1L, createReviewRequestDto));
 
         then(productRepository).should(times(1)).findById(1L);
@@ -218,7 +215,7 @@ class ReviewServiceTest {
 
     @Test
     @DisplayName("정회원인 사용자가 특정 상품의 리뷰 0페이지를 조회하면 정상적으로 조회된다")
-    void should_throw_ForbiddenUserException_when_regular_user_read_first_page_of_product_reviews() {
+    void should_success_to_read_product_reviews_when_regular_user_read_first_page_of_product_reviews() {
         ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
@@ -269,52 +266,51 @@ class ReviewServiceTest {
     }
 
     @Test
-    @DisplayName("준회원인 사용자가 특정 상품의 리뷰 1페이지를 조회하면 ForbiddenUserException이 발생한다")
-    void should_throw_ForbiddenUserException_when_associate_user_read_second_page_of_product_reviews() {
+    @DisplayName("준회원인 사용자가 특정 상품의 리뷰 1페이지를 조회하면 ForbiddenException이 발생한다")
+    void should_throw_ForbiddenException_when_associate_user_read_second_page_of_product_reviews() {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
-        assertThrows(ForbiddenUserException.class,
+        assertThrows(ForbiddenException.class,
             () -> reviewService.readProductReviewList(user1, 1L, requestDto, PageRequest.of(1, 20)));
     }
 
     @Test
-    @DisplayName("로그인하지 않은 사용자가 특정 상품의 리뷰 1페이지를 조회하면 ForbiddenUserException이 발생한다")
-    void should_throw_ForbiddenUserException_when_non_login_user_read_second_page_of_product_reviews() {
+    @DisplayName("로그인하지 않은 사용자가 특정 상품의 리뷰 1페이지를 조회하면 ForbiddenException이 발생한다")
+    void should_throw_ForbiddenException_when_non_login_user_read_second_page_of_product_reviews() {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), null);
 
-        assertThrows(ForbiddenUserException.class,
+        assertThrows(ForbiddenException.class,
             () -> reviewService.readProductReviewList(null, 1L, requestDto, PageRequest.of(1, 20)));
     }
 
     @Test
-    @DisplayName("해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
-    void should_throw_NotFoundProductException_when_product_does_not_exist() {
+    @DisplayName("해당 ID의 상품이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_create_review_but_product_does_not_exist() {
         given(productRepository.findById(anyLong()))
-            .willThrow(NotFoundProductException.class);
+            .willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundProductException.class,
+        assertThrows(NotFoundException.class,
             () -> reviewService.createReview(user1, 100L, createReviewRequestDto));
     }
 
     @Test
-    @DisplayName("리뷰 수정시 해당 ID의 리뷰가 없는 경우 NotFoundReviewException이 발생한다")
-    void should_throw_NotFoundReviewException_when_review_does_not_exist() {
-        given(reviewRepository.findById(anyLong()))
-            .willThrow(NotFoundReviewException.class);
+    @DisplayName("리뷰 수정시 해당 ID의 리뷰가 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_update_review_but_review_does_not_exist() {
+        given(reviewRepository.findById(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundReviewException.class,
+        assertThrows(NotFoundException.class,
             () -> reviewService.updateReview(user1, 100L, updateReviewRequestDto));
     }
 
     @Test
-    @DisplayName("해당 리뷰 작성자 본인이 아닌 사용자가 리뷰 수정을 시도할 경우 ForbiddenUserException이 발생한다")
-    void should_throw_ForbiddenUserException_when_user_is_not_the_reviewer() {
+    @DisplayName("해당 리뷰 작성자 본인이 아닌 사용자가 리뷰 수정을 시도할 경우 ForbiddenException이 발생한다")
+    void should_throw_ForbiddenException_when_update_review_but_user_is_not_the_reviewer() {
         given(reviewRepository.findById(anyLong()))
             .willReturn(Optional.of(review));
 
-        assertThrows(ForbiddenUserException.class,
+        assertThrows(ForbiddenException.class,
             () -> reviewService.updateReview(user1, 100L, updateReviewRequestDto));
     }
 
