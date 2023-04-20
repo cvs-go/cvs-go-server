@@ -3,7 +3,6 @@ package com.cvsgo.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cvsgo.config.TestConfig;
-import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ class UserFollowRepositoryTest {
 
     @Test
     @DisplayName("회원 팔로우를 삭제한다")
-    void succeed_to_delete_product_bookmark() {
+    void succeed_to_delete_user_follow() {
         Optional<UserFollow> foundUserFollow = userFollowRepository.findByUserAndFollower(user2,
             user1);
 
