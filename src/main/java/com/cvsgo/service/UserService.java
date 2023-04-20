@@ -107,18 +107,18 @@ public class UserService {
      */
     @Transactional
     public void createUserFollow(User user, Long userId) {
-        User followingUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
-        if (user.equals(followingUser)) {
+        User followee = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+        if (user.equals(followee)) {
             throw BAD_REQUEST_USER_FOLLOW;
         }
 
-        UserFollow userFollow = UserFollow.create(followingUser, user);
+        UserFollow userFollow = UserFollow.create(followee, user);
         try {
             userFollowRepository.save(userFollow);
         } catch (DataIntegrityViolationException e) {
             entityManager.clear();
-            if (userFollowRepository.existsByUserAndFollower(user, followingUser)) {
-                log.info("중복된 회원 팔로우: {} '{}'", user.getId(), followingUser.getId());
+            if (userFollowRepository.existsByUserAndFollower(user, followee)) {
+                log.info("중복된 회원 팔로우: {} '{}'", user.getId(), followee.getId());
                 throw DUPLICATE_USER_FOLLOW;
             }
             throw e;
@@ -135,9 +135,9 @@ public class UserService {
      */
     @Transactional
     public void deleteUserFollow(User user, Long userId) {
-        User followingUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+        User followee = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
 
-        UserFollow userFollow = userFollowRepository.findByUserAndFollower(followingUser, user)
+        UserFollow userFollow = userFollowRepository.findByUserAndFollower(followee, user)
             .orElseThrow(() -> NOT_FOUND_USER_FOLLOW);
         userFollowRepository.delete(userFollow);
     }
