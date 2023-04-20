@@ -336,7 +336,7 @@ class UserControllerTest {
 
     @Test
     @DisplayName("회원 팔로우 생성 시 이미 해당하는 회원 팔로우가 존재하는 경우 HTTP 409을 응답한다")
-    void respond_40_when_create_user_follow_but_user_follow_duplicated() throws Exception {
+    void respond_409_when_create_user_follow_but_user_follow_duplicated() throws Exception {
         willThrow(DUPLICATE_USER_FOLLOW).given(userService).createUserFollow(any(), anyLong());
 
         mockMvc.perform(post("/api/users/{userId}/followers", 2L)
