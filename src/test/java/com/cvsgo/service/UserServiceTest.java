@@ -53,8 +53,8 @@ class UserServiceTest {
     private EntityManager entityManager;
 
     @Test
-    @DisplayName("이미 존재하는 닉네임이면 회원가입시 DuplicateNicknameException이 발생한다")
-    void should_throw_DuplicateEmailException_when_nickname_is_duplicate() {
+    @DisplayName("이미 존재하는 닉네임이면 회원가입시 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_create_user_but_nickname_is_duplicate() {
         final String nickname = "닉네임";
         SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
             .email("abc@naver.com")
@@ -72,8 +72,8 @@ class UserServiceTest {
 
 
     @Test
-    @DisplayName("이미 존재하는 이메일이면 회원가입시 DuplicateEmailException이 발생한다")
-    void should_throw_DuplicateNicknameException_when_email_is_duplicate() {
+    @DisplayName("이미 존재하는 이메일이면 회원가입시 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_create_user_email_is_duplicate() {
         final String email = "abc@naver.com";
         SignUpRequestDto signUpRequest = SignUpRequestDto.builder()
             .email(email)
