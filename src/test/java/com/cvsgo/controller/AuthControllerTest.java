@@ -112,7 +112,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("해당 이메일을 가진 계정이 존재하지 않으면 로그인 API 호출시 HTTP 400를 응답한다")
-    void respond_400_when_user_does_not_exist() throws Exception {
+    void respond_400_when_login_but_user_does_not_exist() throws Exception {
         LoginRequestDto loginRequestDto = LoginRequestDto.builder()
                 .email("abc@naver.com")
                 .password("password1!")
