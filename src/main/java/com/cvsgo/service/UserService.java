@@ -119,7 +119,7 @@ public class UserService {
             entityManager.clear();
             if (Boolean.TRUE.equals(
                 userFollowRepository.existsByUserAndFollower(followingUser, user))) {
-                log.info("중복된 회원 팔로우: {} '{}'", user, followingUser);
+                log.info("중복된 회원 팔로우: {} '{}'", user.getId(), followingUser.getId());
                 throw DUPLICATE_USER_FOLLOW;
             }
             throw e;
