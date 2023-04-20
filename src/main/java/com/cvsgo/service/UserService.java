@@ -105,7 +105,7 @@ public class UserService {
      * @throws BadRequestUserFollowException 본인을 팔로우하는 경우
      * @throws DuplicateUserFollowException  이미 해당하는 회원 팔로우가 존재하는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createUserFollow(User user, Long userId) {
         User followingUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
         if (user.equals(followingUser)) {
@@ -133,7 +133,7 @@ public class UserService {
      * @throws NotFoundUserException       해당하는 아이디를 가진 사용자가 없는 경우
      * @throws NotFoundUserFollowException 해당하는 팔로우가 없는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteUserFollow(User user, Long userId) {
         User followingUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
 
