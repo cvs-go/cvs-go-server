@@ -9,6 +9,7 @@ import com.cvsgo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +27,8 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<SignUpResponseDto> register(@RequestBody @Valid SignUpRequestDto request) {
+    public SuccessResponse<SignUpResponseDto> register(
+        @RequestBody @Valid SignUpRequestDto request) {
         return SuccessResponse.from(userService.signUp(request));
     }
 
@@ -42,9 +44,14 @@ public class UserController {
 
     @PostMapping("/{userId}/followers")
     @ResponseStatus(HttpStatus.CREATED)
-    public SuccessResponse<Void> createUserFollow(@LoginUser User user,
-        @PathVariable Long userId) {
+    public SuccessResponse<Void> createUserFollow(@LoginUser User user, @PathVariable Long userId) {
         userService.createUserFollow(user, userId);
+        return SuccessResponse.create();
+    }
+
+    @DeleteMapping("/{userId}/followers")
+    public SuccessResponse<Void> deleteUserFollow(@LoginUser User user, @PathVariable Long userId) {
+        userService.deleteUserFollow(user, userId);
         return SuccessResponse.create();
     }
 

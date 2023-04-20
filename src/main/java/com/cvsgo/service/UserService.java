@@ -5,6 +5,7 @@ import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_EMAIL;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_NICKNAME;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_USER_FOLLOW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER_FOLLOW;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
@@ -16,6 +17,7 @@ import com.cvsgo.exception.user.BadRequestUserFollowException;
 import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.exception.user.DuplicateUserFollowException;
+import com.cvsgo.exception.user.NotFoundUserFollowException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
@@ -122,6 +124,23 @@ public class UserService {
             }
             throw e;
         }
+    }
+
+    /**
+     * 회원 팔로우를 삭제한다.
+     *
+     * @param user   로그인한 사용자
+     * @param userId 언팔로우할 사용자 ID
+     * @throws NotFoundUserException       해당하는 아이디를 가진 사용자가 없는 경우
+     * @throws NotFoundUserFollowException 해당하는 팔로우가 없는 경우
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUserFollow(User user, Long userId) {
+        User followingUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+
+        UserFollow userFollow = userFollowRepository.findByUserAndFollower(followingUser, user)
+            .orElseThrow(() -> NOT_FOUND_USER_FOLLOW);
+        userFollowRepository.delete(userFollow);
     }
 
 }

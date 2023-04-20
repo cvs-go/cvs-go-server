@@ -16,6 +16,7 @@ public enum ErrorCode {
     DUPLICATE_USER_FOLLOW("DUPLICATE_USER_FOLLOW", "중복된 회원 팔로우입니다."),
 
     NOT_FOUND_USER("NOT_FOUND_USER", "존재하지 않는 사용자입니다."),
+    NOT_FOUND_USER_FOLLOW("NOT_FOUND_USER_FOLLOW", "존재하지 않는 팔로우입니다."),
     NOT_FOUND_PRODUCT("NOT_FOUND_PRODUCT", "존재하지 않는 상품입니다."),
     NOT_FOUND_PRODUCT_LIKE("NOT_FOUND_PRODUCT_LIKE", "존재하지 않는 상품 좋아요입니다."),
     NOT_FOUND_PRODUCT_BOOKMARK("NOT_FOUND_PRODUCT_BOOKMARK", "존재하지 않는 상품 북마크입니다."),

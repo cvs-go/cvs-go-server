@@ -14,6 +14,7 @@ import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
 import com.cvsgo.exception.user.DuplicateUserFollowException;
 import com.cvsgo.exception.user.ForbiddenUserException;
+import com.cvsgo.exception.user.NotFoundUserFollowException;
 
 public interface ExceptionConstants {
 
@@ -22,6 +23,7 @@ public interface ExceptionConstants {
     NotFoundUserException NOT_FOUND_USER = new NotFoundUserException(ErrorCode.NOT_FOUND_USER);
     BadRequestUserFollowException BAD_REQUEST_USER_FOLLOW = new BadRequestUserFollowException(ErrorCode.BAD_REQUEST_USER_FOLLOW);
     DuplicateUserFollowException DUPLICATE_USER_FOLLOW = new DuplicateUserFollowException(ErrorCode.DUPLICATE_USER_FOLLOW);
+    NotFoundUserFollowException NOT_FOUND_USER_FOLLOW = new NotFoundUserFollowException(ErrorCode.NOT_FOUND_USER_FOLLOW);
     InvalidPasswordException INVALID_PASSWORD = new InvalidPasswordException(ErrorCode.INVALID_PASSWORD);
     UnauthorizedUserException UNAUTHORIZED_USER = new UnauthorizedUserException(ErrorCode.UNAUTHORIZED_USER);
     ForbiddenUserException FORBIDDEN_USER = new ForbiddenUserException(ErrorCode.FORBIDDEN_USER);

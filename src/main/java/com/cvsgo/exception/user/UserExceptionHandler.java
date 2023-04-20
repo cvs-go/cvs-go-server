@@ -1,10 +1,8 @@
 package com.cvsgo.exception.user;
 
 import com.cvsgo.dto.ErrorResponse;
-import com.cvsgo.exception.product.DuplicateProductLikeException;
+import com.cvsgo.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.BindException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,6 +37,12 @@ public class UserExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(DuplicateUserFollowException.class)
     public ErrorResponse handleDuplicateUserFollowException(DuplicateUserFollowException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
+    }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NotFoundUserFollowException.class)
+    public ErrorResponse handleNotFoundUserFollowException(NotFoundUserFollowException e) {
         return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
