@@ -61,6 +61,21 @@ include::{snippets}/user-controller-test/respond_201_when_create_user_follow_suc
 | `409 CONFLICT` | `DUPLICATE_USER_FOLLOW` | 해당하는 유저 팔로우가 이미 있는 경우
 |===
 
+=== 1-6. 회원 팔로우 삭제
+==== Path Parameters
+include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_succeed/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_succeed/http-request.adoc[]
+==== Sample Response
+include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_succeed/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `404 NOT FOUND` | `NOT_FOUND_USER` | 해당하는 유저가 없는 경우
+| `404 NOT FOUND` | `NOT_FOUND_USER_FOLLOW` | 해당하는 팔로우가 없는 경우
+|===
+
 == 2. 인증
 === 2-1. 로그인
 ==== Request Fields
