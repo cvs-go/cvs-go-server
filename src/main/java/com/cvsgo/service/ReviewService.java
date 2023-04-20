@@ -1,5 +1,11 @@
 package com.cvsgo.service;
 
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
+import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
+
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
@@ -14,31 +20,28 @@ import com.cvsgo.entity.ReviewImage;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserTag;
+import com.cvsgo.exception.auth.UnauthorizedUserException;
+import com.cvsgo.exception.product.NotFoundProductException;
+import com.cvsgo.exception.review.DuplicateReviewException;
+import com.cvsgo.exception.user.ForbiddenUserException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.UserTagRepository;
 import com.cvsgo.util.FileConstants;
+import jakarta.persistence.EntityManager;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.auth.UnauthorizedUserException;
-import com.cvsgo.exception.user.ForbiddenUserException;
-
-import java.io.IOException;
-import java.util.List;
-
-import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
-import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
-import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
-import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +57,8 @@ public class ReviewService {
 
     private final ReviewImageRepository reviewImageRepository;
 
+    private final EntityManager entityManager;
+
     /**
      * 리뷰를 추가합니다.
      *
@@ -61,6 +66,7 @@ public class ReviewService {
      * @param productId 상품 ID
      * @param request   사용자가 작성한 리뷰 정보
      * @throws NotFoundProductException 해당 상품이 존재하지 않는 경우
+     * @throws DuplicateReviewException 해당 상품에 대한 리뷰를 이미 작성한 경우
      * @throws IOException              파일 접근에 실패한 경우
      */
     @Transactional(rollbackFor = Exception.class)
@@ -73,7 +79,19 @@ public class ReviewService {
             FileConstants.REVIEW_DIR_NAME);
 
         Review review = request.toEntity(user, product, imageUrls);
-        reviewRepository.save(review);
+
+        try {
+            reviewRepository.save(review);
+        } catch (DataIntegrityViolationException e) {
+            entityManager.clear();
+            if (reviewRepository.existsByProductAndUser(product, user)) {
+                throw DUPLICATE_REVIEW;
+            }
+            throw e;
+        }
+        if (reviewRepository.countByUser(user) == 5) {
+            user.updateRoleToRegular();
+        }
     }
 
     /**

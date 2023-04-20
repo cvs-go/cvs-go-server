@@ -136,7 +136,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
     BooleanExpression userIn(List<Long> tagIds) {
         return tagIds != null && !tagIds.isEmpty()
             ? review.user.in(
-                selectDistinct(userTag.user)
+            selectDistinct(userTag.user)
                 .from(userTag)
                 .where(userTag.tag.id.in(tagIds)))
             : null;

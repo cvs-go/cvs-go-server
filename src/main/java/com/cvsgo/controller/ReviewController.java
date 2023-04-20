@@ -10,11 +10,10 @@ import com.cvsgo.dto.review.SearchReviewResponseDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ReviewService;
-
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,8 +25,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor

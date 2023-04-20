@@ -15,6 +15,7 @@ import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserTag;
+import com.cvsgo.exception.ErrorCode;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -134,6 +136,21 @@ class ReviewControllerTest {
                     parameterWithName("rating").description("별점")
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("해당 사용자가 해당 상품에 이미 리뷰를 작성했다면 HTTP 409을 응답한다.")
+    void respond_409_when_user_requests_duplicate_product_review() throws Exception {
+
+        willThrow(DUPLICATE_REVIEW).given(reviewService).createReview(any(), anyLong(), any());
+
+        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
+                .param("content", "진짜 맛있어요")
+                .param("rating", "5")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+            .andExpect(status().isConflict())
+            .andExpect(content().string(containsString(ErrorCode.DUPLICATE_REVIEW.getMessage())))
+            .andDo(print());
     }
 
     @Test
