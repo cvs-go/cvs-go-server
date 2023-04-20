@@ -6,20 +6,20 @@ import lombok.Getter;
 @Getter
 public class ErrorResponse extends Response {
 
-    private final String message;
     private final String code;
+    private final String message;
 
-    private ErrorResponse(String message, String code) {
-        this.message = message;
+    private ErrorResponse(String code, String message) {
         this.code = code;
-    }
-
-    public static ErrorResponse of(String message, String code) {
-        return new ErrorResponse(message, code);
+        this.message = message;
     }
 
     public static ErrorResponse from(ErrorCode errorCode) {
-        return new ErrorResponse(errorCode.getMessage(), errorCode.getCode());
+        return new ErrorResponse(errorCode.name(), errorCode.getMessage());
+    }
+
+    public static ErrorResponse of(String code, String message) {
+        return new ErrorResponse(code, message);
     }
 
 }

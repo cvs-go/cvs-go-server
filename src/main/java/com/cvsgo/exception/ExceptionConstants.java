@@ -1,39 +1,26 @@
 package com.cvsgo.exception;
 
-import com.cvsgo.exception.auth.InvalidPasswordException;
-import com.cvsgo.exception.auth.NotFoundUserException;
-import com.cvsgo.exception.auth.UnauthorizedUserException;
-import com.cvsgo.exception.product.DuplicateProductBookmarkException;
-import com.cvsgo.exception.product.DuplicateProductLikeException;
-import com.cvsgo.exception.product.NotFoundProductBookmarkException;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.product.NotFoundProductLikeException;
-import com.cvsgo.exception.review.DuplicateReviewException;
-import com.cvsgo.exception.review.NotFoundReviewException;
-import com.cvsgo.exception.user.BadRequestUserFollowException;
-import com.cvsgo.exception.user.DuplicateEmailException;
-import com.cvsgo.exception.user.DuplicateNicknameException;
-import com.cvsgo.exception.user.DuplicateUserFollowException;
-import com.cvsgo.exception.user.ForbiddenUserException;
-import com.cvsgo.exception.user.NotFoundUserFollowException;
-
 public interface ExceptionConstants {
 
-    DuplicateEmailException DUPLICATE_EMAIL = new DuplicateEmailException(ErrorCode.DUPLICATE_EMAIL);
-    DuplicateNicknameException DUPLICATE_NICKNAME = new DuplicateNicknameException(ErrorCode.DUPLICATE_NICKNAME);
-    NotFoundUserException NOT_FOUND_USER = new NotFoundUserException(ErrorCode.NOT_FOUND_USER);
-    BadRequestUserFollowException BAD_REQUEST_USER_FOLLOW = new BadRequestUserFollowException(ErrorCode.BAD_REQUEST_USER_FOLLOW);
-    DuplicateUserFollowException DUPLICATE_USER_FOLLOW = new DuplicateUserFollowException(ErrorCode.DUPLICATE_USER_FOLLOW);
-    NotFoundUserFollowException NOT_FOUND_USER_FOLLOW = new NotFoundUserFollowException(ErrorCode.NOT_FOUND_USER_FOLLOW);
-    InvalidPasswordException INVALID_PASSWORD = new InvalidPasswordException(ErrorCode.INVALID_PASSWORD);
-    UnauthorizedUserException UNAUTHORIZED_USER = new UnauthorizedUserException(ErrorCode.UNAUTHORIZED_USER);
-    ForbiddenUserException FORBIDDEN_USER = new ForbiddenUserException(ErrorCode.FORBIDDEN_USER);
-    NotFoundProductException NOT_FOUND_PRODUCT = new NotFoundProductException(ErrorCode.NOT_FOUND_PRODUCT);
-    DuplicateProductLikeException DUPLICATE_PRODUCT_LIKE = new DuplicateProductLikeException(ErrorCode.DUPLICATE_PRODUCT_LIKE);
-    NotFoundProductLikeException NOT_FOUND_PRODUCT_LIKE = new NotFoundProductLikeException(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
-    DuplicateProductBookmarkException DUPLICATE_PRODUCT_BOOKMARK = new DuplicateProductBookmarkException(ErrorCode.DUPLICATE_PRODUCT_BOOKMARK);
-    NotFoundProductBookmarkException NOT_FOUND_PRODUCT_BOOKMARK = new NotFoundProductBookmarkException(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
-    NotFoundReviewException NOT_FOUND_REVIEW = new NotFoundReviewException(ErrorCode.NOT_FOUND_REVIEW);
-    DuplicateReviewException DUPLICATE_REVIEW = new DuplicateReviewException(ErrorCode.DUPLICATE_REVIEW);
+    BadRequestException BAD_REQUEST_USER_FOLLOW = new BadRequestException(ErrorCode.INVALID_USER_FOLLOW);
+
+    UnauthorizedException INVALID_PASSWORD = new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
+    UnauthorizedException UNAUTHORIZED_USER = new UnauthorizedException(ErrorCode.UNAUTHORIZED_USER);
+
+    ForbiddenException FORBIDDEN_USER = new ForbiddenException(ErrorCode.FORBIDDEN_USER);
+
+    NotFoundException NOT_FOUND_USER = new NotFoundException(ErrorCode.NOT_FOUND_USER);
+    NotFoundException NOT_FOUND_USER_FOLLOW = new NotFoundException(ErrorCode.NOT_FOUND_USER_FOLLOW);
+    NotFoundException NOT_FOUND_PRODUCT = new NotFoundException(ErrorCode.NOT_FOUND_PRODUCT);
+    NotFoundException NOT_FOUND_PRODUCT_LIKE = new NotFoundException(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
+    NotFoundException NOT_FOUND_PRODUCT_BOOKMARK = new NotFoundException(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
+    NotFoundException NOT_FOUND_REVIEW = new NotFoundException(ErrorCode.NOT_FOUND_REVIEW);
+
+    DuplicateException DUPLICATE_EMAIL = new DuplicateException(ErrorCode.DUPLICATE_EMAIL);
+    DuplicateException DUPLICATE_NICKNAME = new DuplicateException(ErrorCode.DUPLICATE_NICKNAME);
+    DuplicateException DUPLICATE_USER_FOLLOW = new DuplicateException(ErrorCode.DUPLICATE_USER_FOLLOW);
+    DuplicateException DUPLICATE_PRODUCT_LIKE = new DuplicateException(ErrorCode.DUPLICATE_PRODUCT_LIKE);
+    DuplicateException DUPLICATE_PRODUCT_BOOKMARK = new DuplicateException(ErrorCode.DUPLICATE_PRODUCT_BOOKMARK);
+    DuplicateException DUPLICATE_REVIEW = new DuplicateException(ErrorCode.DUPLICATE_REVIEW);
 
 }

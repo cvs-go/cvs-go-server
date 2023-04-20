@@ -20,10 +20,10 @@ import com.cvsgo.entity.ReviewImage;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserTag;
-import com.cvsgo.exception.auth.UnauthorizedUserException;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.review.DuplicateReviewException;
-import com.cvsgo.exception.user.ForbiddenUserException;
+import com.cvsgo.exception.DuplicateException;
+import com.cvsgo.exception.ForbiddenException;
+import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.exception.UnauthorizedException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
@@ -65,9 +65,9 @@ public class ReviewService {
      * @param user      리뷰를 작성한 사용자
      * @param productId 상품 ID
      * @param request   사용자가 작성한 리뷰 정보
-     * @throws NotFoundProductException 해당 상품이 존재하지 않는 경우
-     * @throws DuplicateReviewException 해당 상품에 대한 리뷰를 이미 작성한 경우
-     * @throws IOException              파일 접근에 실패한 경우
+     * @throws NotFoundException  해당 상품이 존재하지 않는 경우
+     * @throws DuplicateException 해당 상품에 대한 리뷰를 이미 작성한 경우
+     * @throws IOException        파일 접근에 실패한 경우
      */
     @Transactional(rollbackFor = Exception.class)
     public void createReview(User user, Long productId, CreateReviewRequestDto request)
@@ -100,8 +100,8 @@ public class ReviewService {
      * @param user     현재 로그인한 사용자
      * @param reviewId 리뷰 ID
      * @param request  수정할 리뷰 정보
-     * @throws UnauthorizedUserException 리뷰를 작성한 사용자가 아닌 경우
-     * @throws IOException               파일 접근에 실패한 경우
+     * @throws UnauthorizedException 리뷰를 작성한 사용자가 아닌 경우
+     * @throws IOException           파일 접근에 실패한 경우
      */
     @Transactional(rollbackFor = Exception.class)
     public void updateReview(User user, Long reviewId, UpdateReviewRequestDto request)
@@ -163,7 +163,7 @@ public class ReviewService {
      * @param request   필터 정보
      * @param pageable  페이지 정보
      * @return 리뷰 목록
-     * @throws ForbiddenUserException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
+     * @throws ForbiddenException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
      */
     @Transactional(readOnly = true)
     public Page<ReadReviewResponseDto> readProductReviewList(User user, Long productId,

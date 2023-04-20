@@ -22,11 +22,8 @@ import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.product.DuplicateProductBookmarkException;
-import com.cvsgo.exception.product.DuplicateProductLikeException;
-import com.cvsgo.exception.product.NotFoundProductBookmarkException;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.product.NotFoundProductLikeException;
+import com.cvsgo.exception.DuplicateException;
+import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
@@ -88,7 +85,7 @@ public class ProductService {
      * @param user      로그인한 사용자
      * @param productId 상품 ID
      * @return 상품 상세 정보
-     * @throws NotFoundProductException 해당하는 아이디를 가진 상품이 없는 경우
+     * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
      */
     @Transactional(readOnly = true)
     public ProductDetailResponseDto readProduct(User user, Long productId) {
@@ -107,8 +104,8 @@ public class ProductService {
      *
      * @param user      로그인한 사용자
      * @param productId 상품 ID
-     * @throws NotFoundProductException      해당하는 아이디를 가진 상품이 없는 경우
-     * @throws DuplicateProductLikeException 이미 해당하는 상품 좋아요가 존재하는 경우
+     * @throws NotFoundException  해당하는 아이디를 가진 상품이 없는 경우
+     * @throws DuplicateException 이미 해당하는 상품 좋아요가 존재하는 경우
      */
     @Transactional(rollbackFor = Exception.class)
     public void createProductLike(User user, Long productId) {
@@ -129,8 +126,8 @@ public class ProductService {
      *
      * @param user      로그인한 사용자
      * @param productId 상품 ID
-     * @throws NotFoundProductException     해당하는 아이디를 가진 상품이 없는 경우
-     * @throws NotFoundProductLikeException 해당하는 상품 좋아요가 없는 경우
+     * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
+     * @throws NotFoundException 해당하는 상품 좋아요가 없는 경우
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteProductLike(User user, Long productId) {
@@ -148,8 +145,8 @@ public class ProductService {
      *
      * @param user      로그인한 사용자
      * @param productId 상품 ID
-     * @throws NotFoundProductException          해당하는 아이디를 가진 상품이 없는 경우
-     * @throws DuplicateProductBookmarkException 이미 해당하는 상품 북마크가 존재하는 경우
+     * @throws NotFoundException  해당하는 아이디를 가진 상품이 없는 경우
+     * @throws DuplicateException 이미 해당하는 상품 북마크가 존재하는 경우
      */
     @Transactional(rollbackFor = Exception.class)
     public void createProductBookmark(User user, Long productId) {
@@ -169,8 +166,8 @@ public class ProductService {
      *
      * @param user      로그인한 사용자
      * @param productId 상품 ID
-     * @throws NotFoundProductException         해당하는 아이디를 가진 상품이 없는 경우
-     * @throws NotFoundProductBookmarkException 해당하는 상품 북마크가 없는 경우
+     * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
+     * @throws NotFoundException 해당하는 상품 북마크가 없는 경우
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteProductBookmark(User user, Long productId) {

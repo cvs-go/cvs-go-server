@@ -18,16 +18,4 @@ public class ReviewExceptionHandler {
         return ErrorResponse.of("파일 처리 중 오류가 발생했습니다", "INTERNAL_SERVER_ERROR");
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundReviewException.class)
-    public ErrorResponse handleNotFoundReviewException(NotFoundReviewException e) {
-        return ErrorResponse.of(e.getMessage(), e.getCode());
-    }
-
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(DuplicateReviewException.class)
-    public ErrorResponse handleDuplicateReviewException(DuplicateReviewException e) {
-        return ErrorResponse.of(e.getMessage(), e.getCode());
-    }
-
 }

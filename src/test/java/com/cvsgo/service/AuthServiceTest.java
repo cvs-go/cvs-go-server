@@ -4,9 +4,8 @@ import com.cvsgo.dto.auth.LoginRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.auth.InvalidPasswordException;
-import com.cvsgo.exception.auth.NotFoundUserException;
-import com.cvsgo.exception.auth.UnauthorizedUserException;
+import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.exception.UnauthorizedException;
 import com.cvsgo.repository.RefreshTokenRepository;
 import com.cvsgo.repository.UserRepository;
 import io.jsonwebtoken.io.Decoders;
@@ -89,7 +88,7 @@ class AuthServiceTest {
         given(userRepository.findByUserId(loginRequestDto.getEmail()))
                 .willReturn(Optional.empty());
 
-        assertThrows(NotFoundUserException.class, () -> authService.login(loginRequestDto));
+        assertThrows(NotFoundException.class, () -> authService.login(loginRequestDto));
 
         then(userRepository).should(times(1)).findByUserId(any());
     }
@@ -109,7 +108,7 @@ class AuthServiceTest {
         given(userRepository.findByUserId(loginRequestDto.getEmail()))
                 .willReturn(Optional.of(user));
 
-        assertThrows(InvalidPasswordException.class, () -> authService.login(loginRequestDto));
+        assertThrows(UnauthorizedException.class, () -> authService.login(loginRequestDto));
 
         then(userRepository).should(times(1)).findByUserId(any());
     }
@@ -138,7 +137,7 @@ class AuthServiceTest {
         given(refreshTokenRepository.findByToken(anyString()))
                 .willReturn(Optional.empty());
 
-        assertThrows(UnauthorizedUserException.class, () -> authService.logout(anyString()));
+        assertThrows(UnauthorizedException.class, () -> authService.logout(anyString()));
 
         then(refreshTokenRepository).should(times(1)).findByToken(any());
     }
@@ -168,7 +167,7 @@ class AuthServiceTest {
         given(refreshTokenRepository.findByToken(anyString()))
                 .willReturn(Optional.empty());
 
-        assertThrows(UnauthorizedUserException.class, () -> authService.reissueToken(anyString()));
+        assertThrows(UnauthorizedException.class, () -> authService.reissueToken(anyString()));
 
         then(refreshTokenRepository).should(times(1)).findByToken(any());
     }

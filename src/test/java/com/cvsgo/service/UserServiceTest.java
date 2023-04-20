@@ -13,12 +13,9 @@ import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
-import com.cvsgo.exception.auth.NotFoundUserException;
-import com.cvsgo.exception.user.BadRequestUserFollowException;
-import com.cvsgo.exception.user.DuplicateEmailException;
-import com.cvsgo.exception.user.DuplicateNicknameException;
-import com.cvsgo.exception.user.DuplicateUserFollowException;
-import com.cvsgo.exception.user.NotFoundUserFollowException;
+import com.cvsgo.exception.BadRequestException;
+import com.cvsgo.exception.DuplicateException;
+import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
@@ -69,7 +66,7 @@ class UserServiceTest {
         given(userRepository.findByNickname(nickname)).willReturn(Optional.of(user));
         given(userRepository.save(any())).willThrow(DataIntegrityViolationException.class);
 
-        assertThrows(DuplicateNicknameException.class, () -> userService.signUp(signUpRequest));
+        assertThrows(DuplicateException.class, () -> userService.signUp(signUpRequest));
         then(userRepository).should(times(1)).findByNickname(nickname);
     }
 
@@ -88,7 +85,7 @@ class UserServiceTest {
         given(userRepository.findByUserId(email)).willReturn(Optional.of(user));
         given(userRepository.save(any())).willThrow(DataIntegrityViolationException.class);
 
-        assertThrows(DuplicateEmailException.class, () -> userService.signUp(signUpRequest));
+        assertThrows(DuplicateException.class, () -> userService.signUp(signUpRequest));
         then(userRepository).should(times(1)).findByUserId(email);
     }
 
@@ -177,7 +174,7 @@ class UserServiceTest {
 
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
-        assertThrows(NotFoundUserException.class, () -> userService.createUserFollow(user, followingId));
+        assertThrows(NotFoundException.class, () -> userService.createUserFollow(user, followingId));
         then(userRepository).should(times(1)).findById(anyLong());
     }
 
@@ -188,7 +185,7 @@ class UserServiceTest {
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
 
-        assertThrows(BadRequestUserFollowException.class, () -> userService.createUserFollow(user, followingId));
+        assertThrows(BadRequestException.class, () -> userService.createUserFollow(user, followingId));
         then(userRepository).should(times(1)).findById(anyLong());
     }
 
@@ -201,7 +198,7 @@ class UserServiceTest {
         given(userFollowRepository.save(any())).willThrow(DataIntegrityViolationException.class);
         given(userFollowRepository.existsByUserAndFollower(any(), any())).willReturn(true);
 
-        assertThrows(DuplicateUserFollowException.class, () -> userService.createUserFollow(user, followingId));
+        assertThrows(DuplicateException.class, () -> userService.createUserFollow(user, followingId));
         then(userRepository).should(times(1)).findById(anyLong());
         then(userFollowRepository).should(times(1)).existsByUserAndFollower(any(), any());
     }
@@ -223,9 +220,9 @@ class UserServiceTest {
     @Test
     @DisplayName("회원 팔로우 삭제 API를 조회했을 때 해당 ID의 회원이 없는 경우 NotFoundUserException이 발생한다")
     void should_throw_NotFoundUserException_when_delete_user_follow_and_user_does_not_exist() {
-        given(userRepository.findById(anyLong())).willThrow(NotFoundUserException.class);
+        given(userRepository.findById(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundUserException.class,
+        assertThrows(NotFoundException.class,
             () -> userService.deleteUserFollow(user, 1000L));
 
         then(userRepository).should(times(1)).findById(any());
@@ -238,8 +235,7 @@ class UserServiceTest {
         given(userFollowRepository.findByUserAndFollower(any(), any())).willReturn(
             Optional.empty());
 
-        assertThrows(NotFoundUserFollowException.class,
-            () -> userService.deleteUserFollow(user, 1L));
+        assertThrows(NotFoundException.class, () -> userService.deleteUserFollow(user, 1L));
 
         then(userRepository).should(times(1)).findById(any());
         then(userFollowRepository).should(times(1)).findByUserAndFollower(any(), any());

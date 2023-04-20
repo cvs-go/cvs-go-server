@@ -1,5 +1,16 @@
 package com.cvsgo.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
+
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
@@ -16,10 +27,9 @@ import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.cvsgo.entity.UserTag;
-import com.cvsgo.exception.product.NotFoundProductException;
-import com.cvsgo.exception.review.DuplicateReviewException;
-import com.cvsgo.exception.review.NotFoundReviewException;
-import com.cvsgo.exception.user.ForbiddenUserException;
+import com.cvsgo.exception.DuplicateException;
+import com.cvsgo.exception.ForbiddenException;
+import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewRepository;
@@ -28,26 +38,13 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.times;
-
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 
@@ -94,7 +91,7 @@ class ReviewServiceTest {
         given(reviewRepository.save(any())).willThrow(DataIntegrityViolationException.class);
         given(reviewRepository.existsByProductAndUser(any(), any())).willReturn(true);
 
-        assertThrows(DuplicateReviewException.class,
+        assertThrows(DuplicateException.class,
             () -> reviewService.createReview(user1, 1L, createReviewRequestDto));
 
         then(productRepository).should(times(1)).findById(1L);
@@ -274,7 +271,7 @@ class ReviewServiceTest {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
-        assertThrows(ForbiddenUserException.class,
+        assertThrows(ForbiddenException.class,
             () -> reviewService.readProductReviewList(user1, 1L, requestDto, PageRequest.of(1, 20)));
     }
 
@@ -284,7 +281,7 @@ class ReviewServiceTest {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), null);
 
-        assertThrows(ForbiddenUserException.class,
+        assertThrows(ForbiddenException.class,
             () -> reviewService.readProductReviewList(null, 1L, requestDto, PageRequest.of(1, 20)));
     }
 
@@ -292,19 +289,18 @@ class ReviewServiceTest {
     @DisplayName("해당 ID의 상품이 없는 경우 NotFoundProductException이 발생한다")
     void should_throw_NotFoundProductException_when_product_does_not_exist() {
         given(productRepository.findById(anyLong()))
-            .willThrow(NotFoundProductException.class);
+            .willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundProductException.class,
+        assertThrows(NotFoundException.class,
             () -> reviewService.createReview(user1, 100L, createReviewRequestDto));
     }
 
     @Test
     @DisplayName("리뷰 수정시 해당 ID의 리뷰가 없는 경우 NotFoundReviewException이 발생한다")
     void should_throw_NotFoundReviewException_when_review_does_not_exist() {
-        given(reviewRepository.findById(anyLong()))
-            .willThrow(NotFoundReviewException.class);
+        given(reviewRepository.findById(anyLong())).willThrow(NotFoundException.class);
 
-        assertThrows(NotFoundReviewException.class,
+        assertThrows(NotFoundException.class,
             () -> reviewService.updateReview(user1, 100L, updateReviewRequestDto));
     }
 
@@ -314,7 +310,7 @@ class ReviewServiceTest {
         given(reviewRepository.findById(anyLong()))
             .willReturn(Optional.of(review));
 
-        assertThrows(ForbiddenUserException.class,
+        assertThrows(ForbiddenException.class,
             () -> reviewService.updateReview(user1, 100L, updateReviewRequestDto));
     }
 
