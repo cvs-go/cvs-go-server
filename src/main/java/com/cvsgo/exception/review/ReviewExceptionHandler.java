@@ -24,4 +24,10 @@ public class ReviewExceptionHandler {
         return ErrorResponse.of(e.getMessage(), e.getCode());
     }
 
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(DuplicateReviewException.class)
+    public ErrorResponse handleDuplicateReviewException(DuplicateReviewException e) {
+        return ErrorResponse.of(e.getMessage(), e.getCode());
+    }
+
 }

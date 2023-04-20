@@ -86,4 +86,8 @@ public class User extends BaseTimeEntity {
         userTags.add(userTag);
     }
 
+    public void updateRoleToRegular() {
+        this.role = Role.REGULAR;
+    }
+
 }
