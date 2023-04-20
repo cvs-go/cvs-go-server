@@ -168,8 +168,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("해당하는 아이디를 가진 사용자가 없으면 NotFoundUserException이 발생한다")
-    void should_throw_NotFoundUserException_when_user_does_not_exist() {
+    @DisplayName("회원 팔로우 생성 시 해당하는 아이디를 가진 사용자가 없으면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_create_user_follow_but_user_does_not_exist() {
         final Long followingId = 10000L;
 
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
@@ -179,8 +179,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("본인을 팔로우하는 경우 BadRequestUserFollowException 발생한다")
-    void should_throw_BadRequestUserFollowException_when_user_self_follow() {
+    @DisplayName("회원 팔로우 생성 시 본인을 팔로우하는 경우 BadRequestException 발생한다")
+    void should_throw_BadRequestException_when_create_user_follow_but_invalid_follow() {
         final Long followingId = user.getId();
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
@@ -190,8 +190,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("이미 존재하는 회원 팔로우면 팔로우 생성 시 DuplicateUserFollowException이 발생한다")
-    void should_throw_DuplicateUserFollowException_when_user_follow_is_duplicate() {
+    @DisplayName("회원 팔로우 생성 시 이미 존재하는 회원 팔로우면 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_create_user_follow_but_user_follow_duplicated() {
         final Long followingId = user2.getId();
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
@@ -218,8 +218,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("회원 팔로우 삭제 API를 조회했을 때 해당 ID의 회원이 없는 경우 NotFoundUserException이 발생한다")
-    void should_throw_NotFoundUserException_when_delete_user_follow_and_user_does_not_exist() {
+    @DisplayName("회원 팔로우 삭제 시 해당 ID의 회원이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_user_follow_but_user_does_not_exist() {
         given(userRepository.findById(anyLong())).willThrow(NotFoundException.class);
 
         assertThrows(NotFoundException.class,
@@ -229,8 +229,8 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("해당하는 회원 팔로우가 없는 경우 NotFoundUserFollowException이 발생한다")
-    void should_throw_NotFoundUserFollowException_when_user_follow_does_not_exist() {
+    @DisplayName("회원 팔로우 삭제 시 해당하는 회원 팔로우가 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_user_follow_but_user_follow_does_not_exist() {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
         given(userFollowRepository.findByUserAndFollower(any(), any())).willReturn(
             Optional.empty());

@@ -313,8 +313,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("본인을 팔로우하는 경우 HTTP 400을 응답한다")
-    void respond_400_when_bad_request_user_follow() throws Exception {
+    @DisplayName("회원 팔로우 생성 시 본인을 팔로우하는 경우 HTTP 400을 응답한다")
+    void respond_400_when_create_user_follow_but_invalid_user_follow() throws Exception {
         willThrow(BAD_REQUEST_USER_FOLLOW).given(userService).createUserFollow(any(), anyLong());
 
         mockMvc.perform(post("/api/users/{userId}/followers", 1L)
@@ -324,8 +324,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("해당하는 아이디를 가진 사용자가 없는 경우 HTTP 404을 응답한다")
-    void respond_404_when_not_found_user() throws Exception {
+    @DisplayName("회원 팔로우 생성 시 해당하는 아이디를 가진 사용자가 없는 경우 HTTP 404을 응답한다")
+    void respond_404_when_create_user_follow_but_user_does_not_exist() throws Exception {
         willThrow(NOT_FOUND_USER).given(userService).createUserFollow(any(), anyLong());
 
         mockMvc.perform(post("/api/users/{userId}/followers", 10000L)
@@ -335,8 +335,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("이미 해당하는 회원 팔로우가 존재하는 경우 HTTP 409을 응답한다")
-    void respond_409_when_duplicate_user_follow() throws Exception {
+    @DisplayName("회원 팔로우 생성 시 이미 해당하는 회원 팔로우가 존재하는 경우 HTTP 409을 응답한다")
+    void respond_40_when_create_user_follow_but_user_follow_duplicated() throws Exception {
         willThrow(DUPLICATE_USER_FOLLOW).given(userService).createUserFollow(any(), anyLong());
 
         mockMvc.perform(post("/api/users/{userId}/followers", 2L)
@@ -362,8 +362,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("해당하는 아이디를 가진 사용자가 없는 경우 HTTP 404을 응답한다")
-    void respond_404_when_delete_user_follow_not_found_user() throws Exception {
+    @DisplayName("회원 팔로우 삭제 시 해당하는 아이디를 가진 사용자가 없는 경우 HTTP 404을 응답한다")
+    void respond_404_when_delete_user_follow_but_user_does_not_exist() throws Exception {
         willThrow(NOT_FOUND_USER).given(userService).deleteUserFollow(any(), anyLong());
 
         mockMvc.perform(delete("/api/users/{userId}/followers", 10000L)
@@ -373,8 +373,8 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("해당하는 회원 팔로우가 없는 경우 HTTP 404을 응답한다")
-    void respond_404_when_not_found_user_follow() throws Exception {
+    @DisplayName("회원 팔로우 삭제 시 해당하는 회원 팔로우가 없는 경우 HTTP 404을 응답한다")
+    void respond_404_when_delete_user_follow_but_user_follow_does_not_exist() throws Exception {
         willThrow(NOT_FOUND_USER_FOLLOW).given(userService).deleteUserFollow(any(), anyLong());
 
         mockMvc.perform(delete("/api/users/{userId}/followers", 1L)
