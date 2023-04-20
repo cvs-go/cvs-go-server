@@ -6,6 +6,7 @@ import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static com.cvsgo.exception.ExceptionConstants.BAD_REQUEST_USER_FOLLOW;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_USER_FOLLOW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER_FOLLOW;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -13,6 +14,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -340,6 +342,44 @@ class UserControllerTest {
         mockMvc.perform(post("/api/users/{userId}/followers", 2L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isConflict())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원 팔로우 삭제에 성공하면 HTTP 200을 응답한다")
+    void respond_200_when_delete_user_follow_succeed() throws Exception {
+        mockMvc.perform(delete("/api/users/{userId}/followers", 2L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userId").description("언팔로우할 회원 ID")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("해당하는 아이디를 가진 사용자가 없는 경우 HTTP 404을 응답한다")
+    void respond_404_when_delete_user_follow_not_found_user() throws Exception {
+        willThrow(NOT_FOUND_USER).given(userService).deleteUserFollow(any(), anyLong());
+
+        mockMvc.perform(delete("/api/users/{userId}/followers", 10000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("해당하는 회원 팔로우가 없는 경우 HTTP 404을 응답한다")
+    void respond_404_when_not_found_user_follow() throws Exception {
+        willThrow(NOT_FOUND_USER_FOLLOW).given(userService).deleteUserFollow(any(), anyLong());
+
+        mockMvc.perform(delete("/api/users/{userId}/followers", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
             .andDo(print());
     }
 

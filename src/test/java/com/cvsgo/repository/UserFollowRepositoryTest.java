@@ -3,10 +3,12 @@ package com.cvsgo.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cvsgo.config.TestConfig;
+import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +52,20 @@ class UserFollowRepositoryTest {
     }
 
     @Test
+    @DisplayName("회원 팔로우를 삭제한다")
+    void succeed_to_delete_product_bookmark() {
+        Optional<UserFollow> foundUserFollow = userFollowRepository.findByUserAndFollower(user2,
+            user1);
+
+        foundUserFollow.ifPresent(
+            selectUserFollow -> userFollowRepository.delete(selectUserFollow));
+        Optional<UserFollow> deletedUserFollow = userFollowRepository.findByUserAndFollower(user2,
+            user1);
+
+        assertThat(deletedUserFollow).isNotPresent();
+    }
+
+    @Test
     @DisplayName("회원 팔로우가 있는지 조회한다")
     void succeed_to_check_user_follow_existence() {
         Boolean result1 = userFollowRepository.existsByUserAndFollower(user2, user1);
@@ -57,6 +73,16 @@ class UserFollowRepositoryTest {
 
         assertThat(result1).isTrue();
         assertThat(result2).isFalse();
+    }
+
+    @Test
+    @DisplayName("회원 팔로우가 있는지 조회한다")
+    void succeed_to_find_user_follow_by_user_and_follower() {
+        Optional<UserFollow> userFollow1 = userFollowRepository.findByUserAndFollower(user2, user1);
+        Optional<UserFollow> userFollow2 = userFollowRepository.findByUserAndFollower(user1, user2);
+
+        assertThat(userFollow1).isPresent();
+        assertThat(userFollow2).isNotPresent();
     }
 
 }
