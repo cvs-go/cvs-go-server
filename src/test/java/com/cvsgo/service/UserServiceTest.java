@@ -4,19 +4,26 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
+import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
+import com.cvsgo.entity.UserFollow;
+import com.cvsgo.exception.auth.NotFoundUserException;
+import com.cvsgo.exception.user.BadRequestUserFollowException;
 import com.cvsgo.exception.user.DuplicateEmailException;
 import com.cvsgo.exception.user.DuplicateNicknameException;
+import com.cvsgo.exception.user.DuplicateUserFollowException;
+import com.cvsgo.exception.user.NotFoundUserFollowException;
 import com.cvsgo.repository.TagRepository;
+import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +45,9 @@ class UserServiceTest {
 
     @Mock
     private TagRepository tagRepository;
+
+    @Mock
+    private UserFollowRepository userFollowRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -148,6 +158,107 @@ class UserServiceTest {
         then(userRepository).should(times(1)).findByNickname(nickname);
     }
 
-    private User user = User.create("abc@naver.com", "password1!", "닉네임", List.of());
+    @Test
+    @DisplayName("회원 팔로우를 정상적으로 생성한다")
+    void succeed_to_create_user_follow() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
+        given(userFollowRepository.save(any())).willReturn(any());
+
+        userService.createUserFollow(user, user2.getId());
+
+        then(userRepository).should(times(1)).findById(user2.getId());
+        then(userFollowRepository).should(times(1)).save(any());
+    }
+
+    @Test
+    @DisplayName("해당하는 아이디를 가진 사용자가 없으면 NotFoundUserException이 발생한다")
+    void should_throw_NotFoundUserException_when_user_does_not_exist() {
+        final Long followingId = 10000L;
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundUserException.class, () -> userService.createUserFollow(user, followingId));
+        then(userRepository).should(times(1)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("본인을 팔로우하는 경우 BadRequestUserFollowException 발생한다")
+    void should_throw_BadRequestUserFollowException_when_user_self_follow() {
+        final Long followingId = user.getId();
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+
+        assertThrows(BadRequestUserFollowException.class, () -> userService.createUserFollow(user, followingId));
+        then(userRepository).should(times(1)).findById(anyLong());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 회원 팔로우면 팔로우 생성 시 DuplicateUserFollowException이 발생한다")
+    void should_throw_DuplicateUserFollowException_when_user_follow_is_duplicate() {
+        final Long followingId = user2.getId();
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
+        given(userFollowRepository.save(any())).willThrow(DataIntegrityViolationException.class);
+        given(userFollowRepository.existsByUserAndFollower(any(), any())).willReturn(true);
+
+        assertThrows(DuplicateUserFollowException.class, () -> userService.createUserFollow(user, followingId));
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(userFollowRepository).should(times(1)).existsByUserAndFollower(any(), any());
+    }
+
+    @Test
+    @DisplayName("회원 팔로우를 정상적으로 삭제한다")
+    void succeed_to_delete_user_follow() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
+        given(userFollowRepository.findByUserAndFollower(any(), any())).willReturn(
+            Optional.of(userFollow));
+
+        userService.deleteUserFollow(user, user2.getId());
+
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(userFollowRepository).should(times(1)).findByUserAndFollower(any(), any());
+        then(userFollowRepository).should(times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("회원 팔로우 삭제 API를 조회했을 때 해당 ID의 회원이 없는 경우 NotFoundUserException이 발생한다")
+    void should_throw_NotFoundUserException_when_delete_user_follow_and_user_does_not_exist() {
+        given(userRepository.findById(anyLong())).willThrow(NotFoundUserException.class);
+
+        assertThrows(NotFoundUserException.class,
+            () -> userService.deleteUserFollow(user, 1000L));
+
+        then(userRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("해당하는 회원 팔로우가 없는 경우 NotFoundUserFollowException이 발생한다")
+    void should_throw_NotFoundUserFollowException_when_user_follow_does_not_exist() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(userFollowRepository.findByUserAndFollower(any(), any())).willReturn(
+            Optional.empty());
+
+        assertThrows(NotFoundUserFollowException.class,
+            () -> userService.deleteUserFollow(user, 1L));
+
+        then(userRepository).should(times(1)).findById(any());
+        then(userFollowRepository).should(times(1)).findByUserAndFollower(any(), any());
+    }
+
+    User user = User.builder()
+        .id(1L)
+        .userId("abc@naver.com")
+        .nickname("사용자1")
+        .role(Role.ASSOCIATE)
+        .build();
+
+    User user2 = User.builder()
+        .id(2L)
+        .userId("abcd@naver.com")
+        .nickname("사용자2")
+        .role(Role.REGULAR)
+        .build();
+
+    UserFollow userFollow = UserFollow.create(user2, user);
 
 }

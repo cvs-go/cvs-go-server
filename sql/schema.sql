@@ -165,7 +165,7 @@ create table user (
 
 create table user_follow (
                              id bigint not null auto_increment,
-                             following_id bigint not null,
+                             user_id bigint not null,
                              follower_id bigint not null,
                              created_at datetime,
                              modified_at datetime,
@@ -187,5 +187,5 @@ ALTER TABLE product_like ADD CONSTRAINT unique_user_product_like UNIQUE (user_id
 ALTER TABLE review ADD CONSTRAINT unique_user_product_review UNIQUE (user_id, product_id);
 ALTER TABLE review_like ADD CONSTRAINT unique_user_product_review_like UNIQUE (user_id, review_id);
 ALTER TABLE sell_at ADD CONSTRAINT unique_convenience_store_product UNIQUE (convenience_store_id, product_id);
-ALTER TABLE user_follow ADD CONSTRAINT unique_following_follower UNIQUE (following_id, follower_id);
+ALTER TABLE user_follow ADD CONSTRAINT unique_user_follower UNIQUE (user_id, follower_id);
 ALTER TABLE user_tag ADD CONSTRAINT unique_user_tag UNIQUE (user_id, tag_id);

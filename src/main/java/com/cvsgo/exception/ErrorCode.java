@@ -7,13 +7,17 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum ErrorCode {
 
+    BAD_REQUEST_USER_FOLLOW("BAD_REQUEST_USER_FOLLOW", "본인을 팔로우할 수 없습니다."),
+
     DUPLICATE_EMAIL("DUPLICATE_EMAIL", "중복된 이메일입니다."),
     DUPLICATE_NICKNAME("DUPLICATE_NICKNAME", "중복된 닉네임입니다."),
     DUPLICATE_PRODUCT_LIKE("DUPLICATE_PRODUCT_LIKE", "중복된 상품 좋아요입니다."),
     DUPLICATE_PRODUCT_BOOKMARK("DUPLICATE_PRODUCT_BOOKMARK", "중복된 상품 북마크입니다."),
+    DUPLICATE_USER_FOLLOW("DUPLICATE_USER_FOLLOW", "중복된 회원 팔로우입니다."),
     DUPLICATE_REVIEW("DUPLICATE_REVIEW", "한 상품에 대한 리뷰는 한 번만 작성할 수 있습니다."),
 
     NOT_FOUND_USER("NOT_FOUND_USER", "존재하지 않는 사용자입니다."),
+    NOT_FOUND_USER_FOLLOW("NOT_FOUND_USER_FOLLOW", "존재하지 않는 팔로우입니다."),
     NOT_FOUND_PRODUCT("NOT_FOUND_PRODUCT", "존재하지 않는 상품입니다."),
     NOT_FOUND_PRODUCT_LIKE("NOT_FOUND_PRODUCT_LIKE", "존재하지 않는 상품 좋아요입니다."),
     NOT_FOUND_PRODUCT_BOOKMARK("NOT_FOUND_PRODUCT_BOOKMARK", "존재하지 않는 상품 북마크입니다."),

@@ -79,7 +79,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .join(user).on(user.eq(review.user))
             .join(product).on(review.product.eq(product))
             .leftJoin(userFollow)
-            .on(review.user.eq(userFollow.following).and(userFollowingEq(loginUser)))
+            .on(review.user.eq(userFollow.user).and(userFollowingEq(loginUser)))
             .leftJoin(reviewLike).on(reviewLike.review.eq(review).and(reviewLikeUserEq(loginUser)))
             .where(
                 review.product.id.eq(productId),
