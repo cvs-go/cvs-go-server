@@ -117,8 +117,7 @@ public class UserService {
             userFollowRepository.save(userFollow);
         } catch (DataIntegrityViolationException e) {
             entityManager.clear();
-            if (Boolean.TRUE.equals(
-                userFollowRepository.existsByUserAndFollower(followingUser, user))) {
+            if (userFollowRepository.existsByUserAndFollower(user, followingUser)) {
                 log.info("중복된 회원 팔로우: {} '{}'", user.getId(), followingUser.getId());
                 throw DUPLICATE_USER_FOLLOW;
             }

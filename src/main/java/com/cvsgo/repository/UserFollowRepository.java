@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserFollowRepository extends JpaRepository<UserFollow, Long> {
 
-    Boolean existsByUserAndFollower(User user, User follower);
+    boolean existsByUserAndFollower(User user, User follower);
 
     Optional<UserFollow> findByUserAndFollower(User user, User follower);
 
