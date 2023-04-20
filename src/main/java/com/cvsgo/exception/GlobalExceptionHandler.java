@@ -72,6 +72,12 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(IOException.class)
+    public ErrorResponse handleIOException(IOException e) {
+        return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleException(Exception e) {
         log.error("Unexpected error occurred.", e);
         return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), e.getMessage());
