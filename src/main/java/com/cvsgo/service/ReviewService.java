@@ -69,7 +69,7 @@ public class ReviewService {
      * @throws DuplicateException 해당 상품에 대한 리뷰를 이미 작성한 경우
      * @throws IOException        파일 접근에 실패한 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createReview(User user, Long productId, CreateReviewRequestDto request)
         throws IOException {
         Product product = productRepository.findById(productId)
@@ -103,7 +103,7 @@ public class ReviewService {
      * @throws UnauthorizedException 리뷰를 작성한 사용자가 아닌 경우
      * @throws IOException           파일 접근에 실패한 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void updateReview(User user, Long reviewId, UpdateReviewRequestDto request)
         throws IOException {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
