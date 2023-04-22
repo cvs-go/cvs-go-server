@@ -1,7 +1,7 @@
 package com.cvsgo.service;
 
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
 import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
@@ -109,7 +109,7 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
 
         if (!user.equals(review.getUser())) {
-            throw FORBIDDEN_USER;
+            throw FORBIDDEN_REVIEW;
         }
 
         List<String> imageUrls = fileUploadService.upload(request.getImages(), REVIEW_DIR_NAME);
@@ -171,7 +171,7 @@ public class ReviewService {
 
         if (user == null || user.getRole() != Role.REGULAR) {
             if (pageable.getPageNumber() > 0) {
-                throw FORBIDDEN_USER;
+                throw FORBIDDEN_REVIEW;
             } else {
                 pageable = PageRequest.of(pageable.getPageNumber(), 5);
             }

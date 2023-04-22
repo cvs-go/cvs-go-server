@@ -25,7 +25,7 @@ public enum ErrorCode {
     DUPLICATE_REVIEW("한 상품에 대한 리뷰는 한 번만 작성할 수 있습니다."),
 
     /* 403 FORBIDDEN */
-    FORBIDDEN_USER("권한이 없는 사용자입니다."),
+    FORBIDDEN_REVIEW("해당 리뷰에 대한 권한이 없습니다."),
 
     /* 404 NOT_FOUND */
     NOT_FOUND_USER("존재하지 않는 사용자입니다."),
