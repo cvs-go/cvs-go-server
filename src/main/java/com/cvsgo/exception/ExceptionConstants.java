@@ -7,7 +7,7 @@ public interface ExceptionConstants {
     UnauthorizedException INVALID_PASSWORD = new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
     UnauthorizedException UNAUTHORIZED_USER = new UnauthorizedException(ErrorCode.UNAUTHORIZED_USER);
 
-    ForbiddenException FORBIDDEN_USER = new ForbiddenException(ErrorCode.FORBIDDEN_USER);
+    ForbiddenException FORBIDDEN_REVIEW = new ForbiddenException(ErrorCode.FORBIDDEN_REVIEW);
 
     NotFoundException NOT_FOUND_USER = new NotFoundException(ErrorCode.NOT_FOUND_USER);
     NotFoundException NOT_FOUND_USER_FOLLOW = new NotFoundException(ErrorCode.NOT_FOUND_USER_FOLLOW);

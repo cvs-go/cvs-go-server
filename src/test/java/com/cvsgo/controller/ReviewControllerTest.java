@@ -44,7 +44,7 @@ import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -254,7 +254,7 @@ class ReviewControllerTest {
     void respond_403_when_associate_member_try_to_read_product_reviews() throws Exception {
 
         given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
-            .willThrow(FORBIDDEN_USER);
+            .willThrow(FORBIDDEN_REVIEW);
 
         mockMvc.perform(get(PRODUCT_REVIEW_API_PATH, 1)
                 .contentType(MediaType.APPLICATION_JSON))

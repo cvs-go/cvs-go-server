@@ -47,6 +47,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -296,6 +298,21 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("리뷰 수정에 성공합니다.")
+    void success_to_update_review() throws Exception {
+        MockMultipartFile image1 = new MockMultipartFile("images", "sample_image1.png",
+            MediaType.IMAGE_PNG_VALUE, "image 1".getBytes());
+        MockMultipartFile image2 = new MockMultipartFile("images", "sample_image2.png",
+            MediaType.IMAGE_PNG_VALUE, "image 2".getBytes());
+        UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(4, "맛있어요",
+            List.of(image1, image2));
+        given(reviewRepository.findById(anyLong())).willReturn(Optional.of(review));
+
+        reviewService.updateReview(user2, 1L, requestDto);
+        then(reviewRepository).should(times(1)).findById(any());
+    }
+
+    @Test
     @DisplayName("리뷰 수정시 해당 ID의 리뷰가 없는 경우 NotFoundException이 발생한다")
     void should_throw_NotFoundException_when_update_review_but_review_does_not_exist() {
         given(reviewRepository.findById(anyLong())).willThrow(NotFoundException.class);
@@ -334,6 +351,7 @@ class ReviewServiceTest {
         .id(1L)
         .user(user2)
         .rating(5)
+        .content("맛있어요")
         .imageUrls(List.of())
         .build();
 

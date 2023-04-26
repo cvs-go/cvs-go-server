@@ -1,7 +1,7 @@
 package com.cvsgo.service;
 
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_USER;
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
 import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
@@ -69,7 +69,7 @@ public class ReviewService {
      * @throws DuplicateException 해당 상품에 대한 리뷰를 이미 작성한 경우
      * @throws IOException        파일 접근에 실패한 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createReview(User user, Long productId, CreateReviewRequestDto request)
         throws IOException {
         Product product = productRepository.findById(productId)
@@ -103,13 +103,13 @@ public class ReviewService {
      * @throws UnauthorizedException 리뷰를 작성한 사용자가 아닌 경우
      * @throws IOException           파일 접근에 실패한 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void updateReview(User user, Long reviewId, UpdateReviewRequestDto request)
         throws IOException {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
 
         if (!user.equals(review.getUser())) {
-            throw FORBIDDEN_USER;
+            throw FORBIDDEN_REVIEW;
         }
 
         List<String> imageUrls = fileUploadService.upload(request.getImages(), REVIEW_DIR_NAME);
@@ -171,7 +171,7 @@ public class ReviewService {
 
         if (user == null || user.getRole() != Role.REGULAR) {
             if (pageable.getPageNumber() > 0) {
-                throw FORBIDDEN_USER;
+                throw FORBIDDEN_REVIEW;
             } else {
                 pageable = PageRequest.of(pageable.getPageNumber(), 5);
             }
