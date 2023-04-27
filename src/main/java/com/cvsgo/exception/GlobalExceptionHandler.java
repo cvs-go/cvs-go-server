@@ -83,7 +83,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception e) {
         log.error("예기치 못한 예외가 발생했습니다.", e);
-        return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), ErrorCode.UNEXPECTED_ERROR.getMessage());
+        return ErrorResponse.from(ErrorCode.UNEXPECTED_ERROR);
     }
 
 }
