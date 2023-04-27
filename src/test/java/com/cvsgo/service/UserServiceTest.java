@@ -159,11 +159,13 @@ class UserServiceTest {
     @DisplayName("회원 팔로우를 정상적으로 생성한다")
     void succeed_to_create_user_follow() {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
+        given(userFollowRepository.existsByUserAndFollower(any(), any())).willReturn(false);
         given(userFollowRepository.save(any())).willReturn(any());
 
         userService.createUserFollow(user, user2.getId());
 
         then(userRepository).should(times(1)).findById(user2.getId());
+        then(userFollowRepository).should(times(1)).existsByUserAndFollower(any(), any());
         then(userFollowRepository).should(times(1)).save(any());
     }
 
@@ -195,7 +197,6 @@ class UserServiceTest {
         final Long followingId = user2.getId();
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
-        given(userFollowRepository.save(any())).willThrow(DataIntegrityViolationException.class);
         given(userFollowRepository.existsByUserAndFollower(any(), any())).willReturn(true);
 
         assertThrows(DuplicateException.class, () -> userService.createUserFollow(user, followingId));

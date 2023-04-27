@@ -109,17 +109,13 @@ public class UserService {
             throw BAD_REQUEST_USER_FOLLOW;
         }
 
-        UserFollow userFollow = UserFollow.create(followee, user);
-        try {
-            userFollowRepository.save(userFollow);
-        } catch (DataIntegrityViolationException e) {
-            entityManager.clear();
-            if (userFollowRepository.existsByUserAndFollower(user, followee)) {
-                log.info("중복된 회원 팔로우: {} -> {}", user.getId(), followee.getId());
-                throw DUPLICATE_USER_FOLLOW;
-            }
-            throw e;
+        if (userFollowRepository.existsByUserAndFollower(user, followee)) {
+            log.info("중복된 회원 팔로우: {} -> {}", user.getId(), followee.getId());
+            throw DUPLICATE_USER_FOLLOW;
         }
+
+        UserFollow userFollow = UserFollow.create(followee, user);
+        userFollowRepository.save(userFollow);
     }
 
     /**
