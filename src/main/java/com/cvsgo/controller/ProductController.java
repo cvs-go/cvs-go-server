@@ -2,10 +2,10 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
-import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.ProductFilterResponseDto;
-import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ReadProductDetailResponseDto;
+import com.cvsgo.dto.product.ReadProductFilterResponseDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +30,13 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public SuccessResponse<Page<ProductResponseDto>> readProductList(@LoginUser User user,
-        @ModelAttribute SearchProductRequestDto request, Pageable pageable) {
+    public SuccessResponse<Page<ReadProductResponseDto>> readProductList(@LoginUser User user,
+        @ModelAttribute ReadProductRequestDto request, Pageable pageable) {
         return SuccessResponse.from(productService.readProductList(user, request, pageable));
     }
 
     @GetMapping("/{productId}")
-    public SuccessResponse<ProductDetailResponseDto> readProduct(@LoginUser User user,
+    public SuccessResponse<ReadProductDetailResponseDto> readProduct(@LoginUser User user,
         @PathVariable Long productId) {
         return SuccessResponse.from(productService.readProduct(user, productId));
     }
@@ -80,7 +80,7 @@ public class ProductController {
     }
 
     @GetMapping("/filter")
-    public SuccessResponse<ProductFilterResponseDto> getProductFilter() {
+    public SuccessResponse<ReadProductFilterResponseDto> getProductFilter() {
         return SuccessResponse.from(productService.getProductFilter());
     }
 

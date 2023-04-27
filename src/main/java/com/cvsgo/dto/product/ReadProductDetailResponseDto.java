@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class ProductDetailResponseDto {
+public class ReadProductDetailResponseDto {
 
     private final Long productId;
     private final String productName;
@@ -19,7 +19,7 @@ public class ProductDetailResponseDto {
     private final List<ConvenienceStoreEventDto> convenienceStoreEvents;
 
     @Builder
-    public ProductDetailResponseDto(Long productId, String productName, Integer productPrice,
+    public ReadProductDetailResponseDto(Long productId, String productName, Integer productPrice,
         String productImageUrl, String manufacturerName, Boolean isLiked, Boolean isBookmarked,
         List<ConvenienceStoreEventDto> convenienceStoreEvents) {
         this.productId = productId;
@@ -32,17 +32,17 @@ public class ProductDetailResponseDto {
         this.convenienceStoreEvents = convenienceStoreEvents;
     }
 
-    public static ProductDetailResponseDto of(
-        SearchProductDetailQueryDto searchProductDetailQueryDto,
+    public static ReadProductDetailResponseDto of(
+        ReadProductDetailQueryDto readProductDetailQueryDto,
         List<ConvenienceStoreEventDto> convenienceStoreEvents) {
-        return ProductDetailResponseDto.builder()
-            .productId(searchProductDetailQueryDto.getProductId())
-            .productName(searchProductDetailQueryDto.getProductName())
-            .productPrice(searchProductDetailQueryDto.getProductPrice())
-            .productImageUrl(searchProductDetailQueryDto.getProductImageUrl())
-            .manufacturerName(searchProductDetailQueryDto.getManufacturerName())
-            .isLiked(searchProductDetailQueryDto.getIsLiked())
-            .isBookmarked(searchProductDetailQueryDto.getIsBookmarked())
+        return ReadProductDetailResponseDto.builder()
+            .productId(readProductDetailQueryDto.getProductId())
+            .productName(readProductDetailQueryDto.getProductName())
+            .productPrice(readProductDetailQueryDto.getProductPrice())
+            .productImageUrl(readProductDetailQueryDto.getProductImageUrl())
+            .manufacturerName(readProductDetailQueryDto.getManufacturerName())
+            .isLiked(readProductDetailQueryDto.getIsLiked())
+            .isBookmarked(readProductDetailQueryDto.getIsBookmarked())
             .convenienceStoreEvents(convenienceStoreEvents)
             .build();
     }

@@ -23,13 +23,13 @@ import com.cvsgo.dto.product.CategoryDto;
 import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.EventTypeDto;
-import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.ProductFilterResponseDto;
-import com.cvsgo.dto.product.ProductResponseDto;
+import com.cvsgo.dto.product.ReadProductDetailResponseDto;
+import com.cvsgo.dto.product.ReadProductFilterResponseDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
@@ -98,7 +98,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
-        SearchProductRequestDto request = SearchProductRequestDto.builder()
+        ReadProductRequestDto request = ReadProductRequestDto.builder()
             .sortBy(ProductSortBy.SCORE)
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
@@ -108,7 +108,7 @@ class ProductControllerTest {
             .keyword("500")
             .build();
 
-        Page<ProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
+        Page<ReadProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
         given(productService.readProductList(any(), any(), any())).willReturn(responseDto);
 
         mockMvc.perform(get("/api/products")
@@ -359,38 +359,38 @@ class ProductControllerTest {
         .discountAmount(300)
         .build();
 
-    private List<ProductResponseDto> getProductsResponse() {
-        SearchProductQueryDto productQueryDto1 = new SearchProductQueryDto(product1.getId(),
+    private List<ReadProductResponseDto> getProductsResponse() {
+        ReadProductQueryDto productQueryDto1 = new ReadProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
             product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark, 5L, 3.5, 4.5);
         List<ConvenienceStoreEventDto> convenienceStoreEvents1 = List.of(
             ConvenienceStoreEventDto.of(cvs1.getName(), bogoEvent),
             ConvenienceStoreEventDto.of(cvs2.getName(), btgoEvent));
 
-        SearchProductQueryDto productQueryDto2 = new SearchProductQueryDto(product2.getId(),
+        ReadProductQueryDto productQueryDto2 = new ReadProductQueryDto(product2.getId(),
             product2.getName(), product2.getPrice(), product2.getImageUrl(),
             product2.getCategory().getId(), product2.getManufacturer().getName(), null, null, 5L, 4.0, 4.0);
         List<ConvenienceStoreEventDto> convenienceStoreEvents2 = List.of(
             ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent),
             ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent));
 
-        ProductResponseDto productResponse1 = ProductResponseDto.of(productQueryDto1, convenienceStoreEvents1);
-        ProductResponseDto productResponse2 = ProductResponseDto.of(productQueryDto2, convenienceStoreEvents2);
+        ReadProductResponseDto productResponse1 = ReadProductResponseDto.of(productQueryDto1, convenienceStoreEvents1);
+        ReadProductResponseDto productResponse2 = ReadProductResponseDto.of(productQueryDto2, convenienceStoreEvents2);
         return List.of(productResponse1, productResponse2);
     }
 
-    private ProductDetailResponseDto getProductResponse() {
-        SearchProductDetailQueryDto productDetailQueryDto = new SearchProductDetailQueryDto(
+    private ReadProductDetailResponseDto getProductResponse() {
+        ReadProductDetailQueryDto productDetailQueryDto = new ReadProductDetailQueryDto(
             product2.getId(), product2.getName(), product2.getPrice(), product2.getImageUrl(),
             product2.getManufacturer().getName(), null, null);
         List<ConvenienceStoreEventDto> convenienceStoreEvents = List.of(
             ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent),
             ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent));
 
-        return ProductDetailResponseDto.of(productDetailQueryDto, convenienceStoreEvents);
+        return ReadProductDetailResponseDto.of(productDetailQueryDto, convenienceStoreEvents);
     }
 
-    private ProductFilterResponseDto getProductFilterResponse() {
+    private ReadProductFilterResponseDto getProductFilterResponse() {
         List<ConvenienceStoreDto> convenienceStores = List.of(
             ConvenienceStoreDto.from(cvs1), ConvenienceStoreDto.from(cvs2),
             ConvenienceStoreDto.from(cvs3));
@@ -399,6 +399,6 @@ class ProductControllerTest {
         List<EventTypeDto> eventTypes = List.of(com.cvsgo.dto.product.EventTypeDto.from(EventType.BOGO),
             EventTypeDto.from(EventType.BTGO), com.cvsgo.dto.product.EventTypeDto.from(EventType.GIFT));
         Integer highestPrice = 10000;
-        return ProductFilterResponseDto.of(convenienceStores, categories, eventTypes, highestPrice);
+        return ReadProductFilterResponseDto.of(convenienceStores, categories, eventTypes, highestPrice);
     }
 }

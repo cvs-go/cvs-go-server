@@ -12,10 +12,10 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
@@ -69,7 +69,7 @@ class ProductServiceTest {
     @DisplayName("상품 목록을 정상적으로 조회한다")
     void succeed_to_read_product_list() {
         Pageable pageable = PageRequest.of(0, 20);
-        SearchProductRequestDto request = SearchProductRequestDto.builder()
+        ReadProductRequestDto request = ReadProductRequestDto.builder()
             .convenienceStoreIds(List.of(1L))
             .categoryIds(List.of(1L))
             .eventTypes(List.of(EventType.BOGO))
@@ -82,7 +82,7 @@ class ProductServiceTest {
         given(productRepository.countByFilter(any())).willReturn((long) getProductList().size());
         given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
-        Page<ProductResponseDto> result = productService.readProductList(user, request, pageable);
+        Page<ReadProductResponseDto> result = productService.readProductList(user, request, pageable);
         assertEquals(result.getTotalElements(), getProductList().size());
 
         then(productRepository).should(times(1)).searchByFilter(any(), any(), any());
@@ -302,12 +302,12 @@ class ProductServiceTest {
         .product(product1)
         .build();
 
-    SearchProductQueryDto productResponse1 = new SearchProductQueryDto(product1.getId(),
+    ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
         product1.getName(), product1.getPrice(), product1.getImageUrl(),
         product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark,
         5L, 3.5, 4.5);
 
-    SearchProductDetailQueryDto productDetailResponse = new SearchProductDetailQueryDto(product1.getId(),
+    ReadProductDetailQueryDto productDetailResponse = new ReadProductDetailQueryDto(product1.getId(),
         product1.getName(), product1.getPrice(), product1.getImageUrl(),
         product1.getManufacturer().getName(), productLike, productBookmark);
 
@@ -323,7 +323,7 @@ class ProductServiceTest {
         new ConvenienceStoreEventQueryDto(productResponse1.getProductId(),
             "Emart24", null);
 
-    private List<SearchProductQueryDto> getProductList() {
+    private List<ReadProductQueryDto> getProductList() {
         return List.of(productResponse1);
     }
 

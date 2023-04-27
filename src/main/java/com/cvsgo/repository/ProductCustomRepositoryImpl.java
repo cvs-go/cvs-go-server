@@ -13,11 +13,11 @@ import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.QSearchProductDetailQueryDto;
-import com.cvsgo.dto.product.QSearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.QReadProductDetailQueryDto;
+import com.cvsgo.dto.product.QReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.querydsl.core.BooleanBuilder;
@@ -40,12 +40,12 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<SearchProductQueryDto> searchByFilter(User loginUser,
-        SearchProductRequestDto searchFilter, Pageable pageable) {
+    public List<ReadProductQueryDto> searchByFilter(User loginUser,
+        ReadProductRequestDto searchFilter, Pageable pageable) {
         NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
         NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
         NumberPath<Double> score = Expressions.numberPath(Double.class, "score");
-        return queryFactory.select(new QSearchProductQueryDto(
+        return queryFactory.select(new QReadProductQueryDto(
                 product.id,
                 product.name,
                 product.price,
@@ -90,7 +90,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Long countByFilter(SearchProductRequestDto searchFilter) {
+    public Long countByFilter(ReadProductRequestDto searchFilter) {
         return queryFactory.select(product.count())
             .from(product)
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
@@ -126,9 +126,9 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Optional<SearchProductDetailQueryDto> findByProductId(User loginUser, Long productId) {
+    public Optional<ReadProductDetailQueryDto> findByProductId(User loginUser, Long productId) {
         return Optional.ofNullable(queryFactory
-            .select(new QSearchProductDetailQueryDto(
+            .select(new QReadProductDetailQueryDto(
                 product.id,
                 product.name,
                 product.price,

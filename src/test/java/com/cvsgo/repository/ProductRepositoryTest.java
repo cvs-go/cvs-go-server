@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cvsgo.config.TestConfig;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
@@ -153,7 +153,7 @@ class ProductRepositoryTest {
     void succeed_to_search_by_filter() {
         // given
         Pageable pageable = PageRequest.of(0, 20);
-        SearchProductRequestDto request = SearchProductRequestDto.builder()
+        ReadProductRequestDto request = ReadProductRequestDto.builder()
             .convenienceStoreIds(null)
             .categoryIds(null)
             .eventTypes(null)
@@ -162,21 +162,21 @@ class ProductRepositoryTest {
             .keyword(null)
             .build();
 
-        SearchProductQueryDto productResponse1 = new SearchProductQueryDto(product1.getId(),
+        ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
             product1.getCategory().getId(), product1.getManufacturer().getName(), null, null,
             5L, 3.5, 4.5);
-        SearchProductQueryDto productResponse2 = new SearchProductQueryDto(product2.getId(),
+        ReadProductQueryDto productResponse2 = new ReadProductQueryDto(product2.getId(),
             product2.getName(), product2.getPrice(), product2.getImageUrl(),
             product2.getCategory().getId(), product2.getManufacturer().getName(), null, null,
             5L, 3.5, 4.5);
 
         // when
-        List<SearchProductQueryDto> foundProducts = productRepository.searchByFilter(user, request,
+        List<ReadProductQueryDto> foundProducts = productRepository.searchByFilter(user, request,
             pageable);
 
         // then
-        List<Long> foundProductIds = foundProducts.stream().map(SearchProductQueryDto::getProductId)
+        List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
             .toList();
         assertThat(productResponse1.getProductId()).isIn(foundProductIds);
         assertThat(productResponse2.getProductId()).isNotIn(foundProductIds);
@@ -186,7 +186,7 @@ class ProductRepositoryTest {
     @DisplayName("상품 판매 편의점 목록 요소의 전체 개수를 조회한다")
     void succeed_to_count_by_filter() {
         // given
-        SearchProductRequestDto request = SearchProductRequestDto.builder()
+        ReadProductRequestDto request = ReadProductRequestDto.builder()
             .convenienceStoreIds(null)
             .categoryIds(null)
             .eventTypes(null)
@@ -235,12 +235,12 @@ class ProductRepositoryTest {
     @DisplayName("상품 ID를 통해 상품 정보를 조회한다")
     void succeed_to_find_by_product_id() {
         // given
-        SearchProductDetailQueryDto productDetailResponse = new SearchProductDetailQueryDto(
+        ReadProductDetailQueryDto productDetailResponse = new ReadProductDetailQueryDto(
             product1.getId(), product1.getName(), product1.getPrice(), product1.getImageUrl(),
             product1.getManufacturer().getName(), null, null);
 
         // when
-        Optional<SearchProductDetailQueryDto> foundProduct = productRepository.findByProductId(user,
+        Optional<ReadProductDetailQueryDto> foundProduct = productRepository.findByProductId(user,
             product1.getId());
 
         // then

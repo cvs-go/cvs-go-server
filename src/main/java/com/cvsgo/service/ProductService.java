@@ -11,12 +11,12 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
-import com.cvsgo.dto.product.ProductDetailResponseDto;
-import com.cvsgo.dto.product.ProductFilterResponseDto;
-import com.cvsgo.dto.product.ProductResponseDto;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ReadProductDetailResponseDto;
+import com.cvsgo.dto.product.ReadProductFilterResponseDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -58,21 +58,21 @@ public class ProductService {
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public Page<ProductResponseDto> readProductList(User user, SearchProductRequestDto request,
+    public Page<ReadProductResponseDto> readProductList(User user, ReadProductRequestDto request,
         Pageable pageable) {
-        List<SearchProductQueryDto> products = productRepository.searchByFilter(user,
-            request, pageable);
+        List<ReadProductQueryDto> products = productRepository.searchByFilter(user, request,
+            pageable);
         Long totalCount = productRepository.countByFilter(request);
 
         List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
-            products.stream().map(SearchProductQueryDto::getProductId).toList());
+            products.stream().map(ReadProductQueryDto::getProductId).toList());
 
         Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventsByProduct =
             convenienceStoreEvents.stream().collect(Collectors.groupingBy(
                 ConvenienceStoreEventQueryDto::getProductId));
 
-        List<ProductResponseDto> results = products.stream().map(
-            productDto -> ProductResponseDto.of(productDto,
+        List<ReadProductResponseDto> results = products.stream().map(
+            productDto -> ReadProductResponseDto.of(productDto,
                 cvsEventsByProduct.get(productDto.getProductId()).stream().map(
                         c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
                     .toList())).toList();
@@ -88,14 +88,14 @@ public class ProductService {
      * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
      */
     @Transactional(readOnly = true)
-    public ProductDetailResponseDto readProduct(User user, Long productId) {
-        SearchProductDetailQueryDto product = productRepository.findByProductId(user, productId)
+    public ReadProductDetailResponseDto readProduct(User user, Long productId) {
+        ReadProductDetailQueryDto product = productRepository.findByProductId(user, productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
         List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
             product.getProductId());
 
-        return ProductDetailResponseDto.of(product, convenienceStoreEvents.stream().map(
+        return ReadProductDetailResponseDto.of(product, convenienceStoreEvents.stream().map(
             c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent())).toList());
     }
 
@@ -185,7 +185,7 @@ public class ProductService {
      * @return 상품 필터
      */
     @Transactional(readOnly = true)
-    public ProductFilterResponseDto getProductFilter() {
+    public ReadProductFilterResponseDto getProductFilter() {
         List<ConvenienceStoreDto> convenienceStoreNames = convenienceStoreRepository.findAll()
             .stream().map(ConvenienceStoreDto::from).toList();
         List<CategoryDto> categoryNames = categoryRepository.findAll().stream()
@@ -194,7 +194,7 @@ public class ProductService {
             .map(com.cvsgo.dto.product.EventTypeDto::from).toList();
         Integer highestPrice = productRepository.findFirstByOrderByPriceDesc().getPrice();
 
-        return ProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
+        return ReadProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
             highestPrice);
     }
 

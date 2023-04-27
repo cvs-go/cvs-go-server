@@ -6,7 +6,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
-public class SearchProductDetailQueryDto {
+public class ReadProductDetailQueryDto {
 
     private final Long productId;
     private final String productName;
@@ -17,7 +17,7 @@ public class SearchProductDetailQueryDto {
     private final Boolean isBookmarked;
 
     @QueryProjection
-    public SearchProductDetailQueryDto(Long productId, String productName, Integer productPrice,
+    public ReadProductDetailQueryDto(Long productId, String productName, Integer productPrice,
         String productImageUrl, String manufacturerName, ProductLike productLike,
         ProductBookmark productBookmark) {
         this.productId = productId;
