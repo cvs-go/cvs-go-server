@@ -75,7 +75,7 @@ class UserFollowRepositoryTest {
     }
 
     @Test
-    @DisplayName("회원 팔로우가 있는지 조회한다")
+    @DisplayName("회원과 팔로워를 통해 회원 팔로우를 조회한다")
     void succeed_to_find_user_follow_by_user_and_follower() {
         Optional<UserFollow> userFollow1 = userFollowRepository.findByUserAndFollower(user2, user1);
         Optional<UserFollow> userFollow2 = userFollowRepository.findByUserAndFollower(user1, user2);
