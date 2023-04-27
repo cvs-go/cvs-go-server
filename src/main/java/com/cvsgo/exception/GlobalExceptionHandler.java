@@ -73,13 +73,6 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(UnexpectedException.class)
-    public ErrorResponse handleUnexpectedException(UnexpectedException e) {
-        log.error(e.getMessage(), e);
-        return ErrorResponse.from(e.getErrorCode());
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(IOException.class)
     public ErrorResponse handleIOException(IOException e) {
         log.error("IOException 발생", e);
@@ -87,9 +80,10 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
     public ErrorResponse handleException(Exception e) {
         log.error("예기치 못한 예외가 발생했습니다.", e);
-        return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), e.getMessage());
+        return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), ErrorCode.UNEXPECTED_ERROR.getMessage());
     }
 
 }
