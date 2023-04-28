@@ -26,7 +26,6 @@ public class ReadProductRequestDto {
 
     private String keyword;
 
-    @Builder
     public ReadProductRequestDto(ProductSortBy sortBy, List<Long> convenienceStoreIds,
         List<Long> categoryIds, List<EventType> eventTypes, Integer lowestPrice,
         Integer highestPrice, String keyword) {

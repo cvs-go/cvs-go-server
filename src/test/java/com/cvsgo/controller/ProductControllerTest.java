@@ -98,15 +98,8 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
-        ReadProductRequestDto request = ReadProductRequestDto.builder()
-            .sortBy(ProductSortBy.SCORE)
-            .convenienceStoreIds(List.of(1L))
-            .categoryIds(List.of(1L))
-            .eventTypes(List.of(EventType.BOGO))
-            .lowestPrice(0)
-            .highestPrice(1000)
-            .keyword("500")
-            .build();
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE,
+            List.of(1L), List.of(1L), List.of(EventType.BOGO), 0, 10000, "500");
 
         Page<ReadProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
         given(productService.readProductList(any(), any(), any())).willReturn(responseDto);

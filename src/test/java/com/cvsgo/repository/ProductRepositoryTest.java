@@ -27,7 +27,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @Import(TestConfig.class)
 @DataJpaTest
@@ -149,18 +148,11 @@ class ProductRepositoryTest {
     }
 
     @Test
-    @DisplayName("상품 판매 편의점 목록을 조회한다")
-    void succeed_to_search_by_filter() {
+    @DisplayName("상품 목록을 조회한다")
+    void succeed_to_find_all_by_filter() {
         // given
-        Pageable pageable = PageRequest.of(0, 20);
-        ReadProductRequestDto request = ReadProductRequestDto.builder()
-            .convenienceStoreIds(null)
-            .categoryIds(null)
-            .eventTypes(null)
-            .lowestPrice(0)
-            .highestPrice(1000)
-            .keyword(null)
-            .build();
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            null, null, 0, 1000, null);
 
         ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
@@ -172,8 +164,8 @@ class ProductRepositoryTest {
             5L, 3.5, 4.5);
 
         // when
-        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user, request,
-            pageable);
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
 
         // then
         List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
@@ -186,14 +178,8 @@ class ProductRepositoryTest {
     @DisplayName("상품 판매 편의점 목록 요소의 전체 개수를 조회한다")
     void succeed_to_count_by_filter() {
         // given
-        ReadProductRequestDto request = ReadProductRequestDto.builder()
-            .convenienceStoreIds(null)
-            .categoryIds(null)
-            .eventTypes(null)
-            .lowestPrice(0)
-            .highestPrice(1000)
-            .keyword(null)
-            .build();
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            null, null, 0, 1000, null);
 
         // when
         Long totalCount = productRepository.countByFilter(request);
