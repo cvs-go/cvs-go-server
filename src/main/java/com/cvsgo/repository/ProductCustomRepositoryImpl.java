@@ -176,10 +176,10 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                     orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
-                case LIKE -> {
-                    orderSpecifiers.add(product.likeCount.desc());
-                    orderSpecifiers.add(avgRating.desc());
+                case REVIEW_COUNT -> {
                     orderSpecifiers.add(reviewCount.desc());
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
             }
