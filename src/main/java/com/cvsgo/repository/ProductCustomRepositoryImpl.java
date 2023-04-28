@@ -1,6 +1,5 @@
 package com.cvsgo.repository;
 
-import static com.cvsgo.entity.QConvenienceStore.convenienceStore;
 import static com.cvsgo.entity.QEvent.event;
 import static com.cvsgo.entity.QManufacturer.manufacturer;
 import static com.cvsgo.entity.QProduct.product;
@@ -13,11 +12,11 @@ import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.QConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.QSearchProductDetailQueryDto;
-import com.cvsgo.dto.product.QSearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.QReadProductDetailQueryDto;
+import com.cvsgo.dto.product.QReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.User;
 import com.querydsl.core.BooleanBuilder;
@@ -40,12 +39,12 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<SearchProductQueryDto> searchByFilter(User loginUser,
-        SearchProductRequestDto searchFilter, Pageable pageable) {
+    public List<ReadProductQueryDto> findAllByFilter(User loginUser,
+        ReadProductRequestDto searchFilter, Pageable pageable) {
         NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
         NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
         NumberPath<Double> score = Expressions.numberPath(Double.class, "score");
-        return queryFactory.select(new QSearchProductQueryDto(
+        return queryFactory.select(new QReadProductQueryDto(
                 product.id,
                 product.name,
                 product.price,
@@ -90,7 +89,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Long countByFilter(SearchProductRequestDto searchFilter) {
+    public Long countByFilter(ReadProductRequestDto searchFilter) {
         return queryFactory.select(product.count())
             .from(product)
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
@@ -114,8 +113,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
         List<Long> productIds) {
-        return queryFactory
-            .select(new QConvenienceStoreEventQueryDto(
+        return queryFactory.select(new QConvenienceStoreEventQueryDto(
                 sellAt.product.id,
                 sellAt.convenienceStore.name,
                 event))
@@ -126,9 +124,22 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Optional<SearchProductDetailQueryDto> findByProductId(User loginUser, Long productId) {
+    public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
+        Long productId) {
+        return queryFactory.select(new QConvenienceStoreEventQueryDto(
+                sellAt.convenienceStore.id,
+                sellAt.convenienceStore.name,
+                event))
+            .from(sellAt)
+            .leftJoin(event).on(sellAt.product.eq(event.product)
+                .and(sellAt.convenienceStore.eq(event.convenienceStore)))
+            .where(sellAt.product.id.eq(productId))
+            .fetch();
+    }
+
+    public Optional<ReadProductDetailQueryDto> findByProductId(User loginUser, Long productId) {
         return Optional.ofNullable(queryFactory
-            .select(new QSearchProductDetailQueryDto(
+            .select(new QReadProductDetailQueryDto(
                 product.id,
                 product.name,
                 product.price,
@@ -145,20 +156,6 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(product.id.eq(productId))
             .fetchOne());
-    }
-
-    public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
-        Long productId) {
-        return queryFactory.select(new QConvenienceStoreEventQueryDto(
-                sellAt.convenienceStore.id,
-                sellAt.convenienceStore.name,
-                event))
-            .from(sellAt)
-            .leftJoin(event).on(sellAt.product.eq(event.product)
-                .and(sellAt.convenienceStore.eq(event.convenienceStore)))
-            .leftJoin(convenienceStore).on(sellAt.convenienceStore.eq(convenienceStore))
-            .where(sellAt.product.id.eq(productId))
-            .fetch();
     }
 
     private static List<OrderSpecifier<?>> sortBy(ProductSortBy sortBy, NumberPath<Double> score,
@@ -179,10 +176,10 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                     orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
-                case LIKE -> {
-                    orderSpecifiers.add(product.likeCount.desc());
-                    orderSpecifiers.add(avgRating.desc());
+                case REVIEW_COUNT -> {
                     orderSpecifiers.add(reviewCount.desc());
+                    orderSpecifiers.add(avgRating.desc());
+                    orderSpecifiers.add(product.likeCount.desc());
                     orderSpecifiers.add(product.createdAt.desc());
                 }
             }
@@ -234,7 +231,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
         StringExpression productAndManufacturerName) {
         BooleanBuilder builder = new BooleanBuilder();
         if (keyword != null) {
-            String[] keywords = keyword.replace(" ", "").split("");
+            String[] keywords = keyword.split(" ");
             for (String k : keywords) {
                 builder.and(productAndManufacturerName.contains(k));
             }

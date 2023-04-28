@@ -4,16 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cvsgo.config.TestConfig;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
-import com.cvsgo.dto.product.SearchProductDetailQueryDto;
-import com.cvsgo.dto.product.SearchProductQueryDto;
-import com.cvsgo.dto.product.SearchProductRequestDto;
+import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
 import com.cvsgo.entity.DiscountEvent;
+import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.entity.Review;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
 import java.util.ArrayList;
@@ -27,7 +30,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 
 @Import(TestConfig.class)
 @DataJpaTest
@@ -55,22 +57,36 @@ class ProductRepositoryTest {
     @Autowired
     EventRepository eventRepository;
 
-    User user;
+    @Autowired
+    ReviewRepository reviewRepository;
+
+    User user1;
+    User user2;
+    Category category1;
+    Category category2;
     Product product1;
     Product product2;
     BogoEvent bogoEvent;
     BtgoEvent btgoEvent;
     DiscountEvent discountEvent;
+    Review review1;
+    Review review2;
+    Review review3;
 
     @BeforeEach
     void initData() {
-        user = User.create("abc@naver.com", "password1!", "닉네임", new ArrayList<>());
-        userRepository.save(user);
+        user1 = User.create("abc@naver.com", "password1!", "닉네임", new ArrayList<>());
+        user2 = User.create("abcd@naver.com", "password1!", "닉네임2", new ArrayList<>());
+        userRepository.save(user1);
+        userRepository.save(user2);
 
-        Category category = Category.builder()
+        category1 = Category.builder()
             .name("유제품")
             .build();
-        categoryRepository.save(category);
+        category2 = Category.builder()
+            .name("즉석식품")
+            .build();
+        categoryRepository.saveAll(List.of(category1, category2));
 
         Manufacturer manufacturer = Manufacturer.builder()
             .name("칠성")
@@ -80,14 +96,14 @@ class ProductRepositoryTest {
         product1 = Product.builder()
             .name("상품1")
             .price(1000)
-            .category(category)
+            .category(category1)
             .manufacturer(manufacturer)
             .build();
 
         product2 = Product.builder()
             .name("상품2")
             .price(5000)
-            .category(category)
+            .category(category1)
             .manufacturer(manufacturer)
             .build();
         productRepository.saveAll(List.of(product1, product2));
@@ -128,6 +144,29 @@ class ProductRepositoryTest {
             .product(product2)
             .build();
         eventRepository.saveAll(List.of(bogoEvent, discountEvent, btgoEvent));
+
+        review1 = Review.builder()
+            .user(user1)
+            .product(product1)
+            .rating(5)
+            .content("맛있어요")
+            .imageUrls(new ArrayList<>())
+            .build();
+        review2 = Review.builder()
+            .user(user2)
+            .product(product1)
+            .rating(3)
+            .content("그냥 그래요")
+            .imageUrls(new ArrayList<>())
+            .build();
+        review3 = Review.builder()
+            .user(user1)
+            .product(product2)
+            .rating(2)
+            .content("굿")
+            .imageUrls(new ArrayList<>())
+            .build();
+        reviewRepository.saveAll(List.of(review1, review2, review3));
     }
 
     @Test
@@ -149,51 +188,117 @@ class ProductRepositoryTest {
     }
 
     @Test
-    @DisplayName("상품 판매 편의점 목록을 조회한다")
-    void succeed_to_search_by_filter() {
+    @DisplayName("상품 목록을 조회한다")
+    void succeed_to_find_all_by_filter() {
         // given
-        Pageable pageable = PageRequest.of(0, 20);
-        SearchProductRequestDto request = SearchProductRequestDto.builder()
-            .convenienceStoreIds(null)
-            .categoryIds(null)
-            .eventTypes(null)
-            .lowestPrice(0)
-            .highestPrice(1000)
-            .keyword(null)
-            .build();
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            null, null, 0, 1000, null);
 
-        SearchProductQueryDto productResponse1 = new SearchProductQueryDto(product1.getId(),
+        ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
             product1.getCategory().getId(), product1.getManufacturer().getName(), null, null,
             5L, 3.5, 4.5);
-        SearchProductQueryDto productResponse2 = new SearchProductQueryDto(product2.getId(),
+        ReadProductQueryDto productResponse2 = new ReadProductQueryDto(product2.getId(),
             product2.getName(), product2.getPrice(), product2.getImageUrl(),
             product2.getCategory().getId(), product2.getManufacturer().getName(), null, null,
             5L, 3.5, 4.5);
 
         // when
-        List<SearchProductQueryDto> foundProducts = productRepository.searchByFilter(user, request,
-            pageable);
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
 
         // then
-        List<Long> foundProductIds = foundProducts.stream().map(SearchProductQueryDto::getProductId)
+        List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
             .toList();
         assertThat(productResponse1.getProductId()).isIn(foundProductIds);
         assertThat(productResponse2.getProductId()).isNotIn(foundProductIds);
     }
 
     @Test
-    @DisplayName("상품 판매 편의점 목록 요소의 전체 개수를 조회한다")
+    @DisplayName("랭킹 내림차순으로 정렬하여 특정 상품을 조회하면 첫번째 상품 랭킹이 마지막 상품 랭킹보다 크거나 같아야 한다")
+    void score_of_first_product_should_greater_than_or_equal_to_score_of_last_product_when_sorted_by_score_descending_order() {
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE, null,
+            null, null, 0, 10000, null);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts.get(0).getScore()).isGreaterThanOrEqualTo(
+            foundProducts.get(foundProducts.size() - 1).getScore());
+    }
+
+    @Test
+    @DisplayName("별점 내림차순으로 정렬하여 특정 상품을 조회하면 첫번째 상품 평균 별점이 마지막 상품 평균 별점보다 크거나 같아야 한다")
+    void rating_of_first_product_should_greater_than_or_equal_to_rating_of_last_product_when_sorted_by_rating_descending_order() {
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.RATING, null,
+            null, null, 0, 1000, null);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts.get(0).getAvgRating()).isGreaterThanOrEqualTo(
+            foundProducts.get(foundProducts.size() - 1).getAvgRating());
+    }
+
+    @Test
+    @DisplayName("리뷰순으로 정렬하여 특정 상품을 조회하면 첫번째 상품의 리뷰 개수가 마지막 상품의 리뷰 개수보다 크거나 같아야 한다")
+    void review_count_of_first_product_should_greater_than_or_equal_to_review_count_of_last_product_when_sorted_by_review_count_descending_order() {
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.REVIEW_COUNT, null,
+            null, null, 0, 1000, null);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts.get(0).getReviewCount()).isGreaterThanOrEqualTo(
+            foundProducts.get(foundProducts.size() - 1).getReviewCount());
+    }
+
+    @Test
+    @DisplayName("카테고리 필터를 적용하여 특정 상품을 조회하면 해당하는 상품들만 조회된다 ")
+    void succeed_to_find_product_by_category_filter() {
+        Long categoryId = category1.getId();
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            List.of(categoryId), null, 0, 1000, null);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts).hasSize(1);
+        assertThat(foundProducts.get(0).getCategoryId()).isEqualTo(categoryId);
+    }
+
+    @Test
+    @DisplayName("이벤트 타입 필터를 적용하여 특정 상품을 조회하면 해당하는 상품들만 조회된다 ")
+    void succeed_to_find_product_by_event_type_filter() {
+        EventType eventType = EventType.BOGO;
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            null, List.of(eventType), 0, 1000, null);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("키워드를 입력하여 특정 상품을 조회하면 해당하는 상품들만 조회된다 ")
+    void succeed_to_find_product_by_keyword_filter() {
+        String keyword = "상품1";
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            null, null, 0, 1000, keyword);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("상품 목록 요소의 전체 개수를 조회한다")
     void succeed_to_count_by_filter() {
         // given
-        SearchProductRequestDto request = SearchProductRequestDto.builder()
-            .convenienceStoreIds(null)
-            .categoryIds(null)
-            .eventTypes(null)
-            .lowestPrice(0)
-            .highestPrice(1000)
-            .keyword(null)
-            .build();
+        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+            null, null, 0, 1000, null);
 
         // when
         Long totalCount = productRepository.countByFilter(request);
@@ -235,12 +340,12 @@ class ProductRepositoryTest {
     @DisplayName("상품 ID를 통해 상품 정보를 조회한다")
     void succeed_to_find_by_product_id() {
         // given
-        SearchProductDetailQueryDto productDetailResponse = new SearchProductDetailQueryDto(
+        ReadProductDetailQueryDto productDetailResponse = new ReadProductDetailQueryDto(
             product1.getId(), product1.getName(), product1.getPrice(), product1.getImageUrl(),
             product1.getManufacturer().getName(), null, null);
 
         // when
-        Optional<SearchProductDetailQueryDto> foundProduct = productRepository.findByProductId(user,
+        Optional<ReadProductDetailQueryDto> foundProduct = productRepository.findByProductId(user1,
             product1.getId());
 
         // then

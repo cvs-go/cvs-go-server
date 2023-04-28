@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class SearchProductRequestDto {
+public class ReadProductRequestDto {
 
     @Enumerated(EnumType.STRING)
     private final ProductSortBy sortBy;
@@ -26,8 +26,7 @@ public class SearchProductRequestDto {
 
     private String keyword;
 
-    @Builder
-    public SearchProductRequestDto(ProductSortBy sortBy, List<Long> convenienceStoreIds,
+    public ReadProductRequestDto(ProductSortBy sortBy, List<Long> convenienceStoreIds,
         List<Long> categoryIds, List<EventType> eventTypes, Integer lowestPrice,
         Integer highestPrice, String keyword) {
         this.sortBy = sortBy;

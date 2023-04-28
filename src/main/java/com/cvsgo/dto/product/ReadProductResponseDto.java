@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class ProductResponseDto {
+public class ReadProductResponseDto {
 
     private final Long productId;
     private final String productName;
@@ -20,7 +20,7 @@ public class ProductResponseDto {
     private final List<ConvenienceStoreEventDto> convenienceStoreEvents;
 
     @Builder
-    public ProductResponseDto(Long productId, String productName, Integer productPrice,
+    public ReadProductResponseDto(Long productId, String productName, Integer productPrice,
         String productImageUrl, Long categoryId, String manufacturerName, Boolean isLiked,
         Boolean isBookmarked, Long reviewCount, Double reviewRating,
         List<ConvenienceStoreEventDto> convenienceStoreEvents) {
@@ -37,19 +37,19 @@ public class ProductResponseDto {
         this.convenienceStoreEvents = convenienceStoreEvents;
     }
 
-    public static ProductResponseDto of(SearchProductQueryDto searchProductQueryDto,
+    public static ReadProductResponseDto of(ReadProductQueryDto readProductQueryDto,
         List<ConvenienceStoreEventDto> convenienceStoreEvents) {
-        return ProductResponseDto.builder()
-            .productId(searchProductQueryDto.getProductId())
-            .productName(searchProductQueryDto.getProductName())
-            .productPrice(searchProductQueryDto.getProductPrice())
-            .productImageUrl(searchProductQueryDto.getProductImageUrl())
-            .categoryId(searchProductQueryDto.getCategoryId())
-            .manufacturerName(searchProductQueryDto.getManufacturerName())
-            .isLiked(searchProductQueryDto.getIsLiked())
-            .isBookmarked(searchProductQueryDto.getIsBookmarked())
-            .reviewCount(searchProductQueryDto.getReviewCount())
-            .reviewRating(searchProductQueryDto.getAvgRating())
+        return ReadProductResponseDto.builder()
+            .productId(readProductQueryDto.getProductId())
+            .productName(readProductQueryDto.getProductName())
+            .productPrice(readProductQueryDto.getProductPrice())
+            .productImageUrl(readProductQueryDto.getProductImageUrl())
+            .categoryId(readProductQueryDto.getCategoryId())
+            .manufacturerName(readProductQueryDto.getManufacturerName())
+            .isLiked(readProductQueryDto.getIsLiked())
+            .isBookmarked(readProductQueryDto.getIsBookmarked())
+            .reviewCount(readProductQueryDto.getReviewCount())
+            .reviewRating(readProductQueryDto.getAvgRating())
             .convenienceStoreEvents(convenienceStoreEvents)
             .build();
     }

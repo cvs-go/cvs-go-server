@@ -122,8 +122,8 @@ include::{snippets}/product-controller-test/respond_200_when_read_product_list_s
 | sortBy 값 | 정렬 기준 | 비고
 
 | SCORE | 랭킹순  | 정렬 기준 미지정시 기본값
-| LIKE | 좋아요순 |
 | RATING | 별점순 |
+| REVIEW_COUNT | 리뷰순 |
 |===
 ==== Sample Request
 include::{snippets}/product-controller-test/respond_200_when_read_product_list_successfully/http-request.adoc[]

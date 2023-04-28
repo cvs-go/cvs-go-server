@@ -4,14 +4,14 @@ import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class ProductFilterResponseDto {
+public class ReadProductFilterResponseDto {
 
     private final List<ConvenienceStoreDto> convenienceStores;
     private final List<CategoryDto> categories;
     private final List<EventTypeDto> eventTypes;
     private final Integer highestPrice;
 
-    private ProductFilterResponseDto(List<ConvenienceStoreDto> convenienceStores,
+    private ReadProductFilterResponseDto(List<ConvenienceStoreDto> convenienceStores,
         List<CategoryDto> categories, List<EventTypeDto> eventTypes,
         Integer highestPrice) {
         this.convenienceStores = convenienceStores;
@@ -20,10 +20,10 @@ public class ProductFilterResponseDto {
         this.highestPrice = highestPrice;
     }
 
-    public static ProductFilterResponseDto of(List<ConvenienceStoreDto> convenienceStores,
+    public static ReadProductFilterResponseDto of(List<ConvenienceStoreDto> convenienceStores,
         List<CategoryDto> categories, List<EventTypeDto> eventTypes,
         Integer highestPrice) {
-        return new ProductFilterResponseDto(convenienceStores, categories, eventTypes,
+        return new ReadProductFilterResponseDto(convenienceStores, categories, eventTypes,
             highestPrice);
     }
 }
