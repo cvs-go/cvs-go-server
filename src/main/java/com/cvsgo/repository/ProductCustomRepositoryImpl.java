@@ -1,6 +1,5 @@
 package com.cvsgo.repository;
 
-import static com.cvsgo.entity.QConvenienceStore.convenienceStore;
 import static com.cvsgo.entity.QEvent.event;
 import static com.cvsgo.entity.QManufacturer.manufacturer;
 import static com.cvsgo.entity.QProduct.product;
@@ -232,7 +231,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
         StringExpression productAndManufacturerName) {
         BooleanBuilder builder = new BooleanBuilder();
         if (keyword != null) {
-            String[] keywords = keyword.replace(" ", "").split("");
+            String[] keywords = keyword.split(" ");
             for (String k : keywords) {
                 builder.and(productAndManufacturerName.contains(k));
             }
