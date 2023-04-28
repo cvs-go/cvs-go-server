@@ -114,8 +114,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
         List<Long> productIds) {
-        return queryFactory
-            .select(new QConvenienceStoreEventQueryDto(
+        return queryFactory.select(new QConvenienceStoreEventQueryDto(
                 sellAt.product.id,
                 sellAt.convenienceStore.name,
                 event))
@@ -123,6 +122,19 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .leftJoin(event).on(sellAt.product.eq(event.product)
                 .and(sellAt.convenienceStore.eq(event.convenienceStore)))
             .where(sellAt.product.id.in(productIds))
+            .fetch();
+    }
+
+    public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
+        Long productId) {
+        return queryFactory.select(new QConvenienceStoreEventQueryDto(
+                sellAt.convenienceStore.id,
+                sellAt.convenienceStore.name,
+                event))
+            .from(sellAt)
+            .leftJoin(event).on(sellAt.product.eq(event.product)
+                .and(sellAt.convenienceStore.eq(event.convenienceStore)))
+            .where(sellAt.product.id.eq(productId))
             .fetch();
     }
 
@@ -145,20 +157,6 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
             .where(product.id.eq(productId))
             .fetchOne());
-    }
-
-    public List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(
-        Long productId) {
-        return queryFactory.select(new QConvenienceStoreEventQueryDto(
-                sellAt.convenienceStore.id,
-                sellAt.convenienceStore.name,
-                event))
-            .from(sellAt)
-            .leftJoin(event).on(sellAt.product.eq(event.product)
-                .and(sellAt.convenienceStore.eq(event.convenienceStore)))
-            .leftJoin(convenienceStore).on(sellAt.convenienceStore.eq(convenienceStore))
-            .where(sellAt.product.id.eq(productId))
-            .fetch();
     }
 
     private static List<OrderSpecifier<?>> sortBy(ProductSortBy sortBy, NumberPath<Double> score,

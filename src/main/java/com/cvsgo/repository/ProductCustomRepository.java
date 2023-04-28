@@ -19,8 +19,8 @@ public interface ProductCustomRepository {
     List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
         List<Long> productIds);
 
-    Optional<ReadProductDetailQueryDto> findByProductId(User user, Long productId);
-
     List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductId(Long productId);
+
+    Optional<ReadProductDetailQueryDto> findByProductId(User user, Long productId);
 
 }

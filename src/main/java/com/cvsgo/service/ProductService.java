@@ -63,19 +63,11 @@ public class ProductService {
         List<ReadProductQueryDto> products = productRepository.searchByFilter(user, request,
             pageable);
         Long totalCount = productRepository.countByFilter(request);
-
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
-            products.stream().map(ReadProductQueryDto::getProductId).toList());
-
-        Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventsByProduct =
-            convenienceStoreEvents.stream().collect(Collectors.groupingBy(
-                ConvenienceStoreEventQueryDto::getProductId));
+        List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
 
         List<ReadProductResponseDto> results = products.stream().map(
             productDto -> ReadProductResponseDto.of(productDto,
-                cvsEventsByProduct.get(productDto.getProductId()).stream().map(
-                        c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
-                    .toList())).toList();
+                getConvenienceStoreEvents(productIds, productDto))).toList();
         return new PageImpl<>(results, pageable, totalCount);
     }
 
@@ -92,11 +84,7 @@ public class ProductService {
         ReadProductDetailQueryDto product = productRepository.findByProductId(user, productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
-            product.getProductId());
-
-        return ReadProductDetailResponseDto.of(product, convenienceStoreEvents.stream().map(
-            c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent())).toList());
+        return ReadProductDetailResponseDto.of(product, getConvenienceStoreEvents(productId));
     }
 
     /**
@@ -196,6 +184,27 @@ public class ProductService {
 
         return ReadProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
             highestPrice);
+    }
+
+    private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(List<Long> productIds,
+        ReadProductQueryDto productDto) {
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
+            productIds);
+        Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventsByProduct = convenienceStoreEvents.stream()
+            .collect(Collectors.groupingBy(ConvenienceStoreEventQueryDto::getProductId));
+
+        return cvsEventsByProduct.get(productDto.getProductId()).stream()
+            .map(c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
+            .toList();
+    }
+
+    private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(Long productId) {
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
+            productId);
+
+        return convenienceStoreEvents.stream()
+            .map(c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
+            .toList();
     }
 
 }
