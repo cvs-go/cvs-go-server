@@ -223,8 +223,8 @@ class ProductRepositoryTest {
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
             PageRequest.of(0, 20));
 
-        assertThat(foundProducts.get(0).getAvgRating()).isGreaterThanOrEqualTo(
-            foundProducts.get(foundProducts.size() - 1).getAvgRating());
+        assertThat(foundProducts.get(0).getScore()).isGreaterThanOrEqualTo(
+            foundProducts.get(foundProducts.size() - 1).getScore());
     }
 
     @Test
