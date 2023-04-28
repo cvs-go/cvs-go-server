@@ -127,6 +127,7 @@ public class ReviewService {
      * @param pageable 페이지 정보
      * @return 리뷰 목록
      */
+    @Transactional(readOnly = true)
     public List<SearchReviewResponseDto> getReviewList(User user, SearchReviewRequestDto request,
         Pageable pageable) {
         List<SearchReviewQueryDto> reviews = reviewRepository.searchByFilter(user, request,
