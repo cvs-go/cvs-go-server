@@ -172,7 +172,7 @@ class ProductRepositoryTest {
             5L, 3.5, 4.5);
 
         // when
-        List<ReadProductQueryDto> foundProducts = productRepository.searchByFilter(user, request,
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user, request,
             pageable);
 
         // then

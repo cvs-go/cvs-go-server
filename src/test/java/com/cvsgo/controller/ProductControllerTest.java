@@ -23,13 +23,13 @@ import com.cvsgo.dto.product.CategoryDto;
 import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.EventTypeDto;
-import com.cvsgo.dto.product.ReadProductDetailResponseDto;
-import com.cvsgo.dto.product.ReadProductFilterResponseDto;
-import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
+import com.cvsgo.dto.product.ReadProductDetailResponseDto;
+import com.cvsgo.dto.product.ReadProductFilterResponseDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
@@ -252,9 +252,9 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
+    @DisplayName("상품 필터를 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_filter_successfully() throws Exception {
-        given(productService.getProductFilter()).willReturn(getProductFilterResponse());
+        given(productService.readProductFilter()).willReturn(getProductFilterResponse());
 
         mockMvc.perform(get("/api/products/filter").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())

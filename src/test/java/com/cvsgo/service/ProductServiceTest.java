@@ -78,14 +78,14 @@ class ProductServiceTest {
             .keyword(null)
             .build();
 
-        given(productRepository.searchByFilter(any(), any(), any())).willReturn(getProductList());
+        given(productRepository.findAllByFilter(any(), any(), any())).willReturn(getProductList());
         given(productRepository.countByFilter(any())).willReturn((long) getProductList().size());
         given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
         Page<ReadProductResponseDto> result = productService.readProductList(user, request, pageable);
         assertEquals(result.getTotalElements(), getProductList().size());
 
-        then(productRepository).should(times(1)).searchByFilter(any(), any(), any());
+        then(productRepository).should(times(1)).findAllByFilter(any(), any(), any());
         then(productRepository).should(times(1)).countByFilter(any());
         then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
     }
@@ -246,7 +246,7 @@ class ProductServiceTest {
         given(categoryRepository.findAll()).willReturn(List.of(category1));
         given(productRepository.findFirstByOrderByPriceDesc()).willReturn(product1);
 
-        productService.getProductFilter();
+        productService.readProductFilter();
 
         then(convenienceStoreRepository).should(atLeastOnce()).findAll();
         then(categoryRepository).should(atLeastOnce()).findAll();

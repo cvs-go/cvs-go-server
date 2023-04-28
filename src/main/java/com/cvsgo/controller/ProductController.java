@@ -80,8 +80,8 @@ public class ProductController {
     }
 
     @GetMapping("/filter")
-    public SuccessResponse<ReadProductFilterResponseDto> getProductFilter() {
-        return SuccessResponse.from(productService.getProductFilter());
+    public SuccessResponse<ReadProductFilterResponseDto> readProductFilter() {
+        return SuccessResponse.from(productService.readProductFilter());
     }
 
 }

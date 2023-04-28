@@ -40,7 +40,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ReadProductQueryDto> searchByFilter(User loginUser,
+    public List<ReadProductQueryDto> findAllByFilter(User loginUser,
         ReadProductRequestDto searchFilter, Pageable pageable) {
         NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
         NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");

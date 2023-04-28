@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProductCustomRepository {
 
-    List<ReadProductQueryDto> searchByFilter(User user, ReadProductRequestDto filter,
+    List<ReadProductQueryDto> findAllByFilter(User user, ReadProductRequestDto filter,
         Pageable pageable);
 
     Long countByFilter(ReadProductRequestDto filter);

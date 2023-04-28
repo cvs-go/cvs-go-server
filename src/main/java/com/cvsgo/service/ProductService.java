@@ -60,7 +60,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Page<ReadProductResponseDto> readProductList(User user, ReadProductRequestDto request,
         Pageable pageable) {
-        List<ReadProductQueryDto> products = productRepository.searchByFilter(user, request,
+        List<ReadProductQueryDto> products = productRepository.findAllByFilter(user, request,
             pageable);
         Long totalCount = productRepository.countByFilter(request);
         List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
@@ -173,7 +173,7 @@ public class ProductService {
      * @return 상품 필터
      */
     @Transactional(readOnly = true)
-    public ReadProductFilterResponseDto getProductFilter() {
+    public ReadProductFilterResponseDto readProductFilter() {
         List<ConvenienceStoreDto> convenienceStoreNames = convenienceStoreRepository.findAll()
             .stream().map(ConvenienceStoreDto::from).toList();
         List<CategoryDto> categoryNames = categoryRepository.findAll().stream()
