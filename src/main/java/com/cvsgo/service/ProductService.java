@@ -94,7 +94,7 @@ public class ProductService {
      * @throws NotFoundException  해당하는 아이디를 가진 상품이 없는 경우
      * @throws DuplicateException 이미 해당하는 상품 좋아요가 존재하는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createProductLike(User user, Long productId) {
         Product product = productRepository.findByIdWithOptimisticLock(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
@@ -116,7 +116,7 @@ public class ProductService {
      * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
      * @throws NotFoundException 해당하는 상품 좋아요가 없는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteProductLike(User user, Long productId) {
         Product product = productRepository.findByIdWithOptimisticLock(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
@@ -135,7 +135,7 @@ public class ProductService {
      * @throws NotFoundException  해당하는 아이디를 가진 상품이 없는 경우
      * @throws DuplicateException 이미 해당하는 상품 북마크가 존재하는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createProductBookmark(User user, Long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
@@ -156,7 +156,7 @@ public class ProductService {
      * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
      * @throws NotFoundException 해당하는 상품 북마크가 없는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteProductBookmark(User user, Long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
