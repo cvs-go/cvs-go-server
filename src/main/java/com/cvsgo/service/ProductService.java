@@ -11,12 +11,12 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
-import com.cvsgo.dto.product.ReadProductResponseDto;
-import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -100,12 +99,12 @@ public class ProductService {
         Product product = productRepository.findByIdWithOptimisticLock(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        ProductLike productLike = ProductLike.create(user, product);
-        try {
-            productLikeRepository.save(productLike);
-        } catch (DataIntegrityViolationException e) {
+        if (productLikeRepository.existsByProductAndUser(product, user)) {
             throw DUPLICATE_PRODUCT_LIKE;
         }
+
+        ProductLike productLike = ProductLike.create(user, product);
+        productLikeRepository.save(productLike);
         product.plusLikeCount();
     }
 
@@ -141,12 +140,12 @@ public class ProductService {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        ProductBookmark productBookmark = ProductBookmark.create(user, product);
-        try {
-            productBookmarkRepository.save(productBookmark);
-        } catch (DataIntegrityViolationException e) {
+        if (productBookmarkRepository.existsByProductAndUser(product, user)) {
             throw DUPLICATE_PRODUCT_BOOKMARK;
         }
+
+        ProductBookmark productBookmark = ProductBookmark.create(user, product);
+        productBookmarkRepository.save(productBookmark);
     }
 
     /**

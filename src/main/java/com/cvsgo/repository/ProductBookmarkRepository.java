@@ -10,4 +10,6 @@ public interface ProductBookmarkRepository extends JpaRepository<ProductBookmark
 
     Optional<ProductBookmark> findByProductAndUser(Product product, User user);
 
+    boolean existsByProductAndUser(Product product, User user);
+
 }
