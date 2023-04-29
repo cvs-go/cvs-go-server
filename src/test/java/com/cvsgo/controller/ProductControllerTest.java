@@ -63,6 +63,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -226,6 +227,17 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("상품 좋아요 생성 시 동시성 문제가 발생할 경우 HTTP 500을 응답한다")
+    void respond_500_when_create_product_like_but_like_concurrent_detected() throws Exception {
+        willThrow(ObjectOptimisticLockingFailureException.class).given(productService).createProductLike(any(), anyLong());
+
+        mockMvc.perform(post("/api/products/{productId}/likes", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
+            .andDo(print());
+    }
+
+    @Test
     @DisplayName("상품 좋아요 삭제에 성공하면 HTTP 200을 응답한다")
     void respond_200_when_delete_product_like_succeed() throws Exception {
         mockMvc.perform(delete("/api/products/{productId}/likes", 1L)
@@ -260,6 +272,17 @@ class ProductControllerTest {
         mockMvc.perform(delete("/api/products/{productId}/likes", 2L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 삭제 시 동시성 문제가 발생할 경우 HTTP 500을 응답한다")
+    void respond_500_when_delete_product_like_but_like_concurrent_detected() throws Exception {
+        willThrow(ObjectOptimisticLockingFailureException.class).given(productService).deleteProductLike(any(), anyLong());
+
+        mockMvc.perform(delete("/api/products/{productId}/likes", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
             .andDo(print());
     }
 

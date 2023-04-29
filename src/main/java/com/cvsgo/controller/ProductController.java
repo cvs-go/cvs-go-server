@@ -9,6 +9,7 @@ import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/products")
@@ -48,7 +50,8 @@ public class ProductController {
         try {
             productService.createProductLike(user, productId);
         } catch (ObjectOptimisticLockingFailureException e) {
-            return createProductLike(user, productId);
+            log.info("상품 좋아요 생성 동시성 문제 발생");
+            throw e;
         }
         return SuccessResponse.create();
     }
@@ -59,7 +62,8 @@ public class ProductController {
         try {
             productService.deleteProductLike(user, productId);
         } catch (ObjectOptimisticLockingFailureException e) {
-            return deleteProductLike(user, productId);
+            log.info("상품 좋아요 삭제 동시성 문제 발생");
+            throw e;
         }
         return SuccessResponse.create();
     }
