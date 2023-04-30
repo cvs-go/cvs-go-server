@@ -136,25 +136,13 @@ public class ReviewService {
         List<UserTag> userTags = userTagRepository.findByUserIdIn(
             reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList());
 
-        Map<Long, List<UserTag>> userTagsByUser = userTags.stream()
-            .collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
-
         List<ReviewImage> reviewImages = reviewImageRepository.findByReviewIdIn(
             reviews.stream().map(ReadReviewQueryDto::getReviewId).toList());
 
-        Map<Long, List<ReviewImage>> reviewImagesByReview =
-            reviewImages.stream()
-                .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
-
-        return reviews.stream()
-            .map(reviewDto -> ReadReviewResponseDto.of(reviewDto,
-                reviewImagesByReview.get(reviewDto.getReviewId()) != null
-                    ? reviewImagesByReview.get(reviewDto.getReviewId()).stream()
-                    .map(ReviewImage::getImageUrl).toList() : null,
-                userTagsByUser.get(reviewDto.getReviewerId()) != null
-                    ? userTagsByUser.get(reviewDto.getReviewerId()).stream()
-                    .map(userTag -> userTag.getTag().getName()).toList() : null)
-            ).toList();
+        return reviews.stream().map(reviewDto -> ReadReviewResponseDto.of(reviewDto,
+            getReviewImages(reviewDto.getReviewId(), reviewImages),
+            getUserTags(reviewDto.getReviewerId(), userTags))
+        ).toList();
     }
 
     /**
@@ -184,20 +172,36 @@ public class ReviewService {
 
         Long totalCount = reviewRepository.countByProductIdAndFilter(productId, request);
 
-        Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImageRepository.findByReviewIdIn(
-                reviews.stream().map(ReadProductReviewQueryDto::getReviewId).distinct().toList()).stream()
-            .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
+        List<ReviewImage> reviewImages = reviewImageRepository.findByReviewIdIn(
+            reviews.stream().map(ReadProductReviewQueryDto::getReviewId).distinct().toList());
 
-        Map<Long, List<UserTag>> userTagsByUser = userTagRepository.findByUserIdIn(
-                reviews.stream().map(ReadProductReviewQueryDto::getReviewerId).distinct().toList()).stream()
-            .collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
+        List<UserTag> userTags = userTagRepository.findByUserIdIn(
+            reviews.stream().map(ReadProductReviewQueryDto::getReviewerId).distinct().toList());
 
         List<ReadProductReviewResponseDto> results = reviews.stream().map(
             reviewDto -> ReadProductReviewResponseDto.of(reviewDto, user,
-                reviewImagesByReview.get(reviewDto.getReviewId()),
-                userTagsByUser.get(reviewDto.getReviewerId()))).toList();
+                getReviewImages(reviewDto.getReviewId(), reviewImages),
+                getUserTags(reviewDto.getReviewerId(), userTags))).toList();
 
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    private List<String> getReviewImages(Long reviewId, List<ReviewImage> reviewImages) {
+        Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImages.stream()
+            .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
+
+        return reviewImagesByReview.get(reviewId) != null
+            ? reviewImagesByReview.get(reviewId).stream().map(ReviewImage::getImageUrl).toList()
+            : List.of();
+    }
+
+    private List<String> getUserTags(Long reviewerId, List<UserTag> userTags) {
+        Map<Long, List<UserTag>> userTagsByUser = userTags.stream()
+            .collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
+
+        return userTagsByUser.get(reviewerId) != null
+            ? userTagsByUser.get(reviewerId).stream().map(userTag -> userTag.getTag().getName())
+            .toList() : List.of();
     }
 
 }

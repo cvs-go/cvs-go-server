@@ -60,13 +60,7 @@ public class ReadProductReviewResponseDto {
     }
 
     public static ReadProductReviewResponseDto of(ReadProductReviewQueryDto queryDto, User loginUser,
-        List<ReviewImage> reviewImages, List<UserTag> userTags) {
-        List<String> reviewImageUrls =
-            reviewImages != null ? reviewImages.stream().map(ReviewImage::getImageUrl).toList()
-                : List.of();
-        List<String> tags =
-            userTags != null ? userTags.stream().map(userTag -> userTag.getTag().getName()).toList()
-                : List.of();
+        List<String> reviewImageUrls, List<String> tags) {
         return ReadProductReviewResponseDto.builder()
             .reviewContent(queryDto.getContent())
             .reviewId(queryDto.getReviewId())

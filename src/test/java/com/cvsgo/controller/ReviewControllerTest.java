@@ -214,7 +214,7 @@ class ReviewControllerTest {
             review.getContent(), review.getRating(), null, review.getLikeCount(),
             LocalDateTime.now());
         ReadProductReviewResponseDto responseDto = ReadProductReviewResponseDto.of(readProductReviewQueryDto, reviewer,
-            List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
+            List.of("리뷰 이미지 URL", "리뷰 이미지 URL 2"), List.of("맵부심", "초코러버", "소식가"));
 
         given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
             .willReturn(new PageImpl<>(List.of(responseDto)));
@@ -337,7 +337,6 @@ class ReviewControllerTest {
             .andExpect(status().isCreated()).andDo(print());
     }
 
-
     @Test
     @DisplayName("IOException이 발생하면 HTTP 500을 응답한다.")
     void respond_500_when_IOException_occurs() throws Exception {
@@ -351,18 +350,6 @@ class ReviewControllerTest {
             .andExpect(status().isInternalServerError())
             .andDo(print());
     }
-
-    User user = User.create("abc@naver.com", "password1!", "닉네임", List.of(Tag.builder().name("맵부심").build()));
-    Tag tag1 = Tag.builder().name("맵부심").build();
-    Tag tag2 = Tag.builder().name("초코러버").build();
-    Tag tag3 = Tag.builder().name("소식가").build();
-
-    UserTag userTag1 = UserTag.builder().user(user).tag(tag1).build();
-    UserTag userTag2 = UserTag.builder().user(user).tag(tag2).build();
-    UserTag userTag3 = UserTag.builder().user(user).tag(tag3).build();
-
-    ReviewImage reviewImage1 = ReviewImage.builder().imageUrl("리뷰 이미지 URL 1").build();
-    ReviewImage reviewImage2 = ReviewImage.builder().imageUrl("리뷰 이미지 URL 2").build();
 
     ReadReviewResponseDto responseDto1 = ReadReviewResponseDto.builder()
         .productId(13L)
