@@ -121,7 +121,7 @@ class ReviewServiceTest {
     void succeed_to_read_review() {
         given(reviewRepository.findAllByFilter(any(), any(), any()))
             .willReturn(List.of(readReviewQueryDto));
-        given(userTagRepository.findByUserIn(anyList()))
+        given(userTagRepository.findByUserIdIn(anyList()))
             .willReturn(List.of(userTag));
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
@@ -130,7 +130,7 @@ class ReviewServiceTest {
 
         then(reviewRepository)
             .should(times(1)).findAllByFilter(any(), any(), any());
-        then(userTagRepository).should(times(1)).findByUserIn(any());
+        then(userTagRepository).should(times(1)).findByUserIdIn(any());
         then(reviewImageRepository).should(times(1)).findByReviewIdIn(any());
     }
 

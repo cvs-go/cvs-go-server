@@ -133,8 +133,8 @@ public class ReviewService {
         List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, request,
             pageable);
 
-        List<UserTag> userTags = userTagRepository.findByUserIn(
-            reviews.stream().map(ReadReviewQueryDto::getReviewer).distinct().toList());
+        List<UserTag> userTags = userTagRepository.findByUserIdIn(
+            reviews.stream().map(reviewDto -> reviewDto.getReviewer().getId()).distinct().toList());
 
         Map<User, List<UserTag>> userTagsByUser =
             userTags.stream().collect(Collectors.groupingBy(UserTag::getUser));
