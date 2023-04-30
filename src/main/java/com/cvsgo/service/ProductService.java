@@ -11,12 +11,12 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
+import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
-import com.cvsgo.dto.product.ReadProductResponseDto;
-import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,17 +95,17 @@ public class ProductService {
      * @throws NotFoundException  해당하는 아이디를 가진 상품이 없는 경우
      * @throws DuplicateException 이미 해당하는 상품 좋아요가 존재하는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createProductLike(User user, Long productId) {
         Product product = productRepository.findByIdWithOptimisticLock(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        ProductLike productLike = ProductLike.create(user, product);
-        try {
-            productLikeRepository.save(productLike);
-        } catch (DataIntegrityViolationException e) {
+        if (productLikeRepository.existsByProductAndUser(product, user)) {
             throw DUPLICATE_PRODUCT_LIKE;
         }
+
+        ProductLike productLike = ProductLike.create(user, product);
+        productLikeRepository.save(productLike);
         product.plusLikeCount();
     }
 
@@ -117,7 +117,7 @@ public class ProductService {
      * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
      * @throws NotFoundException 해당하는 상품 좋아요가 없는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteProductLike(User user, Long productId) {
         Product product = productRepository.findByIdWithOptimisticLock(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
@@ -136,17 +136,17 @@ public class ProductService {
      * @throws NotFoundException  해당하는 아이디를 가진 상품이 없는 경우
      * @throws DuplicateException 이미 해당하는 상품 북마크가 존재하는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void createProductBookmark(User user, Long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        ProductBookmark productBookmark = ProductBookmark.create(user, product);
-        try {
-            productBookmarkRepository.save(productBookmark);
-        } catch (DataIntegrityViolationException e) {
+        if (productBookmarkRepository.existsByProductAndUser(product, user)) {
             throw DUPLICATE_PRODUCT_BOOKMARK;
         }
+
+        ProductBookmark productBookmark = ProductBookmark.create(user, product);
+        productBookmarkRepository.save(productBookmark);
     }
 
     /**
@@ -157,7 +157,7 @@ public class ProductService {
      * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
      * @throws NotFoundException 해당하는 상품 북마크가 없는 경우
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteProductBookmark(User user, Long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);

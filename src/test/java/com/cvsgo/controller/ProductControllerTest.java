@@ -3,16 +3,24 @@ package com.cvsgo.controller;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_BOOKMARK;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_LIKE;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
@@ -42,7 +50,6 @@ import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ProductService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,6 +63,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
@@ -172,7 +180,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 조회 시 해당 ID를 가진 상품이 존재하지 않으면 상품 상세 조회 API 호출시 HTTP 404를 응답한다")
     void respond_404_when_read_product_but_product_does_not_exist() throws Exception {
-        given(productService.readProduct(any(), any())).willThrow(ExceptionConstants.NOT_FOUND_PRODUCT);
+        given(productService.readProduct(any(), any())).willThrow(NOT_FOUND_PRODUCT);
 
         mockMvc.perform(get("/api/products/{productId}", 1000L)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -197,9 +205,42 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("상품 좋아요 생성 시 해당 ID를 가진 상품이 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_create_product_like_but_product_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_PRODUCT).given(productService).createProductLike(any(), anyLong());
+
+        mockMvc.perform(post("/api/products/{productId}/likes", 1000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 생성 시 이미 해당하는 상품 좋아요가 있을 경우 HTTP 409를 응답한다")
+    void respond_409_when_create_product_like_but_product_like_already_exists() throws Exception {
+        willThrow(DUPLICATE_PRODUCT_LIKE).given(productService).createProductLike(any(), anyLong());
+
+        mockMvc.perform(post("/api/products/{productId}/likes", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isConflict())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 생성 시 동시성 문제가 발생할 경우 HTTP 500을 응답한다")
+    void respond_500_when_create_product_like_but_like_concurrent_detected() throws Exception {
+        willThrow(ObjectOptimisticLockingFailureException.class).given(productService).createProductLike(any(), anyLong());
+
+        mockMvc.perform(post("/api/products/{productId}/likes", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
+            .andDo(print());
+    }
+
+    @Test
     @DisplayName("상품 좋아요 삭제에 성공하면 HTTP 200을 응답한다")
     void respond_200_when_delete_product_like_succeed() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/products/{productId}/likes", 1L)
+        mockMvc.perform(delete("/api/products/{productId}/likes", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print())
@@ -210,6 +251,39 @@ class ProductControllerTest {
                     parameterWithName("productId").description("상품 ID")
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 삭제 시 해당 ID를 가진 상품이 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_delete_product_like_but_product_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_PRODUCT).given(productService).deleteProductLike(any(), anyLong());
+
+        mockMvc.perform(delete("/api/products/{productId}/likes", 1000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 삭제 시 해당하는 상품 좋아요가 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_delete_product_like_but_product_like_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_PRODUCT_LIKE).given(productService).deleteProductLike(any(), anyLong());
+
+        mockMvc.perform(delete("/api/products/{productId}/likes", 2L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 삭제 시 동시성 문제가 발생할 경우 HTTP 500을 응답한다")
+    void respond_500_when_delete_product_like_but_like_concurrent_detected() throws Exception {
+        willThrow(ObjectOptimisticLockingFailureException.class).given(productService).deleteProductLike(any(), anyLong());
+
+        mockMvc.perform(delete("/api/products/{productId}/likes", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
+            .andDo(print());
     }
 
     @Test
@@ -229,9 +303,31 @@ class ProductControllerTest {
     }
 
     @Test
+    @DisplayName("상품 북마크 생성 시 해당 ID를 가진 상품이 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_create_product_bookmark_but_product_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_PRODUCT).given(productService).createProductBookmark(any(), anyLong());
+
+        mockMvc.perform(post("/api/products/{productId}/bookmarks", 1000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 북마크 생성 시 이미 해당하는 상품 북마크가 있을 경우 HTTP 409를 응답한다")
+    void respond_409_when_create_product_bookmark_but_product_bookmark_already_exists() throws Exception {
+        willThrow(DUPLICATE_PRODUCT_BOOKMARK).given(productService).createProductBookmark(any(), anyLong());
+
+        mockMvc.perform(post("/api/products/{productId}/bookmarks", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isConflict())
+            .andDo(print());
+    }
+
+    @Test
     @DisplayName("상품 북마크 삭제에 성공하면 HTTP 200을 응답한다")
     void respond_200_when_delete_product_bookmark_succeed() throws Exception {
-        mockMvc.perform(RestDocumentationRequestBuilders.delete("/api/products/{productId}/bookmarks", 1L)
+        mockMvc.perform(delete("/api/products/{productId}/bookmarks", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print())
@@ -242,6 +338,28 @@ class ProductControllerTest {
                     parameterWithName("productId").description("상품 ID")
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("상품 북마크 삭제 시 해당 ID를 가진 상품이 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_delete_product_bookmark_but_product_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_PRODUCT).given(productService).deleteProductBookmark(any(), anyLong());
+
+        mockMvc.perform(delete("/api/products/{productId}/bookmarks", 1000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 북마크 삭제 시 해당하는 상품 북마크가 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_delete_product_bookmark_but_product_bookmark_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_PRODUCT_LIKE).given(productService).deleteProductBookmark(any(), anyLong());
+
+        mockMvc.perform(delete("/api/products/{productId}/bookmarks", 2L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
     }
 
     @Test

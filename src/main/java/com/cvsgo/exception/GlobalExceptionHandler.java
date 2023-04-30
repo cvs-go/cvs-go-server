@@ -5,7 +5,9 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,6 +72,20 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleDuplicateException(DuplicateException e) {
         log.info(e.getMessage(), e);
         return ErrorResponse.from(e.getErrorCode());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public ErrorResponse handleObjectOptimisticLockingFailureException(ObjectOptimisticLockingFailureException e) {
+        log.info("상품 좋아요 동시성 문제 발생", e);
+        return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        log.info("데이터 무결성 위반 문제 발생", e);
+        return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

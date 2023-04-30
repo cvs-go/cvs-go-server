@@ -13,10 +13,10 @@ import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.Category;
 import com.cvsgo.entity.ConvenienceStore;
@@ -27,6 +27,7 @@ import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
+import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.CategoryRepository;
 import com.cvsgo.repository.ConvenienceStoreRepository;
@@ -111,6 +112,7 @@ class ProductServiceTest {
     @DisplayName("상품 좋아요를 정상적으로 생성한다")
     void succeed_to_create_product_like() {
         given(productRepository.findByIdWithOptimisticLock(anyLong())).willReturn(Optional.of(product1));
+        given(productLikeRepository.existsByProductAndUser(any(), any())).willReturn(false);
         given(productLikeRepository.save(any())).willReturn(any());
 
         Long beforeLikeCount = product1.getLikeCount();
@@ -118,6 +120,7 @@ class ProductServiceTest {
         Long afterLikeCount = product1.getLikeCount();
 
         then(productRepository).should(times(1)).findByIdWithOptimisticLock(1L);
+        then(productLikeRepository).should(times(1)).existsByProductAndUser(any(), any());
         then(productLikeRepository).should(times(1)).save(any());
         assertThat(afterLikeCount).isSameAs(beforeLikeCount + 1);
     }
@@ -130,6 +133,18 @@ class ProductServiceTest {
         assertThrows(NotFoundException.class, () -> productService.createProductLike(user, 1000L));
 
         then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 생성 시 이미 해당하는 상품 좋아요가 있을 경우 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_create_product_like_but_product_like_already_exists() {
+        given(productRepository.findByIdWithOptimisticLock(anyLong())).willReturn(Optional.of(product1));
+        given(productLikeRepository.existsByProductAndUser(any(), any())).willReturn(true);
+
+        assertThrows(DuplicateException.class, () -> productService.createProductLike(user, 1L));
+
+        then(productRepository).should(times(1)).findByIdWithOptimisticLock(any());
+        then(productLikeRepository).should(times(1)).existsByProductAndUser(any(), any());
     }
 
     @Test
@@ -177,11 +192,13 @@ class ProductServiceTest {
     @DisplayName("상품 북마크를 정상적으로 생성한다")
     void succeed_to_create_product_bookmark() {
         given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
+        given(productBookmarkRepository.existsByProductAndUser(any(), any())).willReturn(false);
         given(productBookmarkRepository.save(any())).willReturn(any());
 
         productService.createProductBookmark(user, 1L);
 
         then(productRepository).should(times(1)).findById(1L);
+        then(productBookmarkRepository).should(times(1)).existsByProductAndUser(any(), any());
         then(productBookmarkRepository).should(times(1)).save(any());
     }
 
@@ -193,6 +210,18 @@ class ProductServiceTest {
         assertThrows(NotFoundException.class, () -> productService.createProductBookmark(user, 1000L));
 
         then(productRepository).should(times(1)).findById(any());
+    }
+
+    @Test
+    @DisplayName("상품 북마크 생성 시 이미 해당하는 상품 북마크가 있을 경우 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_create_product_bookmark_but_product_bookmark_already_exists() {
+        given(productRepository.findById(anyLong())).willReturn(Optional.of(product1));
+        given(productBookmarkRepository.existsByProductAndUser(any(), any())).willReturn(true);
+
+        assertThrows(DuplicateException.class, () -> productService.createProductBookmark(user, 1L));
+
+        then(productRepository).should(times(1)).findById(1L);
+        then(productBookmarkRepository).should(times(1)).existsByProductAndUser(any(), any());
     }
 
     @Test
