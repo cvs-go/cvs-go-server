@@ -151,8 +151,9 @@ public class ReviewService {
                 reviewImagesByReview.get(reviewDto.getReviewId()) != null
                     ? reviewImagesByReview.get(reviewDto.getReviewId()).stream()
                     .map(ReviewImage::getImageUrl).toList() : null,
-                userTagsByUser.get(reviewDto.getReviewer()).stream()
-                    .map(userTag -> userTag.getTag().getName()).toList())
+                userTagsByUser.get(reviewDto.getReviewer()) != null
+                    ? userTagsByUser.get(reviewDto.getReviewer()).stream()
+                    .map(userTag -> userTag.getTag().getName()).toList() : null)
             ).toList();
     }
 
