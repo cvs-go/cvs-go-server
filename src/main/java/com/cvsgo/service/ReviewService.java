@@ -130,7 +130,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public List<ReadReviewResponseDto> getReviewList(User user, ReadReviewRequestDto request,
         Pageable pageable) {
-        List<ReadReviewQueryDto> reviews = reviewRepository.searchByFilter(user, request,
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, request,
             pageable);
 
         List<UserTag> userTags = userTagRepository.findByUserIn(

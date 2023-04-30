@@ -119,7 +119,7 @@ class ReviewServiceTest {
     @Test
     @DisplayName("리뷰를 정상적으로 조회한다")
     void succeed_to_read_review() {
-        given(reviewRepository.searchByFilter(any(), any(), any()))
+        given(reviewRepository.findAllByFilter(any(), any(), any()))
             .willReturn(List.of(readReviewQueryDto));
         given(userTagRepository.findByUserIn(anyList()))
             .willReturn(List.of(userTag));
@@ -129,7 +129,7 @@ class ReviewServiceTest {
         reviewService.getReviewList(user1, searchReviewRequest, PageRequest.of(0, 20));
 
         then(reviewRepository)
-            .should(times(1)).searchByFilter(any(), any(), any());
+            .should(times(1)).findAllByFilter(any(), any(), any());
         then(userTagRepository).should(times(1)).findByUserIn(any());
         then(reviewImageRepository).should(times(1)).findByReviewIdIn(any());
     }

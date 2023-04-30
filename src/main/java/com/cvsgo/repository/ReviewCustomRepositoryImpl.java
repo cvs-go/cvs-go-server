@@ -31,7 +31,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<ReadReviewQueryDto> searchByFilter(User loginUser,
+    public List<ReadReviewQueryDto> findAllByFilter(User loginUser,
         ReadReviewRequestDto searchFilter, Pageable pageable) {
         return queryFactory.select(new QReadReviewQueryDto(
                 review.id,
