@@ -368,7 +368,9 @@ class ReviewServiceTest {
         .productName("불닭볶음면큰컵")
         .manufacturerName("삼양")
         .productImageUrl("https://어쩌구저쩌구/products/불닭볶음면.png")
-        .reviewer(user1)
+        .reviewerId(user1.getId())
+        .reviewerNickname(user1.getNickname())
+        .reviewerProfileImageUrl(user1.getProfileImageUrl())
         .likeCount(3L)
         .rating(4)
         .build();

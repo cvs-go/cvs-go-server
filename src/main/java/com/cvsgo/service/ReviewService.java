@@ -134,10 +134,10 @@ public class ReviewService {
             pageable);
 
         List<UserTag> userTags = userTagRepository.findByUserIdIn(
-            reviews.stream().map(reviewDto -> reviewDto.getReviewer().getId()).distinct().toList());
+            reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList());
 
-        Map<User, List<UserTag>> userTagsByUser =
-            userTags.stream().collect(Collectors.groupingBy(UserTag::getUser));
+        Map<Long, List<UserTag>> userTagsByUser = userTags.stream()
+            .collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
 
         List<ReviewImage> reviewImages = reviewImageRepository.findByReviewIdIn(
             reviews.stream().map(ReadReviewQueryDto::getReviewId).toList());
@@ -151,8 +151,8 @@ public class ReviewService {
                 reviewImagesByReview.get(reviewDto.getReviewId()) != null
                     ? reviewImagesByReview.get(reviewDto.getReviewId()).stream()
                     .map(ReviewImage::getImageUrl).toList() : null,
-                userTagsByUser.get(reviewDto.getReviewer()) != null
-                    ? userTagsByUser.get(reviewDto.getReviewer()).stream()
+                userTagsByUser.get(reviewDto.getReviewerId()) != null
+                    ? userTagsByUser.get(reviewDto.getReviewerId()).stream()
                     .map(userTag -> userTag.getTag().getName()).toList() : null)
             ).toList();
     }
