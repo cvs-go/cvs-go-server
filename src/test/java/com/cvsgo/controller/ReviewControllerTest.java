@@ -2,12 +2,12 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
-import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadProductReviewQueryDto;
+import com.cvsgo.dto.review.ReadProductReviewRequestDto;
+import com.cvsgo.dto.review.ReadProductReviewResponseDto;
+import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewResponseDto;
-import com.cvsgo.dto.review.ReviewSortBy;
-import com.cvsgo.dto.review.SearchReviewRequestDto;
-import com.cvsgo.dto.review.SearchReviewResponseDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.ReviewImage;
@@ -156,7 +156,7 @@ class ReviewControllerTest {
     @Test
     @DisplayName("리뷰 조회에 성공하면 HTTP 200을 응답한다.")
     void respond_200_when_success_to_read_reviews() throws Exception {
-        SearchReviewRequestDto requestDto = SearchReviewRequestDto.builder()
+        ReadReviewRequestDto requestDto = ReadReviewRequestDto.builder()
             .sortBy(ReviewSortBy.LIKE)
             .categoryIds(List.of(1L, 2L, 3L))
             .tagIds(List.of(2L))
@@ -203,17 +203,17 @@ class ReviewControllerTest {
     @Test
     @DisplayName("특정 상품의 리뷰 목록 조회에 성공하면 HTTP 200을 응답한다.")
     void respond_200_when_success_to_read_product_reviews() throws Exception {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
         User reviewer = User.builder().id(1L).userId("abc@naver.com").role(Role.REGULAR)
             .nickname("닉네임").build();
         Review review = Review.builder().id(1L).rating(4).content("맛있어요").user(reviewer)
             .imageUrls(List.of()).build();
-        ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(reviewer.getId(),
+        ReadProductReviewQueryDto readProductReviewQueryDto = new ReadProductReviewQueryDto(reviewer.getId(),
             review.getId(), reviewer.getNickname(), reviewer.getProfileImageUrl(), null,
             review.getContent(), review.getRating(), null, review.getLikeCount(),
             LocalDateTime.now());
-        ReadReviewResponseDto responseDto = ReadReviewResponseDto.of(readReviewQueryDto, reviewer,
+        ReadProductReviewResponseDto responseDto = ReadProductReviewResponseDto.of(readProductReviewQueryDto, reviewer,
             List.of(reviewImage1, reviewImage2), List.of(userTag1, userTag2, userTag3));
 
         given(reviewService.readProductReviewList(any(), anyLong(), any(), any()))
@@ -364,7 +364,7 @@ class ReviewControllerTest {
     ReviewImage reviewImage1 = ReviewImage.builder().imageUrl("리뷰 이미지 URL 1").build();
     ReviewImage reviewImage2 = ReviewImage.builder().imageUrl("리뷰 이미지 URL 2").build();
 
-    SearchReviewResponseDto responseDto1 = SearchReviewResponseDto.builder()
+    ReadReviewResponseDto responseDto1 = ReadReviewResponseDto.builder()
         .productId(13L)
         .productName("불닭볶음면큰컵")
         .productManufacturer("삼양")
@@ -382,7 +382,7 @@ class ReviewControllerTest {
         .createdAt(LocalDateTime.now())
         .build();
 
-    SearchReviewResponseDto responseDto2 = SearchReviewResponseDto.builder()
+    ReadReviewResponseDto responseDto2 = ReadReviewResponseDto.builder()
         .productId(13L)
         .productName("바질크림불닭우동")
         .productManufacturer("삼양")

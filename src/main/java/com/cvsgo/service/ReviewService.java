@@ -7,12 +7,12 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
 import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
 
 import com.cvsgo.dto.review.CreateReviewRequestDto;
+import com.cvsgo.dto.review.ReadProductReviewQueryDto;
+import com.cvsgo.dto.review.ReadProductReviewRequestDto;
+import com.cvsgo.dto.review.ReadProductReviewResponseDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewResponseDto;
-import com.cvsgo.dto.review.SearchReviewQueryDto;
-import com.cvsgo.dto.review.SearchReviewRequestDto;
-import com.cvsgo.dto.review.SearchReviewResponseDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
@@ -128,26 +128,26 @@ public class ReviewService {
      * @return 리뷰 목록
      */
     @Transactional(readOnly = true)
-    public List<SearchReviewResponseDto> getReviewList(User user, SearchReviewRequestDto request,
+    public List<ReadReviewResponseDto> getReviewList(User user, ReadReviewRequestDto request,
         Pageable pageable) {
-        List<SearchReviewQueryDto> reviews = reviewRepository.searchByFilter(user, request,
+        List<ReadReviewQueryDto> reviews = reviewRepository.searchByFilter(user, request,
             pageable);
 
         List<UserTag> userTags = userTagRepository.findByUserIn(
-            reviews.stream().map(SearchReviewQueryDto::getReviewer).distinct().toList());
+            reviews.stream().map(ReadReviewQueryDto::getReviewer).distinct().toList());
 
         Map<User, List<UserTag>> userTagsByUser =
             userTags.stream().collect(Collectors.groupingBy(UserTag::getUser));
 
         List<ReviewImage> reviewImages = reviewImageRepository.findByReviewIdIn(
-            reviews.stream().map(SearchReviewQueryDto::getReviewId).toList());
+            reviews.stream().map(ReadReviewQueryDto::getReviewId).toList());
 
         Map<Long, List<ReviewImage>> reviewImagesByReview =
             reviewImages.stream()
                 .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
 
         return reviews.stream()
-            .map(reviewDto -> SearchReviewResponseDto.of(reviewDto,
+            .map(reviewDto -> ReadReviewResponseDto.of(reviewDto,
                 reviewImagesByReview.get(reviewDto.getReviewId()) != null
                     ? reviewImagesByReview.get(reviewDto.getReviewId()).stream()
                     .map(ReviewImage::getImageUrl).toList() : null,
@@ -167,8 +167,8 @@ public class ReviewService {
      * @throws ForbiddenException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
      */
     @Transactional(readOnly = true)
-    public Page<ReadReviewResponseDto> readProductReviewList(User user, Long productId,
-        ReadReviewRequestDto request, Pageable pageable) {
+    public Page<ReadProductReviewResponseDto> readProductReviewList(User user, Long productId,
+        ReadProductReviewRequestDto request, Pageable pageable) {
 
         if (user == null || user.getRole() != Role.REGULAR) {
             if (pageable.getPageNumber() > 0) {
@@ -178,21 +178,21 @@ public class ReviewService {
             }
         }
 
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user,
+        List<ReadProductReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user,
             productId, request, pageable);
 
         Long totalCount = reviewRepository.countByProductIdAndFilter(productId, request);
 
         Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImageRepository.findByReviewIdIn(
-                reviews.stream().map(ReadReviewQueryDto::getReviewId).distinct().toList()).stream()
+                reviews.stream().map(ReadProductReviewQueryDto::getReviewId).distinct().toList()).stream()
             .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
 
         Map<Long, List<UserTag>> userTagsByUser = userTagRepository.findByUserIdIn(
-                reviews.stream().map(ReadReviewQueryDto::getReviewerId).distinct().toList()).stream()
+                reviews.stream().map(ReadProductReviewQueryDto::getReviewerId).distinct().toList()).stream()
             .collect(Collectors.groupingBy(userTag -> userTag.getUser().getId()));
 
-        List<ReadReviewResponseDto> results = reviews.stream().map(
-            reviewDto -> ReadReviewResponseDto.of(reviewDto, user,
+        List<ReadProductReviewResponseDto> results = reviews.stream().map(
+            reviewDto -> ReadProductReviewResponseDto.of(reviewDto, user,
                 reviewImagesByReview.get(reviewDto.getReviewId()),
                 userTagsByUser.get(reviewDto.getReviewerId()))).toList();
 

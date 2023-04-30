@@ -12,12 +12,12 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.review.CreateReviewRequestDto;
+import com.cvsgo.dto.review.ReadProductReviewQueryDto;
+import com.cvsgo.dto.review.ReadProductReviewRequestDto;
+import com.cvsgo.dto.review.ReadProductReviewResponseDto;
+import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
-import com.cvsgo.dto.review.ReadReviewResponseDto;
-import com.cvsgo.dto.review.ReviewSortBy;
-import com.cvsgo.dto.review.SearchReviewQueryDto;
-import com.cvsgo.dto.review.SearchReviewRequestDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
@@ -120,7 +120,7 @@ class ReviewServiceTest {
     @DisplayName("리뷰를 정상적으로 조회한다")
     void succeed_to_read_review() {
         given(reviewRepository.searchByFilter(any(), any(), any()))
-            .willReturn(List.of(searchReviewQueryDto));
+            .willReturn(List.of(readReviewQueryDto));
         given(userTagRepository.findByUserIn(anyList()))
             .willReturn(List.of(userTag));
         given(reviewImageRepository.findByReviewIdIn(anyList()))
@@ -137,10 +137,10 @@ class ReviewServiceTest {
     @Test
     @DisplayName("특정 상품의 리뷰를 정상적으로 조회한다")
     void succeed_to_read_product_review() {
-        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto1 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
         given(reviewRepository.findAllByProductIdAndFilter(any(), anyLong(), any(), any()))
@@ -152,7 +152,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        List<ReadReviewResponseDto> reviews = reviewService.readProductReviewList(user2, 1L,
+        List<ReadProductReviewResponseDto> reviews = reviewService.readProductReviewList(user2, 1L,
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(1);
@@ -166,25 +166,25 @@ class ReviewServiceTest {
     @Test
     @DisplayName("준회원인 사용자가 특정 상품의 리뷰 0페이지를 조회하면 5개만 조회된다")
     void should_get_only_five_reviews_when_associate_user_read_first_page_of_product_reviews() {
-        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto1 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto2 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto3 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto4 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto4 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto5 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto5 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto6 = new ReadReviewQueryDto(user1.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto6 = new ReadProductReviewQueryDto(user1.getId(), review.getId(),
             user1.getNickname(), user1.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
         PageRequest size20 = PageRequest.of(0, 20);
@@ -205,7 +205,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        List<ReadReviewResponseDto> reviews = reviewService.readProductReviewList(user1, 1L,
+        List<ReadProductReviewResponseDto> reviews = reviewService.readProductReviewList(user1, 1L,
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isLessThanOrEqualTo(5); // user1은 준회원이기 때문에 최대 5개까지만 조회됨
@@ -218,25 +218,25 @@ class ReviewServiceTest {
     @Test
     @DisplayName("정회원인 사용자가 특정 상품의 리뷰 0페이지를 조회하면 정상적으로 조회된다")
     void should_success_to_read_product_reviews_when_regular_user_read_first_page_of_product_reviews() {
-        ReadReviewQueryDto queryDto1 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto1 = new ReadProductReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto2 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto2 = new ReadProductReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto3 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto3 = new ReadProductReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto4 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto4 = new ReadProductReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto5 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto5 = new ReadProductReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewQueryDto queryDto6 = new ReadReviewQueryDto(user2.getId(), review.getId(),
+        ReadProductReviewQueryDto queryDto6 = new ReadProductReviewQueryDto(user2.getId(), review.getId(),
             user2.getNickname(), user2.getProfileImageUrl(), userFollow, review.getContent(),
             review.getRating(), null, review.getLikeCount(), LocalDateTime.now());
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
         PageRequest size20 = PageRequest.of(0, 20);
@@ -257,7 +257,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        List<ReadReviewResponseDto> reviews = reviewService.readProductReviewList(user2, 1L,
+        List<ReadProductReviewResponseDto> reviews = reviewService.readProductReviewList(user2, 1L,
             requestDto, PageRequest.of(0, 20)).getContent();
 
         assertThat(reviews.size()).isEqualTo(6); // user2는 정회원이므로 6개가 조회됨
@@ -270,7 +270,7 @@ class ReviewServiceTest {
     @Test
     @DisplayName("준회원인 사용자가 특정 상품의 리뷰 1페이지를 조회하면 ForbiddenException이 발생한다")
     void should_throw_ForbiddenException_when_associate_user_read_second_page_of_product_reviews() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), ReviewSortBy.LATEST);
 
         assertThrows(ForbiddenException.class,
@@ -280,7 +280,7 @@ class ReviewServiceTest {
     @Test
     @DisplayName("로그인하지 않은 사용자가 특정 상품의 리뷰 1페이지를 조회하면 ForbiddenException이 발생한다")
     void should_throw_ForbiddenException_when_non_login_user_read_second_page_of_product_reviews() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(1L, 2L, 3L),
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(1L, 2L, 3L),
             List.of(4, 5), null);
 
         assertThrows(ForbiddenException.class,
@@ -360,9 +360,9 @@ class ReviewServiceTest {
     UpdateReviewRequestDto updateReviewRequestDto = new UpdateReviewRequestDto(5, "맛있어요",
         new ArrayList<>());
 
-    SearchReviewRequestDto searchReviewRequest = SearchReviewRequestDto.builder().build();
+    ReadReviewRequestDto searchReviewRequest = ReadReviewRequestDto.builder().build();
 
-    SearchReviewQueryDto searchReviewQueryDto = SearchReviewQueryDto.builder()
+    ReadReviewQueryDto readReviewQueryDto = ReadReviewQueryDto.builder()
         .reviewId(1L)
         .productId(2L)
         .productName("불닭볶음면큰컵")
