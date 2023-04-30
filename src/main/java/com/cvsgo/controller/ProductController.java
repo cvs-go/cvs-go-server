@@ -4,8 +4,8 @@ import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
-import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,24 +46,14 @@ public class ProductController {
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<Void> createProductLike(@LoginUser User user,
         @PathVariable Long productId) {
-        try {
-            productService.createProductLike(user, productId);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            log.info("상품 좋아요 생성 동시성 문제 발생");
-            throw e;
-        }
+        productService.createProductLike(user, productId);
         return SuccessResponse.create();
     }
 
     @DeleteMapping("/{productId}/likes")
     public SuccessResponse<Void> deleteProductLike(@LoginUser User user,
         @PathVariable Long productId) {
-        try {
-            productService.deleteProductLike(user, productId);
-        } catch (ObjectOptimisticLockingFailureException e) {
-            log.info("상품 좋아요 삭제 동시성 문제 발생");
-            throw e;
-        }
+        productService.deleteProductLike(user, productId);
         return SuccessResponse.create();
     }
 
