@@ -10,11 +10,8 @@ import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewResponseDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Review;
-import com.cvsgo.entity.ReviewImage;
 import com.cvsgo.entity.Role;
-import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
-import com.cvsgo.entity.UserTag;
 import com.cvsgo.exception.ErrorCode;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ReviewService;
@@ -163,7 +160,7 @@ class ReviewControllerTest {
             .ratings(List.of(4, 5))
             .build();
 
-        given(reviewService.getReviewList(any(), any(), any()))
+        given(reviewService.readReviewList(any(), any(), any()))
             .willReturn(List.of(responseDto1, responseDto2));
 
         mockMvc.perform(get(SEARCH_REVIEW_API_PATH)

@@ -128,7 +128,7 @@ public class ReviewService {
      * @return 리뷰 목록
      */
     @Transactional(readOnly = true)
-    public List<ReadReviewResponseDto> getReviewList(User user, ReadReviewRequestDto request,
+    public List<ReadReviewResponseDto> readReviewList(User user, ReadReviewRequestDto request,
         Pageable pageable) {
         List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, request,
             pageable);

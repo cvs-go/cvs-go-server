@@ -126,7 +126,7 @@ class ReviewServiceTest {
         given(reviewImageRepository.findByReviewIdIn(anyList()))
             .willReturn(List.of(reviewImage));
 
-        reviewService.getReviewList(user1, searchReviewRequest, PageRequest.of(0, 20));
+        reviewService.readReviewList(user1, searchReviewRequest, PageRequest.of(0, 20));
 
         then(reviewRepository)
             .should(times(1)).findAllByFilter(any(), any(), any());

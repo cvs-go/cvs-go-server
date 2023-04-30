@@ -44,7 +44,7 @@ public class ReviewController {
     @GetMapping("/reviews")
     public SuccessResponse<List<ReadReviewResponseDto>> searchReviews(@LoginUser User user,
         @ModelAttribute ReadReviewRequestDto request, Pageable pageable) {
-        return SuccessResponse.from(reviewService.getReviewList(user, request, pageable));
+        return SuccessResponse.from(reviewService.readReviewList(user, request, pageable));
     }
 
     @GetMapping("/products/{productId}/reviews")
