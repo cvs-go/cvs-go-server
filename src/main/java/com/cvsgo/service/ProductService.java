@@ -37,7 +37,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,9 +64,11 @@ public class ProductService {
         Long totalCount = productRepository.countByFilter(request);
         List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
 
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
+            productIds);
         List<ReadProductResponseDto> results = products.stream().map(
             productDto -> ReadProductResponseDto.of(productDto,
-                getConvenienceStoreEvents(productIds, productDto))).toList();
+                getConvenienceStoreEvents(convenienceStoreEvents, productDto))).toList();
         return new PageImpl<>(results, pageable, totalCount);
     }
 
@@ -84,7 +85,10 @@ public class ProductService {
         ReadProductDetailQueryDto product = productRepository.findByProductId(user, productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        return ReadProductDetailResponseDto.of(product, getConvenienceStoreEvents(productId));
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
+            productId);
+        return ReadProductDetailResponseDto.of(product,
+            getConvenienceStoreEvents(convenienceStoreEvents));
     }
 
     /**
@@ -186,10 +190,9 @@ public class ProductService {
             highestPrice);
     }
 
-    private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(List<Long> productIds,
+    private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents,
         ReadProductQueryDto productDto) {
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
-            productIds);
         Map<Long, List<ConvenienceStoreEventQueryDto>> cvsEventsByProduct = convenienceStoreEvents.stream()
             .collect(Collectors.groupingBy(ConvenienceStoreEventQueryDto::getProductId));
 
@@ -198,10 +201,8 @@ public class ProductService {
             .toList();
     }
 
-    private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(Long productId) {
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductId(
-            productId);
-
+    private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents) {
         return convenienceStoreEvents.stream()
             .map(c -> ConvenienceStoreEventDto.of(c.getConvenienceStoreName(), c.getEvent()))
             .toList();
