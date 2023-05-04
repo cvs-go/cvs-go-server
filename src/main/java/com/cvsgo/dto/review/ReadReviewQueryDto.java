@@ -2,6 +2,7 @@ package com.cvsgo.dto.review;
 
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ReviewLike;
+import com.cvsgo.entity.UserFollow;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -26,6 +27,8 @@ public class ReadReviewQueryDto {
 
     private final String reviewerProfileImageUrl;
 
+    private final boolean isFollowing;
+
     private final Long likeCount;
 
     private final Integer rating;
@@ -42,8 +45,9 @@ public class ReadReviewQueryDto {
     @QueryProjection
     public ReadReviewQueryDto(Long reviewId, Long productId, String productName,
         String manufacturerName, String productImageUrl, Long reviewerId, String reviewerNickname,
-        String reviewerProfileImageUrl, Long likeCount, Integer rating, String reviewContent,
-        LocalDateTime createdAt, ReviewLike reviewLike, ProductBookmark productBookmark) {
+        String reviewerProfileImageUrl, UserFollow userFollow, Long likeCount, Integer rating,
+        String reviewContent, LocalDateTime createdAt, ReviewLike reviewLike,
+        ProductBookmark productBookmark) {
         this.reviewId = reviewId;
         this.productId = productId;
         this.productName = productName;
@@ -52,6 +56,7 @@ public class ReadReviewQueryDto {
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
         this.reviewerProfileImageUrl = reviewerProfileImageUrl;
+        this.isFollowing = userFollow != null;
         this.likeCount = likeCount;
         this.rating = rating;
         this.reviewContent = reviewContent;

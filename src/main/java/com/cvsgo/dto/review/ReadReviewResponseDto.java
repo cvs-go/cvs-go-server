@@ -25,6 +25,8 @@ public class ReadReviewResponseDto {
 
     private final String reviewerProfileImageUrl;
 
+    private final Boolean isFollowing;
+
     private final List<String> reviewerTags;
 
     private final Long reviewLikeCount;
@@ -45,7 +47,7 @@ public class ReadReviewResponseDto {
     @Builder
     public ReadReviewResponseDto(Long productId, String productName, String productManufacturer,
         String productImageUrl, Long reviewId, Long reviewerId, String reviewerNickname,
-        String reviewerProfileImageUrl, List<String> reviewerTags,
+        String reviewerProfileImageUrl, boolean isFollowing, List<String> reviewerTags,
         Long reviewLikeCount, Integer reviewRating, String reviewContent, LocalDateTime createdAt,
         Boolean isReviewLiked, Boolean isProductBookmarked, List<String> reviewImageUrls) {
         this.productId = productId;
@@ -56,6 +58,7 @@ public class ReadReviewResponseDto {
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
         this.reviewerProfileImageUrl = reviewerProfileImageUrl;
+        this.isFollowing = isFollowing;
         this.reviewerTags = reviewerTags;
         this.reviewLikeCount = reviewLikeCount;
         this.reviewRating = reviewRating;
@@ -73,6 +76,7 @@ public class ReadReviewResponseDto {
             .productId(readReviewQueryDto.getProductId())
             .reviewContent(readReviewQueryDto.getReviewContent())
             .productImageUrl(readReviewQueryDto.getProductImageUrl())
+            .isFollowing(readReviewQueryDto.isFollowing())
             .productManufacturer(readReviewQueryDto.getManufacturerName())
             .reviewId(readReviewQueryDto.getReviewId())
             .reviewerId(readReviewQueryDto.getReviewerId())

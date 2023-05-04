@@ -42,6 +42,7 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 review.user.id,
                 review.user.nickname,
                 review.user.profileImageUrl,
+                userFollow,
                 review.likeCount,
                 review.rating,
                 review.content,
@@ -49,6 +50,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 reviewLike,
                 productBookmark))
             .from(review)
+            .leftJoin(userFollow)
+            .on(review.user.eq(userFollow.user).and(userFollowingEq(loginUser)))
             .leftJoin(reviewLike)
             .on(reviewLike.review.eq(review).and(reviewLikeUserEq(loginUser)))
             .leftJoin(productBookmark)
