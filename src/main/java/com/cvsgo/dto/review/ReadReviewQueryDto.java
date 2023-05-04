@@ -5,7 +5,6 @@ import com.cvsgo.entity.ReviewLike;
 import com.cvsgo.entity.UserFollow;
 import com.querydsl.core.annotations.QueryProjection;
 import java.time.LocalDateTime;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -41,7 +40,6 @@ public class ReadReviewQueryDto {
 
     private final Boolean isProductBookmarked;
 
-    @Builder
     @QueryProjection
     public ReadReviewQueryDto(Long reviewId, Long productId, String productName,
         String manufacturerName, String productImageUrl, Long reviewerId, String reviewerNickname,

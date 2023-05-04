@@ -362,18 +362,10 @@ class ReviewServiceTest {
 
     ReadReviewRequestDto searchReviewRequest = ReadReviewRequestDto.builder().build();
 
-    ReadReviewQueryDto readReviewQueryDto = ReadReviewQueryDto.builder()
-        .reviewId(1L)
-        .productId(2L)
-        .productName("불닭볶음면큰컵")
-        .manufacturerName("삼양")
-        .productImageUrl("https://어쩌구저쩌구/products/불닭볶음면.png")
-        .reviewerId(user1.getId())
-        .reviewerNickname(user1.getNickname())
-        .reviewerProfileImageUrl(user1.getProfileImageUrl())
-        .likeCount(3L)
-        .rating(4)
-        .build();
+    ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(1L, 2L,
+        "불닭볶음면큰컵", "삼양", "https://어쩌구저쩌구/products/불닭볶음면.png",
+        user1.getId(), user1.getNickname(), user1.getProfileImageUrl(), null, 3L,
+        4, "맛있어요", LocalDateTime.now(), null, null);
 
     Tag tag = Tag.builder()
         .name("초코러버")
