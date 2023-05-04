@@ -67,8 +67,8 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .fetch();
     }
 
-    public List<ReadProductReviewQueryDto> findAllByProductIdAndFilter(User loginUser, Long productId,
-        ReadProductReviewRequestDto filter, Pageable pageable) {
+    public List<ReadProductReviewQueryDto> findAllByProductIdAndFilter(User loginUser,
+        Long productId, ReadProductReviewRequestDto filter, Pageable pageable) {
         return queryFactory.select(new QReadProductReviewQueryDto(
                 user.id,
                 review.id,
