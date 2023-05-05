@@ -5,7 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.cvsgo.config.TestConfig;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
 import com.cvsgo.dto.review.ReadProductReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReviewSortBy;
+import com.cvsgo.entity.Category;
+import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Tag;
@@ -43,6 +47,12 @@ class ReviewRepositoryTest {
     @Autowired
     ReviewImageRepository reviewImageRepository;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
+    ManufacturerRepository manufacturerRepository;
+
     @BeforeEach
     void initData() {
         tag1 = Tag.builder().name("맵찔이").group(1).build();
@@ -57,8 +67,24 @@ class ReviewRepositoryTest {
         user2 = User.create("abcd@naver.com", "password1!", "닉네임2", new ArrayList<>());
         userRepository.save(user1);
         userRepository.save(user2);
+        manufacturer1 = Manufacturer.builder()
+            .name("삼양")
+            .build();
+        manufacturerRepository.save(manufacturer1);
+        category1 = Category.builder()
+            .name("간편식사")
+            .build();
+        category2 = Category.builder()
+            .name("즉석요리")
+            .build();
+        category3 = Category.builder()
+            .name("과자&빵")
+            .build();
+        categoryRepository.saveAll(List.of(category1, category2, category3));
         product1 = Product.builder()
             .name("불닭볶음면")
+            .category(category2)
+            .manufacturer(manufacturer1)
             .price(1800)
             .build();
         productRepository.save(product1);
@@ -85,6 +111,14 @@ class ReviewRepositoryTest {
         reviewRepository.flush();
         Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
         assertThat(foundReview).isEqualTo(review1);
+    }
+
+    @Test
+    @DisplayName("최근 7일간 작성된 리뷰 개수를 조회한다")
+    void succeed_to_find_latest_review_count() {
+        reviewRepository.flush();
+        Long count = reviewRepository.countLatestReviews();
+        assertThat(count).isEqualTo(2);
     }
 
     @Test
@@ -117,6 +151,18 @@ class ReviewRepositoryTest {
         Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
         assertThat(foundReview.getReviewImages().size()).isEqualTo(imageUrls.size());
     }
+
+    @Test
+    @DisplayName("평점이 3점, 4점, 5점인 리뷰만 조회하면 해당하는 리뷰만 조회된다")
+    void succeed_to_read_reviews() {
+        reviewRepository.flush();
+        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(null, List.of(), List.of(),
+            List.of(3, 4, 5));
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, requestDto,
+            PageRequest.of(0, 20));
+        assertThat(reviews.size()).isEqualTo(1);
+    }
+
 
     @Test
     @DisplayName("필터를 적용하지 않고 특정 상품의 리뷰를 조회하면 특정 상품의 모든 리뷰가 검색된다")
@@ -177,6 +223,12 @@ class ReviewRepositoryTest {
 
     private Review review1;
     private Review review2;
+
+    private Category category1;
+    private Category category2;
+    private Category category3;
+
+    private Manufacturer manufacturer1;
 
     private Product product1;
 
