@@ -5,9 +5,10 @@ import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
 import com.cvsgo.dto.review.ReadProductReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewResponseDto;
+import com.cvsgo.dto.review.ReadReviewResponseDto;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
-import com.cvsgo.dto.review.ReadReviewResponseDto;
+import com.cvsgo.dto.review.ReviewDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Role;
@@ -160,8 +161,10 @@ class ReviewControllerTest {
             .ratings(List.of(4, 5))
             .build();
 
+        List<ReviewDto> reviews = List.of(responseDto1, responseDto2);
+
         given(reviewService.readReviewList(any(), any(), any()))
-            .willReturn(List.of(responseDto1, responseDto2));
+            .willReturn(ReadReviewResponseDto.of(17, reviews));
 
         mockMvc.perform(get(SEARCH_REVIEW_API_PATH)
                 .content(objectMapper.writeValueAsString(requestDto))
@@ -177,22 +180,23 @@ class ReviewControllerTest {
                     fieldWithPath("ratings").type(JsonFieldType.ARRAY).description("별점 목록").optional()
                 ),
                 relaxedResponseFields(
-                    fieldWithPath("data[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                    fieldWithPath("data[].productName").type(JsonFieldType.STRING).description("상품명"),
-                    fieldWithPath("data[].productManufacturer").type(JsonFieldType.STRING).description("상품 제조사"),
-                    fieldWithPath("data[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 URL"),
-                    fieldWithPath("data[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
-                    fieldWithPath("data[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
-                    fieldWithPath("data[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
-                    fieldWithPath("data[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL"),
-                    fieldWithPath("data[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
-                    fieldWithPath("data[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
-                    fieldWithPath("data[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
-                    fieldWithPath("data[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
-                    fieldWithPath("data[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
-                    fieldWithPath("data[].isProductBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data[].reviewImageUrls").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록").optional(),
-                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간")
+                    fieldWithPath("data.latestReviewCount").type(JsonFieldType.NUMBER).description("최근 7일간 작성된 리뷰 개수"),
+                    fieldWithPath("data.reviews[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data.reviews[].productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data.reviews[].productManufacturer").type(JsonFieldType.STRING).description("상품 제조사"),
+                    fieldWithPath("data.reviews[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+                    fieldWithPath("data.reviews[].reviewId").type(JsonFieldType.NUMBER).description("리뷰 ID"),
+                    fieldWithPath("data.reviews[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
+                    fieldWithPath("data.reviews[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
+                    fieldWithPath("data.reviews[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자 프로필 이미지 URL"),
+                    fieldWithPath("data.reviews[].reviewerTags").type(JsonFieldType.ARRAY).description("리뷰 작성자의 태그 목록"),
+                    fieldWithPath("data.reviews[].reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 개수"),
+                    fieldWithPath("data.reviews[].reviewRating").type(JsonFieldType.NUMBER).description("리뷰 별점"),
+                    fieldWithPath("data.reviews[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("data.reviews[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("사용자의 리뷰 좋아요 여부"),
+                    fieldWithPath("data.reviews[].isProductBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data.reviews[].reviewImageUrls").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL 목록").optional(),
+                    fieldWithPath("data.reviews[].createdAt").type(JsonFieldType.STRING).description("리뷰 생성 시간")
                 )
             ));
     }
@@ -348,7 +352,7 @@ class ReviewControllerTest {
             .andDo(print());
     }
 
-    ReadReviewResponseDto responseDto1 = ReadReviewResponseDto.builder()
+    ReviewDto responseDto1 = ReviewDto.builder()
         .productId(13L)
         .productName("불닭볶음면큰컵")
         .productManufacturer("삼양")
@@ -366,7 +370,7 @@ class ReviewControllerTest {
         .createdAt(LocalDateTime.now())
         .build();
 
-    ReadReviewResponseDto responseDto2 = ReadReviewResponseDto.builder()
+    ReviewDto responseDto2 = ReviewDto.builder()
         .productId(13L)
         .productName("바질크림불닭우동")
         .productManufacturer("삼양")

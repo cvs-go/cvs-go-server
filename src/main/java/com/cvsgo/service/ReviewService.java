@@ -13,6 +13,7 @@ import com.cvsgo.dto.review.ReadProductReviewResponseDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewResponseDto;
+import com.cvsgo.dto.review.ReviewDto;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
@@ -128,7 +129,7 @@ public class ReviewService {
      * @return 리뷰 목록
      */
     @Transactional(readOnly = true)
-    public List<ReadReviewResponseDto> readReviewList(User user, ReadReviewRequestDto request,
+    public ReadReviewResponseDto readReviewList(User user, ReadReviewRequestDto request,
         Pageable pageable) {
         List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user, request,
             pageable);
@@ -139,10 +140,14 @@ public class ReviewService {
         List<ReviewImage> reviewImages = reviewImageRepository.findByReviewIdIn(
             reviews.stream().map(ReadReviewQueryDto::getReviewId).toList());
 
-        return reviews.stream().map(reviewDto -> ReadReviewResponseDto.of(reviewDto,
+        Long latestReviewCount = reviewRepository.countLatestReviews();
+
+        List<ReviewDto> reviewDtos = reviews.stream().map(reviewDto -> ReviewDto.of(reviewDto,
             getReviewImages(reviewDto.getReviewId(), reviewImages),
             getUserTags(reviewDto.getReviewerId(), userTags))
         ).toList();
+
+        return ReadReviewResponseDto.of(latestReviewCount, reviewDtos);
     }
 
     /**

@@ -12,7 +12,6 @@ import com.cvsgo.entity.User;
 import com.cvsgo.service.ReviewService;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +41,7 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews")
-    public SuccessResponse<List<ReadReviewResponseDto>> searchReviews(@LoginUser User user,
+    public SuccessResponse<ReadReviewResponseDto> searchReviews(@LoginUser User user,
         @ModelAttribute ReadReviewRequestDto request, Pageable pageable) {
         return SuccessResponse.from(reviewService.readReviewList(user, request, pageable));
     }

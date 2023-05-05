@@ -20,6 +20,7 @@ import com.cvsgo.entity.User;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +66,15 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
+    }
+
+    @Override
+    public Long countLatestReviews() {
+        LocalDate sevenDaysAgo = LocalDate.now().minusDays(7);
+        return queryFactory.select(review.count())
+            .from(review)
+            .where(review.createdAt.after(sevenDaysAgo.atStartOfDay()))
+            .fetchOne();
     }
 
     public List<ReadProductReviewQueryDto> findAllByProductIdAndFilter(User loginUser,
