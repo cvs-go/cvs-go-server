@@ -8,7 +8,6 @@ import lombok.Getter;
 @Getter
 public class ReadReviewRequestDto {
 
-    @Enumerated(EnumType.STRING)
     private final ReviewSortBy sortBy;
 
     private final List<Long> categoryIds;
