@@ -360,7 +360,8 @@ class ReviewServiceTest {
     UpdateReviewRequestDto updateReviewRequestDto = new UpdateReviewRequestDto(5, "맛있어요",
         new ArrayList<>());
 
-    ReadReviewRequestDto searchReviewRequest = ReadReviewRequestDto.builder().build();
+    ReadReviewRequestDto searchReviewRequest = new ReadReviewRequestDto(null, null,
+        null, null);
 
     ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(1L, 2L,
         "불닭볶음면큰컵", "삼양", "https://어쩌구저쩌구/products/불닭볶음면.png",

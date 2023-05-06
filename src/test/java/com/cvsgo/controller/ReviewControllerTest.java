@@ -154,12 +154,8 @@ class ReviewControllerTest {
     @Test
     @DisplayName("리뷰 조회에 성공하면 HTTP 200을 응답한다.")
     void respond_200_when_success_to_read_reviews() throws Exception {
-        ReadReviewRequestDto requestDto = ReadReviewRequestDto.builder()
-            .sortBy(ReviewSortBy.LIKE)
-            .categoryIds(List.of(1L, 2L, 3L))
-            .tagIds(List.of(2L))
-            .ratings(List.of(4, 5))
-            .build();
+        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(ReviewSortBy.LIKE,
+            List.of(1L, 2L, 3L), List.of(2L), List.of(4, 5));
 
         List<ReviewDto> reviews = List.of(responseDto1, responseDto2);
 
