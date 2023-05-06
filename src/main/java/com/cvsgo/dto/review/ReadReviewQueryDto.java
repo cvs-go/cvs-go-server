@@ -1,5 +1,6 @@
 package com.cvsgo.dto.review;
 
+import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ReviewLike;
 import com.cvsgo.entity.UserFollow;
 import com.querydsl.core.annotations.QueryProjection;
@@ -9,9 +10,17 @@ import lombok.Getter;
 @Getter
 public class ReadReviewQueryDto {
 
-    private final long reviewerId;
+    private final Long reviewId;
 
-    private final long reviewId;
+    private final Long productId;
+
+    private final String productName;
+
+    private final String manufacturerName;
+
+    private final String productImageUrl;
+
+    private final Long reviewerId;
 
     private final String reviewerNickname;
 
@@ -19,29 +28,38 @@ public class ReadReviewQueryDto {
 
     private final boolean isFollowing;
 
-    private final String content;
+    private final Long likeCount;
 
-    private final int rating;
+    private final Integer rating;
 
-    private final boolean isReviewLiked;
-
-    private final long likeCount;
+    private final String reviewContent;
 
     private final LocalDateTime createdAt;
 
+    private final Boolean isReviewLiked;
+
+    private final Boolean isProductBookmarked;
+
     @QueryProjection
-    public ReadReviewQueryDto(long reviewerId, long reviewId, String reviewerNickname,
-        String reviewerProfileImageUrl, UserFollow userFollow, String content, int rating,
-        ReviewLike reviewLike, long likeCount, LocalDateTime createdAt) {
-        this.reviewerId = reviewerId;
+    public ReadReviewQueryDto(Long reviewId, Long productId, String productName,
+        String manufacturerName, String productImageUrl, Long reviewerId, String reviewerNickname,
+        String reviewerProfileImageUrl, UserFollow userFollow, Long likeCount, Integer rating,
+        String reviewContent, LocalDateTime createdAt, ReviewLike reviewLike,
+        ProductBookmark productBookmark) {
         this.reviewId = reviewId;
+        this.productId = productId;
+        this.productName = productName;
+        this.manufacturerName = manufacturerName;
+        this.productImageUrl = productImageUrl;
+        this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
         this.reviewerProfileImageUrl = reviewerProfileImageUrl;
         this.isFollowing = userFollow != null;
-        this.content = content;
-        this.rating = rating;
-        this.isReviewLiked = reviewLike != null;
         this.likeCount = likeCount;
+        this.rating = rating;
+        this.reviewContent = reviewContent;
         this.createdAt = createdAt;
+        this.isReviewLiked = reviewLike != null;
+        this.isProductBookmarked = productBookmark != null;
     }
 }

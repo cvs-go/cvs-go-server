@@ -3,9 +3,13 @@ package com.cvsgo.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cvsgo.config.TestConfig;
+import com.cvsgo.dto.review.ReadProductReviewQueryDto;
+import com.cvsgo.dto.review.ReadProductReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReviewSortBy;
+import com.cvsgo.entity.Category;
+import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Tag;
@@ -43,6 +47,12 @@ class ReviewRepositoryTest {
     @Autowired
     ReviewImageRepository reviewImageRepository;
 
+    @Autowired
+    CategoryRepository categoryRepository;
+
+    @Autowired
+    ManufacturerRepository manufacturerRepository;
+
     @BeforeEach
     void initData() {
         tag1 = Tag.builder().name("맵찔이").group(1).build();
@@ -57,8 +67,24 @@ class ReviewRepositoryTest {
         user2 = User.create("abcd@naver.com", "password1!", "닉네임2", new ArrayList<>());
         userRepository.save(user1);
         userRepository.save(user2);
+        manufacturer1 = Manufacturer.builder()
+            .name("삼양")
+            .build();
+        manufacturerRepository.save(manufacturer1);
+        category1 = Category.builder()
+            .name("간편식사")
+            .build();
+        category2 = Category.builder()
+            .name("즉석요리")
+            .build();
+        category3 = Category.builder()
+            .name("과자&빵")
+            .build();
+        categoryRepository.saveAll(List.of(category1, category2, category3));
         product1 = Product.builder()
             .name("불닭볶음면")
+            .category(category2)
+            .manufacturer(manufacturer1)
             .price(1800)
             .build();
         productRepository.save(product1);
@@ -85,6 +111,14 @@ class ReviewRepositoryTest {
         reviewRepository.flush();
         Review foundReview = reviewRepository.findById(review1.getId()).orElseThrow();
         assertThat(foundReview).isEqualTo(review1);
+    }
+
+    @Test
+    @DisplayName("최근 7일간 작성된 리뷰 개수를 조회한다")
+    void succeed_to_find_latest_review_count() {
+        reviewRepository.flush();
+        Long count = reviewRepository.countLatestReviews();
+        assertThat(count).isEqualTo(2);
     }
 
     @Test
@@ -119,10 +153,22 @@ class ReviewRepositoryTest {
     }
 
     @Test
+    @DisplayName("평점이 3점, 4점, 5점인 리뷰만 조회하면 해당하는 리뷰만 조회된다")
+    void succeed_to_read_reviews() {
+        reviewRepository.flush();
+        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(null, List.of(), List.of(),
+            List.of(3, 4, 5));
+        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, requestDto,
+            PageRequest.of(0, 20));
+        assertThat(reviews.size()).isEqualTo(1);
+    }
+
+
+    @Test
     @DisplayName("필터를 적용하지 않고 특정 상품의 리뷰를 조회하면 특정 상품의 모든 리뷰가 검색된다")
     void should_return_all_reviews_of_the_product() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(), List.of(), null);
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(), List.of(), null);
+        List<ReadProductReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
             product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.size()).isEqualTo(2);
@@ -131,9 +177,9 @@ class ReviewRepositoryTest {
     @Test
     @DisplayName("별점 5점 필터를 적용하여 특정 상품의 리뷰를 조회하면 5점인 리뷰들만 조회된다")
     void success_to_read_product_reviews() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(
             List.of(tag1.getId(), tag2.getId(), tag3.getId()), List.of(5), null);
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+        List<ReadProductReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
             product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.size()).isEqualTo(1);
@@ -143,10 +189,10 @@ class ReviewRepositoryTest {
     @Test
     @DisplayName("별점 내림차순으로 정렬하여 특정 상품의 리뷰를 조회하면 첫번째 리뷰 별점이 마지막 리뷰 별점보다 크거나 같아야 한다")
     void rating_of_first_review_should_greater_than_or_equal_to_rating_of_last_when_sorted_by_rating_descending_order() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(
             List.of(tag1.getId(), tag2.getId(), tag3.getId()), List.of(5), ReviewSortBy.RATING);
 
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+        List<ReadProductReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
             product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.get(0).getRating()).isGreaterThanOrEqualTo(
@@ -156,10 +202,10 @@ class ReviewRepositoryTest {
     @Test
     @DisplayName("최신순으로 정렬하여 특정 상품의 리뷰를 조회하면 첫번째 리뷰의 생성시각이 마지막 리뷰의 생성 시각보다 크거나 같아야 한다")
     void created_time_of_first_review_should_greater_than_or_equal_to_created_time_of_last_review_when_sorted_by_review_createdAt_descending_order() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(
             List.of(tag1.getId(), tag2.getId(), tag3.getId()), List.of(5), ReviewSortBy.LATEST);
 
-        List<ReadReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
+        List<ReadProductReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user1,
             product1.getId(), requestDto, PageRequest.of(0, 20));
 
         assertThat(reviews.get(0).getCreatedAt()
@@ -169,7 +215,7 @@ class ReviewRepositoryTest {
     @Test
     @DisplayName("필터를 적용한 특정 상품의 리뷰 개수를 조회한다")
     void succeed_to_get_total_count() {
-        ReadReviewRequestDto requestDto = new ReadReviewRequestDto(List.of(), List.of(), null);
+        ReadProductReviewRequestDto requestDto = new ReadProductReviewRequestDto(List.of(), List.of(), null);
         Long totalCount = reviewRepository.countByProductIdAndFilter(product1.getId(), requestDto);
 
         assertThat(totalCount).isEqualTo(2L);
@@ -177,6 +223,12 @@ class ReviewRepositoryTest {
 
     private Review review1;
     private Review review2;
+
+    private Category category1;
+    private Category category2;
+    private Category category3;
+
+    private Manufacturer manufacturer1;
 
     private Product product1;
 

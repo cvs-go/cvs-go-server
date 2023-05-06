@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class SearchReviewResponseDto {
+public class ReviewDto {
 
     private final Long productId;
 
@@ -24,6 +24,8 @@ public class SearchReviewResponseDto {
     private final String reviewerNickname;
 
     private final String reviewerProfileImageUrl;
+
+    private final Boolean isFollowing;
 
     private final List<String> reviewerTags;
 
@@ -43,9 +45,9 @@ public class SearchReviewResponseDto {
     private final LocalDateTime createdAt;
 
     @Builder
-    public SearchReviewResponseDto(Long productId, String productName, String productManufacturer,
+    public ReviewDto(Long productId, String productName, String productManufacturer,
         String productImageUrl, Long reviewId, Long reviewerId, String reviewerNickname,
-        String reviewerProfileImageUrl, List<String> reviewerTags,
+        String reviewerProfileImageUrl, boolean isFollowing, List<String> reviewerTags,
         Long reviewLikeCount, Integer reviewRating, String reviewContent, LocalDateTime createdAt,
         Boolean isReviewLiked, Boolean isProductBookmarked, List<String> reviewImageUrls) {
         this.productId = productId;
@@ -56,6 +58,7 @@ public class SearchReviewResponseDto {
         this.reviewerId = reviewerId;
         this.reviewerNickname = reviewerNickname;
         this.reviewerProfileImageUrl = reviewerProfileImageUrl;
+        this.isFollowing = isFollowing;
         this.reviewerTags = reviewerTags;
         this.reviewLikeCount = reviewLikeCount;
         this.reviewRating = reviewRating;
@@ -66,23 +69,24 @@ public class SearchReviewResponseDto {
         this.reviewImageUrls = reviewImageUrls;
     }
 
-    public static SearchReviewResponseDto of(SearchReviewQueryDto searchReviewQueryDto,
+    public static ReviewDto of(ReadReviewQueryDto readReviewQueryDto,
         List<String> reviewImageUrls, List<String> tags) {
-        return SearchReviewResponseDto.builder()
-            .productName(searchReviewQueryDto.getProductName())
-            .productId(searchReviewQueryDto.getProductId())
-            .reviewContent(searchReviewQueryDto.getReviewContent())
-            .productImageUrl(searchReviewQueryDto.getProductImageUrl())
-            .productManufacturer(searchReviewQueryDto.getManufacturerName())
-            .reviewId(searchReviewQueryDto.getReviewId())
-            .reviewerId(searchReviewQueryDto.getReviewer().getId())
-            .reviewerNickname(searchReviewQueryDto.getReviewer().getNickname())
-            .reviewerProfileImageUrl(searchReviewQueryDto.getReviewer().getProfileImageUrl())
-            .reviewRating(searchReviewQueryDto.getRating())
-            .reviewLikeCount(searchReviewQueryDto.getLikeCount())
-            .createdAt(searchReviewQueryDto.getCreatedAt())
-            .isProductBookmarked(searchReviewQueryDto.getIsProductBookmarked())
-            .isReviewLiked(searchReviewQueryDto.getIsReviewLiked())
+        return ReviewDto.builder()
+            .productName(readReviewQueryDto.getProductName())
+            .productId(readReviewQueryDto.getProductId())
+            .reviewContent(readReviewQueryDto.getReviewContent())
+            .productImageUrl(readReviewQueryDto.getProductImageUrl())
+            .isFollowing(readReviewQueryDto.isFollowing())
+            .productManufacturer(readReviewQueryDto.getManufacturerName())
+            .reviewId(readReviewQueryDto.getReviewId())
+            .reviewerId(readReviewQueryDto.getReviewerId())
+            .reviewerNickname(readReviewQueryDto.getReviewerNickname())
+            .reviewerProfileImageUrl(readReviewQueryDto.getReviewerProfileImageUrl())
+            .reviewRating(readReviewQueryDto.getRating())
+            .reviewLikeCount(readReviewQueryDto.getLikeCount())
+            .createdAt(readReviewQueryDto.getCreatedAt())
+            .isProductBookmarked(readReviewQueryDto.getIsProductBookmarked())
+            .isReviewLiked(readReviewQueryDto.getIsReviewLiked())
             .reviewImageUrls(reviewImageUrls)
             .reviewerTags(tags)
             .build();

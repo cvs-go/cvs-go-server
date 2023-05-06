@@ -1,20 +1,26 @@
 package com.cvsgo.dto.review;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.util.List;
 import lombok.Getter;
 
 @Getter
 public class ReadReviewRequestDto {
 
+    private final ReviewSortBy sortBy;
+
+    private final List<Long> categoryIds;
+
     private final List<Long> tagIds;
 
     private final List<Integer> ratings;
 
-    private final ReviewSortBy sortBy;
-
-    public ReadReviewRequestDto(List<Long> tagIds, List<Integer> ratings, ReviewSortBy sortBy) {
+    public ReadReviewRequestDto(ReviewSortBy sortBy, List<Long> categoryIds, List<Long> tagIds,
+        List<Integer> ratings) {
+        this.sortBy = sortBy;
+        this.categoryIds = categoryIds;
         this.tagIds = tagIds;
         this.ratings = ratings;
-        this.sortBy = sortBy;
     }
 }
