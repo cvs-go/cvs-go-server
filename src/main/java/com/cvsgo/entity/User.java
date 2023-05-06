@@ -1,5 +1,7 @@
 package com.cvsgo.entity;
 
+import static com.cvsgo.exception.ExceptionConstants.INVALID_PASSWORD;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,16 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.cvsgo.exception.ExceptionConstants.INVALID_PASSWORD;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -88,6 +87,14 @@ public class User extends BaseTimeEntity {
 
     public void updateRoleToRegular() {
         this.role = Role.REGULAR;
+    }
+
+    public void updateUser(User user, String nickname, List<Tag> tags) {
+        this.nickname = nickname;
+        user.userTags.clear();
+        for (Tag tag : tags) {
+            user.addTag(tag);
+        }
     }
 
 }
