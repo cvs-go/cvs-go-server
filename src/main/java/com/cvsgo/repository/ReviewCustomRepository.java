@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReviewCustomRepository {
 
-    List<ReadReviewQueryDto> findAllByFilter(User user, ReadReviewRequestDto request,
+    List<ReadReviewQueryDto> findAllByFilter(User loginUser, ReadReviewRequestDto filter,
         Pageable pageable);
 
     Long countLatestReviews();
