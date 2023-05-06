@@ -41,13 +41,13 @@ public class ReviewController {
     }
 
     @GetMapping("/reviews")
-    public SuccessResponse<ReadReviewResponseDto> searchReviews(@LoginUser User user,
+    public SuccessResponse<ReadReviewResponseDto> readReviews(@LoginUser User user,
         @ModelAttribute ReadReviewRequestDto request, Pageable pageable) {
         return SuccessResponse.from(reviewService.readReviewList(user, request, pageable));
     }
 
     @GetMapping("/products/{productId}/reviews")
-    public SuccessResponse<Page<ReadProductReviewResponseDto>> readReviews(@LoginUser User user,
+    public SuccessResponse<Page<ReadProductReviewResponseDto>> readProductReviews(@LoginUser User user,
         @PathVariable Long productId, @ModelAttribute ReadProductReviewRequestDto request,
         Pageable pageable) {
         return SuccessResponse.from(
