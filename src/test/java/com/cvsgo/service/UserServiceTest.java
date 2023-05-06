@@ -1,5 +1,6 @@
 package com.cvsgo.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,17 +11,22 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
+import com.cvsgo.dto.user.UpdateUserRequestDto;
 import com.cvsgo.entity.Role;
+import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
+import com.cvsgo.entity.UserTag;
 import com.cvsgo.exception.BadRequestException;
 import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
+import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,6 +48,9 @@ class UserServiceTest {
 
     @Mock
     private TagRepository tagRepository;
+
+    @Mock
+    private UserTagRepository userTagRepository;
 
     @Mock
     private UserFollowRepository userFollowRepository;
@@ -69,7 +78,6 @@ class UserServiceTest {
         assertThrows(DuplicateException.class, () -> userService.signUp(signUpRequest));
         then(userRepository).should(times(1)).findByNickname(nickname);
     }
-
 
     @Test
     @DisplayName("이미 존재하는 이메일이면 회원가입시 DuplicateException이 발생한다")
@@ -153,6 +161,41 @@ class UserServiceTest {
         // then
         assertFalse(result);
         then(userRepository).should(times(1)).findByNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("회원을 정상적으로 수정한다")
+    void succeed_to_update_user() {
+        String newNickname = "수정닉네임";
+        List<Tag> newTags = List.of(tag1, tag2);
+        UpdateUserRequestDto request = new UpdateUserRequestDto(newNickname, List.of(1L, 3L));
+
+        given(userRepository.findByNickname(request.getNickname())).willReturn(Optional.empty());
+        given(tagRepository.findAllById(List.of(tag1.getId(), tag2.getId()))).willReturn(newTags);
+
+        String beforeNickname = user.getNickname();
+        userService.updateUser(user, request);
+        String afterNickname = user.getNickname();
+
+        then(userRepository).should(times(1)).findByNickname(request.getNickname());
+        then(tagRepository).should(times(1)).findAllById(List.of(tag1.getId(), tag2.getId()));
+        then(userTagRepository).should(times(1)).deleteByUser(any());
+        then(userTagRepository).should(times(1)).flush();
+        assertThat(beforeNickname).isNotEqualTo(user.getNickname());
+        assertThat(afterNickname).isEqualTo(user.getNickname());
+        assertThat(user.getUserTags()).hasSize(newTags.size());
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임이면 회원 수정 시 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_update_user_but_nickname_is_duplicate() {
+        final String duplicatedNickname = user2.getNickname();
+        UpdateUserRequestDto request = new UpdateUserRequestDto(duplicatedNickname, List.of(1L, 3L));
+
+        given(userRepository.findByNickname(request.getNickname())).willReturn(Optional.of(user2));
+
+        assertThrows(DuplicateException.class, () -> userService.updateUser(user, request));
+        then(userRepository).should(times(1)).findByNickname(request.getNickname());
     }
 
     @Test
@@ -254,6 +297,28 @@ class UserServiceTest {
         .userId("abcd@naver.com")
         .nickname("사용자2")
         .role(Role.REGULAR)
+        .build();
+
+    Tag tag1 = Tag.builder()
+        .id(1L)
+        .name("맵찔이")
+        .group(1)
+        .build();
+
+    Tag tag2 = Tag.builder()
+        .id(3L)
+        .name("초코러버")
+        .group(2)
+        .build();
+
+    UserTag userTag1 = UserTag.builder()
+        .user(user)
+        .tag(tag1)
+        .build();
+
+    UserTag userTag2 = UserTag.builder()
+        .user(user)
+        .tag(tag2)
         .build();
 
     UserFollow userFollow = UserFollow.create(user2, user);
