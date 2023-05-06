@@ -68,7 +68,6 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .fetch();
     }
 
-    @Override
     public Long countLatestReviews() {
         LocalDate sevenDaysAgo = LocalDate.now().minusDays(7);
         return queryFactory.select(review.count())
