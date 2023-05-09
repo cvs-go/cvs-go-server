@@ -35,6 +35,7 @@ public enum ErrorCode {
     NOT_FOUND_PRODUCT_LIKE("존재하지 않는 상품 좋아요입니다."),
     NOT_FOUND_PRODUCT_BOOKMARK("존재하지 않는 상품 북마크입니다."),
     NOT_FOUND_REVIEW("존재하지 않는 리뷰입니다."),
+    NOT_FOUND_REVIEW_LIKE("해당 리뷰의 좋아요가 없습니다."),
 
     /* 500 INTERNAL_SEVER_ERROR */
     UNEXPECTED_ERROR("시스템에 문제가 발생했습니다.");

@@ -216,6 +216,23 @@ public class ReviewService {
         review.increaseLikeCount();
     }
 
+    /**
+     * 리뷰 좋아요를 삭제합니다.
+     *
+     * @param user     현재 로그인한 사용자
+     * @param reviewId 좋아요 취소하려는 리뷰 ID
+     */
+    @Transactional
+    public void deleteReviewLike(User user, Long reviewId) {
+        Review review = reviewRepository.findByIdWithOptimisticLock(reviewId)
+            .orElseThrow(() -> NOT_FOUND_REVIEW);
+
+        ReviewLike reviewLike = reviewLikeRepository.findByReviewAndUser(review, user)
+            .orElseThrow(() -> NOT_FOUND_REVIEW_LIKE);
+        reviewLikeRepository.delete(reviewLike);
+        review.decreaseLikeCount();
+    }
+
     private List<String> getReviewImages(Long reviewId, List<ReviewImage> reviewImages) {
         Map<Long, List<ReviewImage>> reviewImagesByReview = reviewImages.stream()
             .collect(Collectors.groupingBy(reviewImage -> reviewImage.getReview().getId()));
