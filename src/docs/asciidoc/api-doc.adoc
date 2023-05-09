@@ -286,3 +286,33 @@ include::{snippets}/review-controller-test/respond_200_when_success_to_read_prod
 include::{snippets}/review-controller-test/respond_200_when_success_to_read_product_reviews/response-fields.adoc[]
 ==== Sample Response
 include::{snippets}/review-controller-test/respond_200_when_success_to_read_product_reviews/http-response.adoc[]
+
+=== 4-5. 리뷰 좋아요 추가
+==== Path Parameters
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_create_review_like/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_create_review_like/http-request.adoc[]
+==== Sample Response
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_create_review_like/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `404 NOT FOUND` | `NOT_FOUND_REVIEW` | 해당하는 리뷰가 없는 경우
+| `409 CONFLICT` | `DUPLICATE_REVIEW_LIKE` | 해당하는 리뷰 좋아요가 이미 있는 경우
+|===
+
+=== 4-6. 리뷰 좋아요 취소
+==== Path Parameters
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review_like/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review_like/http-request.adoc[]
+==== Sample Response
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review_like/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `404 NOT FOUND` | `NOT_FOUND_REVIEW` | 해당하는 리뷰가 없는 경우
+| `404 NOT FOUND` | `NOT_FOUND_REVIEW_LIKE` | 해당하는 리뷰 좋아요가 없는 경우
+|===
