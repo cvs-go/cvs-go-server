@@ -22,5 +22,6 @@ public interface ExceptionConstants {
     DuplicateException DUPLICATE_PRODUCT_LIKE = new DuplicateException(ErrorCode.DUPLICATE_PRODUCT_LIKE);
     DuplicateException DUPLICATE_PRODUCT_BOOKMARK = new DuplicateException(ErrorCode.DUPLICATE_PRODUCT_BOOKMARK);
     DuplicateException DUPLICATE_REVIEW = new DuplicateException(ErrorCode.DUPLICATE_REVIEW);
+    DuplicateException DUPLICATE_REVIEW_LIKE = new DuplicateException(ErrorCode.DUPLICATE_REVIEW_LIKE);
 
 }

@@ -61,4 +61,12 @@ public class ReviewController {
         return SuccessResponse.create();
     }
 
+    @PostMapping("/reviews/{reviewId}/likes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SuccessResponse<Void> createReviewLike(@LoginUser User user,
+        @PathVariable Long reviewId) {
+        reviewService.createReviewLike(user, reviewId);
+        return SuccessResponse.create();
+    }
+
 }

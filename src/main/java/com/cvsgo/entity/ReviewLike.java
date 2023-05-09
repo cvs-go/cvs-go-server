@@ -38,4 +38,11 @@ public class ReviewLike extends BaseTimeEntity {
         this.user = user;
         this.review = review;
     }
+
+    public static ReviewLike create(User user, Review review) {
+        return ReviewLike.builder()
+            .user(user)
+            .review(review)
+            .build();
+    }
 }
