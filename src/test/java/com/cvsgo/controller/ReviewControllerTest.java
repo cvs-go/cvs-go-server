@@ -30,19 +30,24 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW_LIKE;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -56,8 +61,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -93,6 +100,8 @@ class ReviewControllerTest {
     private static final String UPDATE_REVIEW_API_PATH = "/api/reviews/{reviewId}";
 
     private static final String SEARCH_REVIEW_API_PATH = "/api/reviews";
+
+    private static final String REVIEW_LIKE_API_PATH = "/api/reviews/{reviewId}/likes";
 
     @BeforeEach
     void setup(WebApplicationContext webApplicationContext,
@@ -344,6 +353,106 @@ class ReviewControllerTest {
                 .param("content", "맛있어요")
                 .param("rating", "5")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isInternalServerError())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요에 성공하면 HTTP 201을 응답한다")
+    void respond_201_when_succeed_to_create_review_like() throws Exception {
+        mockMvc.perform(post(REVIEW_LIKE_API_PATH, 1)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 ID")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 요청시 해당 리뷰가 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_create_review_like_but_review_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_REVIEW).given(reviewService).createReviewLike(any(), anyLong());
+
+        mockMvc.perform(MockMvcRequestBuilders.post(REVIEW_LIKE_API_PATH, 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 요청시 사용자가 해당 리뷰에 이미 좋아요를 했으면 HTTP 409를 응답한다")
+    void respond_409_when_create_review_like_but_review_like_already_exists() throws Exception {
+        willThrow(DUPLICATE_REVIEW_LIKE).given(reviewService).createReviewLike(any(), anyLong());
+
+        mockMvc.perform(MockMvcRequestBuilders.post(REVIEW_LIKE_API_PATH, 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isConflict())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 처리 중 동시성 문제가 발생할 경우 HTTP 500을 응답한다")
+    void respond_500_when_create_review_like_but_concurrency_issue_occurs() throws Exception {
+        willThrow(ObjectOptimisticLockingFailureException.class)
+            .given(reviewService).createReviewLike(any(), anyLong());
+
+        mockMvc.perform(post(REVIEW_LIKE_API_PATH, 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isInternalServerError())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소에 성공하면 HTTP 200을 응답한다")
+    void respond_200_when_succeed_to_delete_review_like() throws Exception {
+        mockMvc.perform(delete(REVIEW_LIKE_API_PATH, 1)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 ID")
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소 요청시 해당하는 리뷰가 없다면 HTTP 404를 응답한다")
+    void respond_404_when_delete_review_like_but_review_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_REVIEW).given(reviewService).deleteReviewLike(any(), anyLong());
+
+        mockMvc.perform(delete(REVIEW_LIKE_API_PATH, 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소 요청시 해당하는 리뷰 좋아요가 없으면 HTTP 404를 응답한다")
+    void respond_404_when_delete_review_like_but_review_like_does_not_exist() throws Exception {
+        willThrow(NOT_FOUND_REVIEW_LIKE).given(reviewService).deleteReviewLike(any(), anyLong());
+
+        mockMvc.perform(delete(REVIEW_LIKE_API_PATH, 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소 처리 중 동시성 문제가 발생할 경우 HTTP 500을 응답한다")
+    void respond_500_when_delete_review_like_but_concurrency_issue_occurs() throws Exception {
+        willThrow(ObjectOptimisticLockingFailureException.class)
+            .given(reviewService).deleteReviewLike(any(), anyLong());
+
+        mockMvc.perform(delete(REVIEW_LIKE_API_PATH, 1L)
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isInternalServerError())
             .andDo(print());
     }
