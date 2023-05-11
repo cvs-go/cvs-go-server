@@ -113,9 +113,8 @@ public class UserService {
         }
         List<Tag> tags = tagRepository.findAllById(request.getTagIds());
 
-        userTagRepository.deleteByUser(user);
-        userTagRepository.flush();
-        user.updateUser(user, request.getNickname(), tags);
+        user.updateNickname(request.getNickname());
+        user.updateTag(tags);
     }
 
     /**

@@ -179,8 +179,6 @@ class UserServiceTest {
 
         then(userRepository).should(times(1)).findByNickname(request.getNickname());
         then(tagRepository).should(times(1)).findAllById(List.of(tag1.getId(), tag2.getId()));
-        then(userTagRepository).should(times(1)).deleteByUser(any());
-        then(userTagRepository).should(times(1)).flush();
         assertThat(beforeNickname).isNotEqualTo(user.getNickname());
         assertThat(afterNickname).isEqualTo(user.getNickname());
         assertThat(user.getUserTags()).hasSize(newTags.size());

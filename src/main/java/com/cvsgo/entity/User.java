@@ -46,7 +46,7 @@ public class User extends BaseTimeEntity {
 
     private String profileImageUrl;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTag> userTags = new ArrayList<>();
 
     @Builder
@@ -89,12 +89,17 @@ public class User extends BaseTimeEntity {
         this.role = Role.REGULAR;
     }
 
-    public void updateUser(User user, String nickname, List<Tag> tags) {
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
-        user.userTags.clear();
+    }
+
+    public void updateTag(List<Tag> tags) {
         for (Tag tag : tags) {
-            user.addTag(tag);
+            if (userTags.stream().noneMatch(userTag -> userTag.getTag().equals(tag))) {
+                addTag(tag);
+            }
         }
+        userTags.removeIf(userTag -> !tags.contains(userTag.getTag()));
     }
 
 }
