@@ -1,5 +1,7 @@
 package com.cvsgo.entity;
 
+import static com.cvsgo.exception.ExceptionConstants.INVALID_PASSWORD;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,16 +12,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.cvsgo.exception.ExceptionConstants.INVALID_PASSWORD;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -47,7 +46,7 @@ public class User extends BaseTimeEntity {
 
     private String profileImageUrl;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserTag> userTags = new ArrayList<>();
 
     @Builder
@@ -61,11 +60,11 @@ public class User extends BaseTimeEntity {
 
     public static User create(String userId, String password, String nickname, List<Tag> tags) {
         User user = User.builder()
-                .userId(userId)
-                .password(password)
-                .nickname(nickname)
-                .role(Role.ASSOCIATE)
-                .build();
+            .userId(userId)
+            .password(password)
+            .nickname(nickname)
+            .role(Role.ASSOCIATE)
+            .build();
         for (Tag tag : tags) {
             user.addTag(tag);
         }
@@ -80,14 +79,27 @@ public class User extends BaseTimeEntity {
 
     public void addTag(Tag tag) {
         UserTag userTag = UserTag.builder()
-                .user(this)
-                .tag(tag)
-                .build();
+            .user(this)
+            .tag(tag)
+            .build();
         userTags.add(userTag);
     }
 
     public void updateRoleToRegular() {
         this.role = Role.REGULAR;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateTags(List<Tag> tags) {
+        for (Tag tag : tags) {
+            if (userTags.stream().noneMatch(userTag -> userTag.getTag().equals(tag))) {
+                addTag(tag);
+            }
+        }
+        userTags.removeIf(userTag -> !tags.contains(userTag.getTag()));
     }
 
 }

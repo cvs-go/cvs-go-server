@@ -45,7 +45,21 @@ include::{snippets}/user-controller-test/respond_201_when_sign_up_succeed/respon
 ==== Sample Response
 include::{snippets}/user-controller-test/respond_201_when_sign_up_succeed/http-response.adoc[]
 
-=== 1-5. 회원 팔로우 생성
+=== 1-5. 회원 정보 수정
+==== Request Fields
+include::{snippets}/user-controller-test/respond_200_when_update_user_succeed/request-fields.adoc[]
+==== Sample Request
+include::{snippets}/user-controller-test/respond_200_when_update_user_succeed/http-request.adoc[]
+==== Sample Response
+include::{snippets}/user-controller-test/respond_200_when_update_user_succeed/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `409 CONFLICT` | `DUPLICATE_NICKNAME` | 해당하는 닉네임을 가진 유저가 이미 있는 경우
+|===
+
+=== 1-6. 회원 팔로우 생성
 ==== Path Parameters
 include::{snippets}/user-controller-test/respond_201_when_create_user_follow_succeed/path-parameters.adoc[]
 ==== Sample Request
@@ -61,7 +75,7 @@ include::{snippets}/user-controller-test/respond_201_when_create_user_follow_suc
 | `409 CONFLICT` | `DUPLICATE_USER_FOLLOW` | 해당하는 유저 팔로우가 이미 있는 경우
 |===
 
-=== 1-6. 회원 팔로우 삭제
+=== 1-7. 회원 팔로우 삭제
 ==== Path Parameters
 include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_succeed/path-parameters.adoc[]
 ==== Sample Request

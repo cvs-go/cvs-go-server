@@ -9,6 +9,7 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER_FOLLOW;
 
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
+import com.cvsgo.dto.user.UpdateUserRequestDto;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
@@ -18,6 +19,7 @@ import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
+import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final TagRepository tagRepository;
+
+    private final UserTagRepository userTagRepository;
 
     private final UserFollowRepository userFollowRepository;
 
@@ -91,6 +95,26 @@ public class UserService {
     @Transactional(readOnly = true)
     public boolean isDuplicatedNickname(String nickname) {
         return userRepository.findByNickname(nickname).isPresent();
+    }
+
+
+    /**
+     * 사용자 정보를 수정한다.
+     *
+     * @param user    로그인한 사용자
+     * @param request 수정할 사용자 정보
+     * @throws DuplicateException 닉네임이 중복된 경우
+     */
+    @Transactional
+    public void updateUser(User user, UpdateUserRequestDto request) {
+        if (!user.getNickname().equals(request.getNickname()) && isDuplicatedNickname(
+            request.getNickname())) {
+            throw DUPLICATE_NICKNAME;
+        }
+        List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+
+        user.updateNickname(request.getNickname());
+        user.updateTags(tags);
     }
 
     /**
