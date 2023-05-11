@@ -22,43 +22,43 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<SignUpResponseDto> register(
         @RequestBody @Valid SignUpRequestDto request) {
         return SuccessResponse.from(userService.signUp(request));
     }
 
-    @GetMapping("/emails/{email}/exists")
+    @GetMapping("/users/emails/{email}/exists")
     public SuccessResponse<Boolean> checkEmailExists(@PathVariable String email) {
         return SuccessResponse.from(userService.isDuplicatedEmail(email));
     }
 
-    @GetMapping("/nicknames/{nickname}/exists")
+    @GetMapping("/users/nicknames/{nickname}/exists")
     public SuccessResponse<Boolean> checkNicknameExists(@PathVariable String nickname) {
         return SuccessResponse.from(userService.isDuplicatedNickname(nickname));
     }
 
-    @PutMapping
+    @PutMapping("/user")
     public SuccessResponse<Void> updateUser(@LoginUser User user,
         @RequestBody @Valid UpdateUserRequestDto request) {
         userService.updateUser(user, request);
         return SuccessResponse.create();
     }
 
-    @PostMapping("/{userId}/followers")
+    @PostMapping("/users/{userId}/followers")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<Void> createUserFollow(@LoginUser User user, @PathVariable Long userId) {
         userService.createUserFollow(user, userId);
         return SuccessResponse.create();
     }
 
-    @DeleteMapping("/{userId}/followers")
+    @DeleteMapping("/users/{userId}/followers")
     public SuccessResponse<Void> deleteUserFollow(@LoginUser User user, @PathVariable Long userId) {
         userService.deleteUserFollow(user, userId);
         return SuccessResponse.create();

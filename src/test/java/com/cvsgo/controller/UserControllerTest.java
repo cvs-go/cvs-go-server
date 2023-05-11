@@ -304,7 +304,7 @@ class UserControllerTest {
     void respond_200_when_update_user_succeed() throws Exception {
         UpdateUserRequestDto request = new UpdateUserRequestDto("수정닉네임", List.of(1L, 3L));
 
-        mockMvc.perform(put("/api/users")
+        mockMvc.perform(put("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk())
@@ -325,7 +325,7 @@ class UserControllerTest {
         UpdateUserRequestDto request = new UpdateUserRequestDto("중복", List.of(1L, 3L));
         willThrow(DUPLICATE_NICKNAME).given(userService).updateUser(any(), any());
 
-        mockMvc.perform(put("/api/users")
+        mockMvc.perform(put("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isConflict())
