@@ -289,11 +289,11 @@ include::{snippets}/review-controller-test/respond_200_when_success_to_read_prod
 
 === 4-5. 리뷰 좋아요 추가
 ==== Path Parameters
-include::{snippets}/review-controller-test/respond_200_when_succeed_to_create_review_like/path-parameters.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_succeed_to_create_review_like/path-parameters.adoc[]
 ==== Sample Request
-include::{snippets}/review-controller-test/respond_200_when_succeed_to_create_review_like/http-request.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_succeed_to_create_review_like/http-request.adoc[]
 ==== Sample Response
-include::{snippets}/review-controller-test/respond_200_when_succeed_to_create_review_like/http-response.adoc[]
+include::{snippets}/review-controller-test/respond_201_when_succeed_to_create_review_like/http-response.adoc[]
 ==== Error Response
 |===
 | HTTP Status | Error Code | Detail
