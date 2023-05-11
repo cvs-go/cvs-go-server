@@ -114,7 +114,7 @@ public class UserService {
         List<Tag> tags = tagRepository.findAllById(request.getTagIds());
 
         user.updateNickname(request.getNickname());
-        user.updateTag(tags);
+        user.updateTags(tags);
     }
 
     /**

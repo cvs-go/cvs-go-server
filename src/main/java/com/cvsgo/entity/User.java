@@ -93,7 +93,7 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
     }
 
-    public void updateTag(List<Tag> tags) {
+    public void updateTags(List<Tag> tags) {
         for (Tag tag : tags) {
             if (userTags.stream().noneMatch(userTag -> userTag.getTag().equals(tag))) {
                 addTag(tag);
