@@ -202,6 +202,8 @@ public class ReviewService {
      *
      * @param user     현재 로그인한 사용자
      * @param reviewId 좋아요 하려는 리뷰 ID
+     * @throws NotFoundException  해당 리뷰가 존재하지 않는 경우
+     * @throws DuplicateException 사용자가 해당 리뷰에 좋아요를 이미 한 경우
      */
     @Transactional
     public void createReviewLike(User user, Long reviewId) {
@@ -221,6 +223,7 @@ public class ReviewService {
      *
      * @param user     현재 로그인한 사용자
      * @param reviewId 좋아요 취소하려는 리뷰 ID
+     * @throws NotFoundException  해당 리뷰가 존재하지 않거나 사용자가 해당 리뷰에 좋아요를 하지 않은 경우
      */
     @Transactional
     public void deleteReviewLike(User user, Long reviewId) {
