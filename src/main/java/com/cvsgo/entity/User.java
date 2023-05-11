@@ -60,11 +60,11 @@ public class User extends BaseTimeEntity {
 
     public static User create(String userId, String password, String nickname, List<Tag> tags) {
         User user = User.builder()
-                .userId(userId)
-                .password(password)
-                .nickname(nickname)
-                .role(Role.ASSOCIATE)
-                .build();
+            .userId(userId)
+            .password(password)
+            .nickname(nickname)
+            .role(Role.ASSOCIATE)
+            .build();
         for (Tag tag : tags) {
             user.addTag(tag);
         }
@@ -79,9 +79,9 @@ public class User extends BaseTimeEntity {
 
     public void addTag(Tag tag) {
         UserTag userTag = UserTag.builder()
-                .user(this)
-                .tag(tag)
-                .build();
+            .user(this)
+            .tag(tag)
+            .build();
         userTags.add(userTag);
     }
 
