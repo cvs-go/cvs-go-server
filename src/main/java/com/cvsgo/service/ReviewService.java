@@ -213,7 +213,7 @@ public class ReviewService {
         }
         ReviewLike reviewLike = ReviewLike.create(user, review);
         reviewLikeRepository.save(reviewLike);
-        review.increaseLikeCount();
+        review.plusLikeCount();
     }
 
     /**
@@ -230,7 +230,7 @@ public class ReviewService {
         ReviewLike reviewLike = reviewLikeRepository.findByReviewAndUser(review, user)
             .orElseThrow(() -> NOT_FOUND_REVIEW_LIKE);
         reviewLikeRepository.delete(reviewLike);
-        review.decreaseLikeCount();
+        review.minusLikeCount();
     }
 
     private List<String> getReviewImages(Long reviewId, List<ReviewImage> reviewImages) {

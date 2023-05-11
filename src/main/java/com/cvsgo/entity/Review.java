@@ -95,11 +95,11 @@ public class Review extends BaseTimeEntity {
         }
     }
 
-    public void increaseLikeCount() {
+    public void plusLikeCount() {
         this.likeCount++;
     }
 
-    public void decreaseLikeCount() {
+    public void minusLikeCount() {
         this.likeCount--;
     }
 
