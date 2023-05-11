@@ -1,9 +1,11 @@
 package com.cvsgo.service;
 
 import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW_LIKE;
 import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
 
 import com.cvsgo.dto.review.CreateReviewRequestDto;
@@ -18,6 +20,7 @@ import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.ReviewImage;
+import com.cvsgo.entity.ReviewLike;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserTag;
@@ -27,6 +30,7 @@ import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.exception.UnauthorizedException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
+import com.cvsgo.repository.ReviewLikeRepository;
 import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.UserTagRepository;
 import com.cvsgo.util.FileConstants;
@@ -57,6 +61,8 @@ public class ReviewService {
     private final UserTagRepository userTagRepository;
 
     private final ReviewImageRepository reviewImageRepository;
+
+    private final ReviewLikeRepository reviewLikeRepository;
 
     private final EntityManager entityManager;
 
@@ -189,6 +195,45 @@ public class ReviewService {
                 getUserTags(reviewDto.getReviewerId(), userTags))).toList();
 
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    /**
+     * 리뷰 좋아요를 추가합니다.
+     *
+     * @param user     현재 로그인한 사용자
+     * @param reviewId 좋아요 하려는 리뷰 ID
+     * @throws NotFoundException  해당 리뷰가 존재하지 않는 경우
+     * @throws DuplicateException 사용자가 해당 리뷰에 좋아요를 이미 한 경우
+     */
+    @Transactional
+    public void createReviewLike(User user, Long reviewId) {
+        Review review = reviewRepository.findByIdWithOptimisticLock(reviewId)
+            .orElseThrow(() -> NOT_FOUND_REVIEW);
+
+        if (reviewLikeRepository.existsByReviewAndUser(review, user)) {
+            throw DUPLICATE_REVIEW_LIKE;
+        }
+        ReviewLike reviewLike = ReviewLike.create(user, review);
+        reviewLikeRepository.save(reviewLike);
+        review.plusLikeCount();
+    }
+
+    /**
+     * 리뷰 좋아요를 삭제합니다.
+     *
+     * @param user     현재 로그인한 사용자
+     * @param reviewId 좋아요 취소하려는 리뷰 ID
+     * @throws NotFoundException  해당 리뷰가 존재하지 않거나 사용자가 해당 리뷰에 좋아요를 하지 않은 경우
+     */
+    @Transactional
+    public void deleteReviewLike(User user, Long reviewId) {
+        Review review = reviewRepository.findByIdWithOptimisticLock(reviewId)
+            .orElseThrow(() -> NOT_FOUND_REVIEW);
+
+        ReviewLike reviewLike = reviewLikeRepository.findByReviewAndUser(review, user)
+            .orElseThrow(() -> NOT_FOUND_REVIEW_LIKE);
+        reviewLikeRepository.delete(reviewLike);
+        review.minusLikeCount();
     }
 
     private List<String> getReviewImages(Long reviewId, List<ReviewImage> reviewImages) {

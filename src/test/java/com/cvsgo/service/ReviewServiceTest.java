@@ -22,6 +22,7 @@ import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.ReviewImage;
+import com.cvsgo.entity.ReviewLike;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
@@ -32,6 +33,7 @@ import com.cvsgo.exception.ForbiddenException;
 import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
+import com.cvsgo.repository.ReviewLikeRepository;
 import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
@@ -67,6 +69,9 @@ class ReviewServiceTest {
 
     @Mock
     private ReviewImageRepository reviewImageRepository;
+
+    @Mock
+    private ReviewLikeRepository reviewLikeRepository;
 
     @InjectMocks
     ReviewService reviewService;
@@ -331,6 +336,90 @@ class ReviewServiceTest {
             () -> reviewService.updateReview(user1, 100L, updateReviewRequestDto));
     }
 
+    @Test
+    @DisplayName("리뷰 좋아요에 성공하면 리뷰 좋아요 수가 하나 증가한다")
+    void succeed_to_create_review_like() {
+        given(reviewRepository.findByIdWithOptimisticLock(anyLong()))
+            .willReturn(Optional.of(review));
+        given(reviewLikeRepository.existsByReviewAndUser(any(), any())).willReturn(false);
+        given(reviewLikeRepository.save(any())).willReturn(any());
+
+        Long previousLikeCount = review.getLikeCount();
+        reviewService.createReviewLike(user1, 1L);
+
+        then(reviewRepository).should(times(1)).findByIdWithOptimisticLock(1L);
+        then(reviewLikeRepository).should(times(1)).existsByReviewAndUser(any(), any());
+        then(reviewLikeRepository).should(times(1)).save(any());
+        assertThat(review.getLikeCount()).isEqualTo(previousLikeCount + 1);
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 추가시 해당 ID의 리뷰가 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_create_review_like_but_review_does_not_exist() {
+        given(reviewRepository.findByIdWithOptimisticLock(anyLong()))
+            .willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> reviewService.createReviewLike(user1, 10L));
+
+        then(reviewRepository).should(times(1)).findByIdWithOptimisticLock(any());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 추가시 이미 해당하는 리뷰 좋아요가 있을 경우 DuplicateException이 발생한다")
+    void should_throw_DuplicateException_when_create_review_like_but_review_like_already_exists() {
+        given(reviewRepository.findByIdWithOptimisticLock(anyLong()))
+            .willReturn(Optional.of(review));
+        given(reviewLikeRepository.existsByReviewAndUser(any(), any())).willReturn(true);
+
+        assertThrows(DuplicateException.class, () -> reviewService.createReviewLike(user1, 1L));
+
+        then(reviewRepository).should(times(1)).findByIdWithOptimisticLock(any());
+        then(reviewLikeRepository).should(times(1)).existsByReviewAndUser(any(), any());
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소에 성공하면 좋아요 개수가 하나 줄어든다")
+    void succeed_to_delete_review_like() {
+        given(reviewRepository.findByIdWithOptimisticLock(anyLong()))
+            .willReturn(Optional.of(review));
+        given(reviewLikeRepository.findByReviewAndUser(any(), any()))
+            .willReturn(Optional.of(reviewLike));
+
+        Long previousLikeCount = review.getLikeCount();
+        reviewService.deleteReviewLike(user1, 1L);
+
+        then(reviewRepository).should(times(1)).findByIdWithOptimisticLock(1L);
+        then(reviewLikeRepository).should(times(1)).findByReviewAndUser(any(), any());
+        then(reviewLikeRepository).should(times(1)).delete(any());
+        assertThat(review.getLikeCount()).isEqualTo(previousLikeCount - 1);
+    }
+
+    @Test
+    @DisplayName("리뷰 좋아요 삭제시 해당 ID의 리뷰가 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_review_like_but_review_does_not_exist() {
+        given(reviewRepository.findByIdWithOptimisticLock(anyLong()))
+            .willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> reviewService.deleteReviewLike(user1, 10L));
+
+        then(reviewRepository).should(times(1)).findByIdWithOptimisticLock(any());
+    }
+
+
+    @Test
+    @DisplayName("리뷰 좋아요 취소시 해당하는 리뷰 좋아요가 없다면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_delete_review_like_but_review_like_does_not_exist() {
+        given(reviewRepository.findByIdWithOptimisticLock(anyLong()))
+            .willReturn(Optional.of(review));
+        given(reviewLikeRepository.findByReviewAndUser(any(), any()))
+            .willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> reviewService.deleteReviewLike(user1, 1L));
+
+        then(reviewRepository).should(times(1)).findByIdWithOptimisticLock(any());
+        then(reviewLikeRepository).should(times(1)).findByReviewAndUser(any(), any());
+    }
+
     User user1 = User.builder()
         .id(1L)
         .userId("abc@naver.com")
@@ -349,6 +438,7 @@ class ReviewServiceTest {
 
     Review review = Review.builder()
         .id(1L)
+        .product(product)
         .user(user2)
         .rating(5)
         .content("맛있어요")
@@ -386,5 +476,7 @@ class ReviewServiceTest {
         .user(user2)
         .follower(user1)
         .build();
+
+    ReviewLike reviewLike = ReviewLike.create(user1, review);
 
 }

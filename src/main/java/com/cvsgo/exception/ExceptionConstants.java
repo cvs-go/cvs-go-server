@@ -15,6 +15,7 @@ public interface ExceptionConstants {
     NotFoundException NOT_FOUND_PRODUCT_LIKE = new NotFoundException(ErrorCode.NOT_FOUND_PRODUCT_LIKE);
     NotFoundException NOT_FOUND_PRODUCT_BOOKMARK = new NotFoundException(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
     NotFoundException NOT_FOUND_REVIEW = new NotFoundException(ErrorCode.NOT_FOUND_REVIEW);
+    NotFoundException NOT_FOUND_REVIEW_LIKE = new NotFoundException(ErrorCode.NOT_FOUND_REVIEW_LIKE);
 
     DuplicateException DUPLICATE_EMAIL = new DuplicateException(ErrorCode.DUPLICATE_EMAIL);
     DuplicateException DUPLICATE_NICKNAME = new DuplicateException(ErrorCode.DUPLICATE_NICKNAME);
@@ -22,5 +23,6 @@ public interface ExceptionConstants {
     DuplicateException DUPLICATE_PRODUCT_LIKE = new DuplicateException(ErrorCode.DUPLICATE_PRODUCT_LIKE);
     DuplicateException DUPLICATE_PRODUCT_BOOKMARK = new DuplicateException(ErrorCode.DUPLICATE_PRODUCT_BOOKMARK);
     DuplicateException DUPLICATE_REVIEW = new DuplicateException(ErrorCode.DUPLICATE_REVIEW);
+    DuplicateException DUPLICATE_REVIEW_LIKE = new DuplicateException(ErrorCode.DUPLICATE_REVIEW_LIKE);
 
 }

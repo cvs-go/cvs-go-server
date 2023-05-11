@@ -23,6 +23,7 @@ public enum ErrorCode {
     DUPLICATE_PRODUCT_BOOKMARK("중복된 상품 북마크입니다."),
     DUPLICATE_USER_FOLLOW("중복된 회원 팔로우입니다."),
     DUPLICATE_REVIEW("한 상품에 대한 리뷰는 한 번만 작성할 수 있습니다."),
+    DUPLICATE_REVIEW_LIKE( "하나의 리뷰에 좋아요는 한 번만 할 수 있습니다."),
 
     /* 403 FORBIDDEN */
     FORBIDDEN_REVIEW("해당 리뷰에 대한 권한이 없습니다."),
@@ -34,6 +35,7 @@ public enum ErrorCode {
     NOT_FOUND_PRODUCT_LIKE("존재하지 않는 상품 좋아요입니다."),
     NOT_FOUND_PRODUCT_BOOKMARK("존재하지 않는 상품 북마크입니다."),
     NOT_FOUND_REVIEW("존재하지 않는 리뷰입니다."),
+    NOT_FOUND_REVIEW_LIKE("해당 리뷰의 좋아요가 없습니다."),
 
     /* 500 INTERNAL_SEVER_ERROR */
     UNEXPECTED_ERROR("시스템에 문제가 발생했습니다.");

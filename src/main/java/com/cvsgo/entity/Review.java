@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Version;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
@@ -57,6 +58,9 @@ public class Review extends BaseTimeEntity {
     @ColumnDefault("0")
     private Long likeCount = 0L;
 
+    @Version
+    private Long version;
+
     @Builder
     public Review(Long id, String content, Integer rating, User user, Product product,
         List<String> imageUrls) {
@@ -89,6 +93,14 @@ public class Review extends BaseTimeEntity {
                 .imageUrl(imageUrl)
                 .build());
         }
+    }
+
+    public void plusLikeCount() {
+        this.likeCount++;
+    }
+
+    public void minusLikeCount() {
+        this.likeCount--;
     }
 
 }

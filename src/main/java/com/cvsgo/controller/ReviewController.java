@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,6 +59,21 @@ public class ReviewController {
     public SuccessResponse<Void> updateReview(@LoginUser User user, @PathVariable Long reviewId,
         @ModelAttribute UpdateReviewRequestDto request) throws IOException {
         reviewService.updateReview(user, reviewId, request);
+        return SuccessResponse.create();
+    }
+
+    @PostMapping("/reviews/{reviewId}/likes")
+    @ResponseStatus(HttpStatus.CREATED)
+    public SuccessResponse<Void> createReviewLike(@LoginUser User user,
+        @PathVariable Long reviewId) {
+        reviewService.createReviewLike(user, reviewId);
+        return SuccessResponse.create();
+    }
+
+    @DeleteMapping("/reviews/{reviewId}/likes")
+    public SuccessResponse<Void> deleteReviewLike(@LoginUser User user,
+        @PathVariable Long reviewId) {
+        reviewService.deleteReviewLike(user, reviewId);
         return SuccessResponse.create();
     }
 
