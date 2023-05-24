@@ -1,15 +1,45 @@
 package com.cvsgo.controller;
 
+import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
+import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
+import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW_LIKE;
+import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW_LIKE;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
+
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
 import com.cvsgo.dto.review.ReadProductReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewResponseDto;
-import com.cvsgo.dto.review.ReadReviewResponseDto;
-import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
+import com.cvsgo.dto.review.ReadReviewResponseDto;
 import com.cvsgo.dto.review.ReviewDto;
+import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Role;
@@ -37,40 +67,8 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
-import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
-import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
-import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_REVIEW_LIKE;
-import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
-import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW_LIKE;
-import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willThrow;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
 
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(ReviewController.class)
