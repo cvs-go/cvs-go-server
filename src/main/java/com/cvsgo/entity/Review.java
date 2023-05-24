@@ -61,6 +61,14 @@ public class Review extends BaseTimeEntity {
     @Version
     private Long version;
 
+    public void addImage(String imageUrl) {
+        ReviewImage reviewImage = ReviewImage.builder()
+            .review(this)
+            .imageUrl(imageUrl)
+            .build();
+        reviewImages.add(reviewImage);
+    }
+
     @Builder
     public Review(Long id, String content, Integer rating, User user, Product product,
         List<String> imageUrls) {
@@ -69,11 +77,10 @@ public class Review extends BaseTimeEntity {
         this.rating = rating;
         this.user = user;
         this.product = product;
-        for (String imageUrl : imageUrls) {
-            this.reviewImages.add(ReviewImage.builder()
-                .review(this)
-                .imageUrl(imageUrl)
-                .build());
+        if (imageUrls != null) {
+            for (String imageUrl : imageUrls) {
+                addImage(imageUrl);
+            }
         }
     }
 
@@ -86,12 +93,13 @@ public class Review extends BaseTimeEntity {
     }
 
     public void updateReviewImages(List<String> imageUrls) {
-        this.reviewImages.clear();
+        this.reviewImages.removeIf(reviewImage -> !imageUrls.contains(reviewImage.getImageUrl()));
+        List<String> currentImageUrls = reviewImages.stream().map(ReviewImage::getImageUrl)
+            .toList();
         for (String imageUrl : imageUrls) {
-            this.reviewImages.add(ReviewImage.builder()
-                .review(this)
-                .imageUrl(imageUrl)
-                .build());
+            if (!currentImageUrls.contains(imageUrl)) {
+                addImage(imageUrl);
+            }
         }
     }
 
