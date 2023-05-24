@@ -2,6 +2,7 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
+import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
 import com.cvsgo.dto.review.ReadProductReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewResponseDto;
@@ -29,13 +30,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.restdocs.request.RequestDocumentation;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -55,8 +53,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.io.IOException;
-
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -65,6 +61,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
@@ -115,19 +112,16 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("리뷰 생성에 성공하면 HTTP 201을 응답한다.")
-    void respond_201_when_success_to_create_review() throws Exception {
+    void respond_201_when_succeed_to_create_review() throws Exception {
+        CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
+            .rating(5)
+            .content("맛있어요")
+            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .build();
 
-        MockMultipartFile image1 = new MockMultipartFile("images", "sample_image1.png",
-            MediaType.IMAGE_PNG_VALUE, "image 1".getBytes());
-        MockMultipartFile image2 = new MockMultipartFile("images", "sample_image2.png",
-            MediaType.IMAGE_PNG_VALUE, "image 2".getBytes());
-
-        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .file(image1)
-                .file(image2)
-                .param("content", "진짜 맛있어요")
-                .param("rating", "5")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        mockMvc.perform(post(PRODUCT_REVIEW_API_PATH, 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isCreated()).andDo(print())
             .andDo(document(documentIdentifier,
                 getDocumentRequest(),
@@ -135,26 +129,28 @@ class ReviewControllerTest {
                 pathParameters(
                     parameterWithName("productId").description("상품 ID")
                 ),
-                RequestDocumentation.requestParts(
-                    RequestDocumentation.partWithName("images").description("리뷰 이미지")
-                ),
-                RequestDocumentation.formParameters(
-                    parameterWithName("content").description("리뷰 내용"),
-                    parameterWithName("rating").description("별점")
+                requestFields(
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
+                    fieldWithPath("rating").type(JsonFieldType.NUMBER).description("별점"),
+                    fieldWithPath("images").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL").optional()
                 )
             ));
     }
 
     @Test
-    @DisplayName("해당 사용자가 해당 상품에 이미 리뷰를 작성했다면 HTTP 409을 응답한다.")
+    @DisplayName("리뷰 작성시 해당 사용자가 해당 상품에 이미 리뷰를 작성했다면 HTTP 409을 응답한다.")
     void respond_409_when_user_requests_duplicate_product_review() throws Exception {
+        CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
+            .rating(5)
+            .content("맛있어요")
+            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .build();
 
         willThrow(DUPLICATE_REVIEW).given(reviewService).createReview(any(), anyLong(), any());
 
-        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .param("content", "진짜 맛있어요")
-                .param("rating", "5")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+        mockMvc.perform(post(PRODUCT_REVIEW_API_PATH, 1)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto)))
             .andExpect(status().isConflict())
             .andExpect(content().string(containsString(ErrorCode.DUPLICATE_REVIEW.getMessage())))
             .andDo(print());
@@ -269,13 +265,13 @@ class ReviewControllerTest {
 
     @Test
     @DisplayName("리뷰 수정에 성공하면 HTTP 200을 응답한다.")
-    void respond_200_when_success_to_update_review() throws Exception {
+    void respond_200_when_succeed_to_update_review() throws Exception {
         UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(5, "맛있어요",
-            List.of());
+            List.of("리뷰 이미지 URL 1", "리뷰 이미지 URL 2"));
 
-        mockMvc.perform(RestDocumentationRequestBuilders.put(UPDATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(put(UPDATE_REVIEW_API_PATH, 1)
                 .content(objectMapper.writeValueAsString(requestDto))
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk()).andDo(print())
             .andDo(document(documentIdentifier,
                 getDocumentRequest(),
@@ -286,33 +282,38 @@ class ReviewControllerTest {
                 requestFields(
                     fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
                     fieldWithPath("rating").type(JsonFieldType.NUMBER).description("별점"),
-                    fieldWithPath("images").type(JsonFieldType.ARRAY).description("리뷰 이미지")
+                    fieldWithPath("images").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL").optional()
                 )
             ));
     }
 
     @ParameterizedTest
-    @DisplayName("리뷰 별점이 1점 이상 5점 이하가 아니면 HTTP 400을 응답한다.")
+    @DisplayName("리뷰 작성시 별점이 1점 이상 5점 이하가 아니면 HTTP 400을 응답한다.")
     @ValueSource(ints = {0, 6, 7, 8, 9, 10, 100})
     void respond_400_when_rating_is_not_range_1_to_5(Integer rating) throws Exception {
+        UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(rating, "맛있어요",
+            List.of());
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .param("content", "맛있어요")
-                .param("rating", String.valueOf(rating))
-                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("평점은 1점 이상 5점 이하여야 합니다")))
             .andDo(print());
     }
 
     @Test
-    @DisplayName("리뷰 내용이 없으면 HTTP 400을 응답한다.")
+    @DisplayName("리뷰 작성시 리뷰 내용이 없으면 HTTP 400을 응답한다.")
     void respond_400_when_review_content_is_empty() throws Exception {
+        CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
+            .rating(5)
+            .content("")
+            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .build();
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .param("content", "")
-                .param("rating", "5")
-                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("리뷰는 1자 이상 1000자 이하여야 합니다.")))
             .andDo(print());
@@ -320,41 +321,35 @@ class ReviewControllerTest {
     }
 
     @Test
-    @DisplayName("리뷰 내용이 1000글자를 초과하면 HTTP 400을 응답한다.")
+    @DisplayName("리뷰 작성시 리뷰 내용이 1000글자를 초과하면 HTTP 400을 응답한다.")
     void respond_400_when_review_content_exceed_1000_letters() throws Exception {
+        CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
+            .rating(5)
+            .content("내용".repeat(501))
+            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .build();
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .param("content", "내용".repeat(501))
-                .param("rating", "5")
-                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(content().string(containsString("리뷰는 1자 이상 1000자 이하여야 합니다.")))
             .andDo(print());
     }
 
     @Test
-    @DisplayName("리뷰 내용이 1000글자이면 HTTP 201을 응답한다.")
+    @DisplayName("리뷰 작성시 리뷰 내용이 1000글자이면 HTTP 201을 응답한다.")
     void respond_201_when_review_content_does_not_exceed_1000_letters() throws Exception {
+        CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
+            .rating(5)
+            .content("내용".repeat(500))
+            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .build();
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .param("content", "내용".repeat(500))
-                .param("rating", "5")
-                .contentType(MediaType.MULTIPART_FORM_DATA))
+                .content(objectMapper.writeValueAsString(requestDto))
+                .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated()).andDo(print());
-    }
-
-    @Test
-    @DisplayName("IOException이 발생하면 HTTP 500을 응답한다.")
-    void respond_500_when_IOException_occurs() throws Exception {
-
-        willThrow(IOException.class).given(reviewService).createReview(any(), anyLong(), any());
-
-        mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
-                .param("content", "맛있어요")
-                .param("rating", "5")
-                .contentType(MediaType.MULTIPART_FORM_DATA))
-            .andExpect(status().isInternalServerError())
-            .andDo(print());
     }
 
     @Test

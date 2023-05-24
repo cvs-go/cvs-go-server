@@ -49,14 +49,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
-
-    @Mock
-    private FileUploadService fileUploadService;
 
     @Mock
     private ReviewRepository reviewRepository;
@@ -304,13 +299,9 @@ class ReviewServiceTest {
 
     @Test
     @DisplayName("리뷰 수정에 성공합니다.")
-    void success_to_update_review() throws Exception {
-        MockMultipartFile image1 = new MockMultipartFile("images", "sample_image1.png",
-            MediaType.IMAGE_PNG_VALUE, "image 1".getBytes());
-        MockMultipartFile image2 = new MockMultipartFile("images", "sample_image2.png",
-            MediaType.IMAGE_PNG_VALUE, "image 2".getBytes());
+    void succeed_to_update_review() {
         UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(4, "맛있어요",
-            List.of(image1, image2));
+            List.of("이미지 URL 1", "이미지 URL 2"));
         given(reviewRepository.findById(anyLong())).willReturn(Optional.of(review));
 
         reviewService.updateReview(user2, 1L, requestDto);
