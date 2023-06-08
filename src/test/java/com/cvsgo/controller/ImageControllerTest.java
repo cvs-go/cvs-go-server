@@ -71,8 +71,8 @@ public class ImageControllerTest {
     }
 
     @Test
-    @DisplayName("이미지 업로드에 성공하면 HTTP 200을 응답한다.")
-    void respond_200_when_succeed_to_upload_images() throws Exception {
+    @DisplayName("이미지 업로드에 성공하면 HTTP 201을 응답한다.")
+    void respond_201_when_succeed_to_upload_images() throws Exception {
 
         given(fileUploadService.upload(anyList(), anyString())).willReturn(
             List.of("이미지 URL 1", "이미지 URL 2"));
@@ -86,7 +86,7 @@ public class ImageControllerTest {
                 .file(image1)
                 .file(image2)
                 .contentType(MediaType.MULTIPART_FORM_DATA))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andDo(print())
             .andDo(document(documentIdentifier,
                 getDocumentRequest(),

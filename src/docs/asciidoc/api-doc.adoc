@@ -328,10 +328,10 @@ include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_re
 == 5. 이미지
 === 5-1. 이미지 업로드
 ==== Path Parameters
-include::{snippets}/image-controller-test/respond_200_when_succeed_to_upload_images/path-parameters.adoc[]
+include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_images/path-parameters.adoc[]
 ===== Request Parts
-include::{snippets}/image-controller-test/respond_200_when_succeed_to_upload_images/request-parts.adoc[]
+include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_images/request-parts.adoc[]
 ==== Sample Request
-include::{snippets}/image-controller-test/respond_200_when_succeed_to_upload_images/http-request.adoc[]
+include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_images/http-request.adoc[]
 ==== Sample Response
-include::{snippets}/image-controller-test/respond_200_when_succeed_to_upload_images/http-response.adoc[]
+include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_images/http-response.adoc[]
