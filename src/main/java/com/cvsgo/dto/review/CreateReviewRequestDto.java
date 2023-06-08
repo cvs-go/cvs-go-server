@@ -22,13 +22,13 @@ public class CreateReviewRequestDto {
     @Size(min = 1, max = 1000, message = "리뷰는 1자 이상 1000자 이하여야 합니다.")
     private String content;
 
-    private List<String> images;
+    private List<String> imageUrls;
 
     @Builder
-    public CreateReviewRequestDto(Integer rating, String content, List<String> images) {
+    public CreateReviewRequestDto(Integer rating, String content, List<String> imageUrls) {
         this.rating = rating;
         this.content = content;
-        this.images = images;
+        this.imageUrls = imageUrls;
     }
 
     public Review toEntity(User user, Product product) {
@@ -37,7 +37,7 @@ public class CreateReviewRequestDto {
             .product(product)
             .rating(rating)
             .content(content)
-            .imageUrls(images)
+            .imageUrls(imageUrls)
             .build();
     }
 

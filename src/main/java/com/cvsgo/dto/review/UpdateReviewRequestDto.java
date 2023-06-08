@@ -18,11 +18,11 @@ public class UpdateReviewRequestDto {
     @Size(min = 1, max = 1000, message = "리뷰는 1자 이상 1000자 이하여야 합니다.")
     private String content;
 
-    private List<String> images;
+    private List<String> imageUrls;
 
-    public UpdateReviewRequestDto(Integer rating, String content, List<String> images) {
+    public UpdateReviewRequestDto(Integer rating, String content, List<String> imageUrls) {
         this.rating = rating;
         this.content = content;
-        this.images = images;
+        this.imageUrls = imageUrls;
     }
 }

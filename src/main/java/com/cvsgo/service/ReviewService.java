@@ -107,7 +107,7 @@ public class ReviewService {
             throw FORBIDDEN_REVIEW;
         }
 
-        review.updateReviewImages(request.getImages());
+        review.updateReviewImages(request.getImageUrls());
         review.updateContent(request.getContent());
         review.updateRating(request.getRating());
     }

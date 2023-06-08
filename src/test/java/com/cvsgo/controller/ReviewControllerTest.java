@@ -114,7 +114,7 @@ class ReviewControllerTest {
         CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
             .rating(5)
             .content("맛있어요")
-            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .imageUrls(List.of("이미지 URL 1", "이미지 URL 2"))
             .build();
 
         mockMvc.perform(post(PRODUCT_REVIEW_API_PATH, 1)
@@ -130,7 +130,7 @@ class ReviewControllerTest {
                 requestFields(
                     fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
                     fieldWithPath("rating").type(JsonFieldType.NUMBER).description("별점"),
-                    fieldWithPath("images").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL").optional()
+                    fieldWithPath("imageUrls").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL").optional()
                 )
             ));
     }
@@ -141,7 +141,7 @@ class ReviewControllerTest {
         CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
             .rating(5)
             .content("맛있어요")
-            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .imageUrls(List.of("이미지 URL 1", "이미지 URL 2"))
             .build();
 
         willThrow(DUPLICATE_REVIEW).given(reviewService).createReview(any(), anyLong(), any());
@@ -280,7 +280,7 @@ class ReviewControllerTest {
                 requestFields(
                     fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용"),
                     fieldWithPath("rating").type(JsonFieldType.NUMBER).description("별점"),
-                    fieldWithPath("images").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL").optional()
+                    fieldWithPath("imageUrls").type(JsonFieldType.ARRAY).description("리뷰 이미지 URL").optional()
                 )
             ));
     }
@@ -306,7 +306,7 @@ class ReviewControllerTest {
         CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
             .rating(5)
             .content("")
-            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .imageUrls(List.of("이미지 URL 1", "이미지 URL 2"))
             .build();
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
@@ -324,7 +324,7 @@ class ReviewControllerTest {
         CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
             .rating(5)
             .content("내용".repeat(501))
-            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .imageUrls(List.of("이미지 URL 1", "이미지 URL 2"))
             .build();
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
@@ -341,7 +341,7 @@ class ReviewControllerTest {
         CreateReviewRequestDto requestDto = CreateReviewRequestDto.builder()
             .rating(5)
             .content("내용".repeat(500))
-            .images(List.of("이미지 URL 1", "이미지 URL 2"))
+            .imageUrls(List.of("이미지 URL 1", "이미지 URL 2"))
             .build();
 
         mockMvc.perform(multipart(PRODUCT_REVIEW_API_PATH, 1)
