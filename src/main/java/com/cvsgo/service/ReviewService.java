@@ -6,7 +6,6 @@ import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW_LIKE;
-import static com.cvsgo.util.FileConstants.REVIEW_DIR_NAME;
 
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
@@ -33,9 +32,7 @@ import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewLikeRepository;
 import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.UserTagRepository;
-import com.cvsgo.util.FileConstants;
 import jakarta.persistence.EntityManager;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,8 +48,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
-
-    private final FileUploadService fileUploadService;
 
     private final ReviewRepository reviewRepository;
 
@@ -74,18 +69,13 @@ public class ReviewService {
      * @param request   사용자가 작성한 리뷰 정보
      * @throws NotFoundException  해당 상품이 존재하지 않는 경우
      * @throws DuplicateException 해당 상품에 대한 리뷰를 이미 작성한 경우
-     * @throws IOException        파일 접근에 실패한 경우
      */
     @Transactional
-    public void createReview(User user, Long productId, CreateReviewRequestDto request)
-        throws IOException {
+    public void createReview(User user, Long productId, CreateReviewRequestDto request) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> NOT_FOUND_PRODUCT);
 
-        List<String> imageUrls = fileUploadService.upload(request.getImages(),
-            FileConstants.REVIEW_DIR_NAME);
-
-        Review review = request.toEntity(user, product, imageUrls);
+        Review review = request.toEntity(user, product);
 
         try {
             reviewRepository.save(review);
@@ -108,20 +98,16 @@ public class ReviewService {
      * @param reviewId 리뷰 ID
      * @param request  수정할 리뷰 정보
      * @throws UnauthorizedException 리뷰를 작성한 사용자가 아닌 경우
-     * @throws IOException           파일 접근에 실패한 경우
      */
     @Transactional
-    public void updateReview(User user, Long reviewId, UpdateReviewRequestDto request)
-        throws IOException {
+    public void updateReview(User user, Long reviewId, UpdateReviewRequestDto request) {
         Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
 
         if (!user.equals(review.getUser())) {
             throw FORBIDDEN_REVIEW;
         }
 
-        List<String> imageUrls = fileUploadService.upload(request.getImages(), REVIEW_DIR_NAME);
-
-        review.updateReviewImages(imageUrls);
+        review.updateReviewImages(request.getImageUrls());
         review.updateContent(request.getContent());
         review.updateRating(request.getRating());
     }
@@ -223,7 +209,7 @@ public class ReviewService {
      *
      * @param user     현재 로그인한 사용자
      * @param reviewId 좋아요 취소하려는 리뷰 ID
-     * @throws NotFoundException  해당 리뷰가 존재하지 않거나 사용자가 해당 리뷰에 좋아요를 하지 않은 경우
+     * @throws NotFoundException 해당 리뷰가 존재하지 않거나 사용자가 해당 리뷰에 좋아요를 하지 않은 경우
      */
     @Transactional
     public void deleteReviewLike(User user, Long reviewId) {

@@ -1,8 +1,6 @@
 package com.cvsgo.dto.review;
 
-import com.cvsgo.entity.ReviewImage;
 import com.cvsgo.entity.User;
-import com.cvsgo.entity.UserTag;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
 import java.util.List;
