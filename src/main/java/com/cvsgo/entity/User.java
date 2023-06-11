@@ -102,4 +102,8 @@ public class User extends BaseTimeEntity {
         userTags.removeIf(userTag -> !tags.contains(userTag.getTag()));
     }
 
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
 }

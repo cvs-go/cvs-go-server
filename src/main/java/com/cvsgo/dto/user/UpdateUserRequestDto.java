@@ -16,8 +16,11 @@ public class UpdateUserRequestDto {
 
     private List<Long> tagIds;
 
-    public UpdateUserRequestDto(String nickname, List<Long> tagIds) {
+    private String profileImageUrl;
+
+    public UpdateUserRequestDto(String nickname, List<Long> tagIds, String profileImageUrl) {
         this.nickname = nickname;
         this.tagIds = tagIds;
+        this.profileImageUrl = profileImageUrl;
     }
 }
