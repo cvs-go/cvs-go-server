@@ -115,6 +115,7 @@ public class UserService {
 
         user.updateNickname(request.getNickname());
         user.updateTags(tags);
+        user.updateProfileImageUrl(request.getProfileImageUrl());
     }
 
     /**

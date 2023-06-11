@@ -168,7 +168,8 @@ class UserServiceTest {
     void succeed_to_update_user() {
         String newNickname = "수정닉네임";
         List<Tag> newTags = List.of(tag1, tag2);
-        UpdateUserRequestDto request = new UpdateUserRequestDto(newNickname, List.of(1L, 3L));
+        UpdateUserRequestDto request = new UpdateUserRequestDto(newNickname, List.of(1L, 3L),
+            "프로필 이미지 URL");
 
         given(userRepository.findByNickname(request.getNickname())).willReturn(Optional.empty());
         given(tagRepository.findAllById(List.of(tag1.getId(), tag2.getId()))).willReturn(newTags);
@@ -188,7 +189,8 @@ class UserServiceTest {
     @DisplayName("이미 존재하는 닉네임이면 회원 수정 시 DuplicateException이 발생한다")
     void should_throw_DuplicateException_when_update_user_but_nickname_is_duplicate() {
         final String duplicatedNickname = user2.getNickname();
-        UpdateUserRequestDto request = new UpdateUserRequestDto(duplicatedNickname, List.of(1L, 3L));
+        UpdateUserRequestDto request = new UpdateUserRequestDto(duplicatedNickname, List.of(1L, 3L),
+            "프로필 이미지 URL");
 
         given(userRepository.findByNickname(request.getNickname())).willReturn(Optional.of(user2));
 

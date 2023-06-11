@@ -302,7 +302,8 @@ class UserControllerTest {
     @Test
     @DisplayName("회원 정보 수정에 성공하면 200을 응답한다")
     void respond_200_when_update_user_succeed() throws Exception {
-        UpdateUserRequestDto request = new UpdateUserRequestDto("수정닉네임", List.of(1L, 3L));
+        UpdateUserRequestDto request = new UpdateUserRequestDto("수정닉네임", List.of(1L, 3L),
+            "프로필 이미지 URL");
 
         mockMvc.perform(put("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -314,7 +315,8 @@ class UserControllerTest {
                 getDocumentResponse(),
                 requestFields(
                     fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임"),
-                    fieldWithPath("tagIds").type(JsonFieldType.ARRAY).description("태그 ID 목록")
+                    fieldWithPath("tagIds").type(JsonFieldType.ARRAY).description("태그 ID 목록"),
+                    fieldWithPath("profileImageUrl").type(JsonFieldType.STRING).description("프로필 이미지 URL")
                 )
             ));
     }
@@ -322,7 +324,8 @@ class UserControllerTest {
     @Test
     @DisplayName("해당 닉네임을 가진 계정이 존재하면 회원 수정 API 호출시 HTTP 409를 응답한다")
     void respond_409_when_update_user_but_nickname_conflicts() throws Exception {
-        UpdateUserRequestDto request = new UpdateUserRequestDto("중복", List.of(1L, 3L));
+        UpdateUserRequestDto request = new UpdateUserRequestDto("중복", List.of(1L, 3L),
+            "프로필 이미지 URL");
         willThrow(DUPLICATE_NICKNAME).given(userService).updateUser(any(), any());
 
         mockMvc.perform(put("/api/user")
