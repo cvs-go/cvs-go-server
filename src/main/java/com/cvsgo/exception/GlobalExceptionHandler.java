@@ -13,6 +13,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 @Slf4j
 @RestControllerAdvice
@@ -86,6 +87,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         log.info("데이터 무결성 위반 문제 발생", e);
         return ErrorResponse.of(ErrorCode.UNEXPECTED_ERROR.name(), e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ErrorResponse handleFileSizeLimitExceededException(MaxUploadSizeExceededException e) {
+        log.info("파일 크기 초과", e);
+        return ErrorResponse.from(ErrorCode.INVALID_FILE_SIZE);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

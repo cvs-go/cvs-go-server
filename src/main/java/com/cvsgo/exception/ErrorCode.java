@@ -10,6 +10,7 @@ public enum ErrorCode {
     /* 400 BAD_REQUEST */
     INVALID_REQUEST("유효성 검사에 실패했습니다."),
     INVALID_USER_FOLLOW("본인을 팔로우할 수 없습니다."),
+    INVALID_FILE_SIZE("파일 최대 용량을 초과하였습니다."),
 
     /* 401 UNAUTHORIZED */
     UNAUTHORIZED_USER("로그인을 하지 않은 사용자입니다."),
