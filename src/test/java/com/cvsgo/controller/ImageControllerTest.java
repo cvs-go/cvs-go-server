@@ -3,6 +3,7 @@ package com.cvsgo.controller;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static com.cvsgo.exception.ExceptionConstants.INVALID_FILE_SIZE;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -11,7 +12,6 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.multipart;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
-import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.partWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
@@ -101,6 +101,24 @@ public class ImageControllerTest {
                     fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("이미지 URL 목록")
                 )
             ));
+    }
+
+    @Test
+    @DisplayName("이미지가 최대 파일 용량을 초과하면 400을 응답한다.")
+    void respond_400_when_exceed_file_size_limit() throws Exception {
+        given(fileUploadService.upload(anyList(), anyString())).willThrow(INVALID_FILE_SIZE);
+
+        MockMultipartFile image1 = new MockMultipartFile("images", "sample_image1.png",
+            MediaType.IMAGE_PNG_VALUE, "image 1".getBytes());
+        MockMultipartFile image2 = new MockMultipartFile("images", "sample_image2.png",
+            MediaType.IMAGE_PNG_VALUE, "image 2".getBytes());
+
+        mockMvc.perform(multipart("/api/images/{folder}", "review")
+                .file(image1)
+                .file(image2)
+                .contentType(MediaType.MULTIPART_FORM_DATA))
+            .andExpect(status().isBadRequest())
+            .andDo(print());
     }
 
 }
