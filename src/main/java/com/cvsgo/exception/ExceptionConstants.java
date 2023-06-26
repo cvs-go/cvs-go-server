@@ -7,6 +7,8 @@ public interface ExceptionConstants {
     UnauthorizedException INVALID_PASSWORD = new UnauthorizedException(ErrorCode.INVALID_PASSWORD);
     UnauthorizedException UNAUTHORIZED_USER = new UnauthorizedException(ErrorCode.UNAUTHORIZED_USER);
 
+    BadRequestException INVALID_FILE_SIZE = new BadRequestException(ErrorCode.INVALID_FILE_SIZE);
+
     ForbiddenException FORBIDDEN_REVIEW = new ForbiddenException(ErrorCode.FORBIDDEN_REVIEW);
 
     NotFoundException NOT_FOUND_USER = new NotFoundException(ErrorCode.NOT_FOUND_USER);
