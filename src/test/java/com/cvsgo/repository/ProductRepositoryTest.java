@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.cvsgo.config.TestConfig;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.ReadLikedProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
@@ -16,6 +17,7 @@ import com.cvsgo.entity.DiscountEvent;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.SellAt;
 import com.cvsgo.entity.User;
@@ -59,6 +61,9 @@ class ProductRepositoryTest {
 
     @Autowired
     ReviewRepository reviewRepository;
+
+    @Autowired
+    ProductLikeRepository productLikeRepository;
 
     User user1;
     User user2;
@@ -305,6 +310,37 @@ class ProductRepositoryTest {
 
         // then
         assertThat(totalCount).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("회원이 좋아요 한 상품 목록을 조회한다")
+    void succeed_to_find_all_by_user_not_null() {
+        // given
+        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(null);
+        ProductLike productLike1 = ProductLike.builder()
+            .user(user1)
+            .product(product1)
+            .build();
+        productLikeRepository.save(productLike1);
+
+        ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
+            product1.getName(), product1.getPrice(), product1.getImageUrl(),
+            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike1, null,
+            5L, 3.5, 4.5);
+        ReadProductQueryDto productResponse2 = new ReadProductQueryDto(product2.getId(),
+            product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null,
+            5L, 3.5, 4.5);
+
+        // when
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByUser(user1,
+            request.getSortBy(), PageRequest.of(0, 20));
+
+        // then
+        List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
+            .toList();
+        assertThat(productResponse1.getProductId()).isIn(foundProductIds);
+        assertThat(productResponse2.getProductId()).isNotIn(foundProductIds);
     }
 
     @Test

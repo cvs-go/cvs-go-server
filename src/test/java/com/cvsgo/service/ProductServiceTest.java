@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.ReadLikedProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
@@ -275,6 +276,38 @@ class ProductServiceTest {
         then(convenienceStoreRepository).should(atLeastOnce()).findAll();
         then(categoryRepository).should(atLeastOnce()).findAll();
         then(productRepository).should(atLeastOnce()).findFirstByOrderByPriceDesc();
+    }
+
+    @Test
+    @DisplayName("로그인한 회원의 상품 좋아요 목록을 정상적으로 조회한다")
+    void succeed_to_read_liked_product_list_user_not_null() {
+        Pageable pageable = PageRequest.of(0, 20);
+        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
+
+        given(productRepository.findAllByUser(any(), any(), any())).willReturn(getProductList());
+        given(productRepository.countByUser(any())).willReturn((long) getProductList().size());
+        given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
+
+        Page<ReadProductResponseDto> result = productService.readLikedProductList(user, request, pageable);
+        assertEquals(result.getTotalElements(), getProductList().size());
+
+        then(productRepository).should(times(1)).findAllByUser(any(), any(), any());
+        then(productRepository).should(times(1)).countByUser(any());
+        then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
+    }
+
+    @Test
+    @DisplayName("로그인하지 않은 경우 상품 좋아요 빈 목록을 정상적으로 조회한다")
+    void succeed_to_read_liked_product_list_user_is_null() {
+        Pageable pageable = PageRequest.of(0, 20);
+        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
+
+        given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
+
+        Page<ReadProductResponseDto> result = productService.readLikedProductList(null, request, pageable);
+        assertEquals(0, result.getTotalElements());
+
+        then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
     }
 
     Category category1 = Category.builder()
