@@ -4,7 +4,6 @@ import com.cvsgo.entity.EventType;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter

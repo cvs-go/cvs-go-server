@@ -11,6 +11,7 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
+import com.cvsgo.dto.product.ReadLikedProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
@@ -62,14 +63,8 @@ public class ProductService {
         List<ReadProductQueryDto> products = productRepository.findAllByFilter(user, request,
             pageable);
         Long totalCount = productRepository.countByFilter(request);
-        List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
 
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
-            productIds);
-        List<ReadProductResponseDto> results = products.stream().map(
-            productDto -> ReadProductResponseDto.of(productDto,
-                getConvenienceStoreEvents(convenienceStoreEvents, productDto))).toList();
-        return new PageImpl<>(results, pageable, totalCount);
+        return new PageImpl<>(getProducts(products), pageable, totalCount);
     }
 
     /**
@@ -188,6 +183,34 @@ public class ProductService {
 
         return ReadProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
             highestPrice);
+    }
+
+    /**
+     * 사용자가 좋아요 한 상품을 조회한다.
+     *
+     * @param request 사용자가 적용한 정렬 기준
+     * @return 상품 목록
+     */
+    @Transactional(readOnly = true)
+    public Page<ReadProductResponseDto> readLikedProductList(User user,
+        ReadLikedProductRequestDto request, Pageable pageable) {
+        List<ReadProductQueryDto> products = List.of();
+        Long totalCount = 0L;
+        if (user != null) {
+            products = productRepository.findAllByUser(user, request.getSortBy(), pageable);
+            totalCount = productRepository.countByUser(user);
+        }
+
+        return new PageImpl<>(getProducts(products), pageable, totalCount);
+    }
+
+    private List<ReadProductResponseDto> getProducts(List<ReadProductQueryDto> products) {
+        List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
+            productIds);
+
+        return products.stream().map(productDto -> ReadProductResponseDto.of(productDto,
+            getConvenienceStoreEvents(convenienceStoreEvents, productDto))).toList();
     }
 
     private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(
