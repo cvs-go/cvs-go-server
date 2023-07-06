@@ -206,6 +206,24 @@ public class ProductService {
         return new PageImpl<>(getProducts(products), pageable, totalCount);
     }
 
+    /**
+     * 특정 사용자의 북마크 상품 목록을 조회한다.
+     *
+     * @param request 사용자가 적용한 정렬 기준
+     * @return 상품 목록
+     */
+    @Transactional(readOnly = true)
+    public Page<ReadProductResponseDto> readBookmarkedProductList(Long userId,
+        ReadUserProductRequestDto request, Pageable pageable) {
+        User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+
+        List<ReadProductQueryDto> products = productRepository.findAllByUserProductBookmark(user,
+            request.getSortBy(), pageable);
+        Long totalCount = productRepository.countByUserProductBookmark(user);
+
+        return new PageImpl<>(getProducts(products), pageable, totalCount);
+    }
+
     private List<ReadProductResponseDto> getProducts(List<ReadProductQueryDto> products) {
         List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
         List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(

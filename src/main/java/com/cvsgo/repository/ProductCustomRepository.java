@@ -21,6 +21,10 @@ public interface ProductCustomRepository {
 
     Long countByUserProductLike(User user);
 
+    List<ReadProductQueryDto> findAllByUserProductBookmark(User user, ProductSortBy sortBy, Pageable pageable);
+
+    Long countByUserProductBookmark(User user);
+
     List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
         List<Long> productIds);
 

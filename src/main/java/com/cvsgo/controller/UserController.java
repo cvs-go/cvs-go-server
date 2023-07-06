@@ -78,4 +78,12 @@ public class UserController {
         return SuccessResponse.from(productService.readLikedProductList(userId, request, pageable));
     }
 
+    @GetMapping("/users/{userId}/bookmarked-products")
+    public SuccessResponse<Page<ReadProductResponseDto>> readBookmarkedProductList(
+        @PathVariable Long userId, @ModelAttribute ReadUserProductRequestDto request,
+        Pageable pageable) {
+        return SuccessResponse.from(
+            productService.readBookmarkedProductList(userId, request, pageable));
+    }
+
 }
