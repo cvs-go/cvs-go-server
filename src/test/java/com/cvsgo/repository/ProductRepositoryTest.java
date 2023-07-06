@@ -348,6 +348,37 @@ class ProductRepositoryTest {
     }
 
     @Test
+    @DisplayName("특정 회원이 북마크 한 상품 목록을 조회한다")
+    void succeed_to_find_all_by_user_product_bookmark() {
+        // given
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(null);
+        ProductBookmark productBookmark1 = ProductBookmark.builder()
+            .user(user1)
+            .product(product1)
+            .build();
+        productBookmarkRepository.save(productBookmark1);
+
+        ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
+            product1.getName(), product1.getPrice(), product1.getImageUrl(),
+            product1.getCategory().getId(), product1.getManufacturer().getName(), null,
+            productBookmark1, 5L, 3.5, 4.5);
+        ReadProductQueryDto productResponse2 = new ReadProductQueryDto(product2.getId(),
+            product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null,
+            5L, 3.5, 4.5);
+
+        // when
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByUserProductBookmark(
+            user1, request.getSortBy(), PageRequest.of(0, 20));
+
+        // then
+        List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
+            .toList();
+        assertThat(productResponse1.getProductId()).isIn(foundProductIds);
+        assertThat(productResponse2.getProductId()).isNotIn(foundProductIds);
+    }
+
+    @Test
     @DisplayName("상품 ID 리스트에 따른 편의점 행사를 조회한다")
     void succeed_to_find_convenience_store_events_by_product_ids() {
         // given

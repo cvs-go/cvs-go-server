@@ -315,6 +315,39 @@ class ProductServiceTest {
         then(userRepository).should(times(1)).findById(any());
     }
 
+    @Test
+    @DisplayName("특정 회원의 상품 북마크 목록을 정상적으로 조회한다")
+    void succeed_to_read_bookmarked_product_list_user_not_null() {
+        Pageable pageable = PageRequest.of(0, 20);
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(ProductSortBy.SCORE);
+
+        given(userRepository.findById(any())).willReturn(Optional.of(user));
+        given(productRepository.findAllByUserProductBookmark(any(), any(), any())).willReturn(getProductList());
+        given(productRepository.countByUserProductBookmark(any())).willReturn((long) getProductList().size());
+        given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
+
+        Page<ReadProductResponseDto> result = productService.readBookmarkedProductList(user.getId(), request, pageable);
+        assertEquals(result.getTotalElements(), getProductList().size());
+
+        then(userRepository).should(times(1)).findById(any());
+        then(productRepository).should(times(1)).findAllByUserProductBookmark(any(), any(), any());
+        then(productRepository).should(times(1)).countByUserProductBookmark(any());
+        then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
+    }
+
+    @Test
+    @DisplayName("특정 회원의 상품 북마크 목록 조회 시 해당 회원이 없는 경우 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_read_bookmarked_product_but_user_does_not_exist() {
+        Pageable pageable = PageRequest.of(0, 20);
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(ProductSortBy.SCORE);
+
+        given(userRepository.findById(any())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> productService.readBookmarkedProductList(1000L, request, pageable));
+
+        then(userRepository).should(times(1)).findById(any());
+    }
+
     Category category1 = Category.builder()
         .id(1L)
         .name("아이스크림")
