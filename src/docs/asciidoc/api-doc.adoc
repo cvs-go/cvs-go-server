@@ -90,6 +90,26 @@ include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_suc
 | `404 NOT FOUND` | `NOT_FOUND_USER_FOLLOW` | 해당하는 팔로우가 없는 경우
 |===
 
+=== 1-8. 특정 회원의 좋아요 상품 목록 조회
+==== Path Parameters
+include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/path-parameters.adoc[]
+==== Request Fields
+include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/request-fields.adoc[]
+==== 정렬 기준 항목
+|===
+| sortBy 값 | 정렬 기준 | 비고
+
+| SCORE | 랭킹순  | 정렬 기준 미지정시 기본값
+| RATING | 별점순 |
+| REVIEW_COUNT | 리뷰순 |
+|===
+==== Sample Request
+include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/http-response.adoc[]
+
 == 2. 인증
 === 2-1. 로그인
 ==== Request Fields
@@ -221,24 +241,6 @@ include::{snippets}/product-controller-test/respond_200_when_delete_product_book
 | `404 NOT FOUND` | `NOT_FOUND_PRODUCT` | 해당하는 상품이 없는 경우
 | `404 NOT FOUND` | `NOT_FOUND_PRODUCT_BOOKMARK` | 해당하는 상품 북마크가 없는 경우
 |===
-
-=== 3-8. 좋아요 상품 목록 조회
-==== Request Fields
-include::{snippets}/product-controller-test/respond_200_when_read_liked_product_list_successfully/request-fields.adoc[]
-==== 정렬 기준 항목
-|===
-| sortBy 값 | 정렬 기준 | 비고
-
-| SCORE | 랭킹순  | 정렬 기준 미지정시 기본값
-| RATING | 별점순 |
-| REVIEW_COUNT | 리뷰순 |
-|===
-==== Sample Request
-include::{snippets}/product-controller-test/respond_200_when_read_liked_product_list_successfully/http-request.adoc[]
-==== Response Fields
-include::{snippets}/product-controller-test/respond_200_when_read_liked_product_list_successfully/response-fields.adoc[]
-==== Sample Response
-include::{snippets}/product-controller-test/respond_200_when_read_liked_product_list_successfully/http-response.adoc[]
 
 == 4. 리뷰
 === 4-1. 리뷰 작성
