@@ -1,6 +1,7 @@
 package com.cvsgo.repository;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
+import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
@@ -15,6 +16,10 @@ public interface ProductCustomRepository {
         Pageable pageable);
 
     Long countByFilter(ReadProductRequestDto filter);
+
+    List<ReadProductQueryDto> findAllByUser(User user, ProductSortBy sortBy, Pageable pageable);
+
+    Long countByUser(User user);
 
     List<ConvenienceStoreEventQueryDto> findConvenienceStoreEventsByProductIds(
         List<Long> productIds);

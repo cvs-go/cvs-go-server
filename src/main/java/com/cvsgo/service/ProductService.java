@@ -5,12 +5,14 @@ import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
 
 import com.cvsgo.dto.product.CategoryDto;
 import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
+import com.cvsgo.dto.product.ReadLikedProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
@@ -29,6 +31,7 @@ import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
+import com.cvsgo.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +52,7 @@ public class ProductService {
     private final ConvenienceStoreRepository convenienceStoreRepository;
     private final ProductLikeRepository productLikeRepository;
     private final ProductBookmarkRepository productBookmarkRepository;
+    private final UserRepository userRepository;
 
     /**
      * 사용자가 적용한 필터를 적용해 상품을 조회한다.
@@ -62,14 +66,8 @@ public class ProductService {
         List<ReadProductQueryDto> products = productRepository.findAllByFilter(user, request,
             pageable);
         Long totalCount = productRepository.countByFilter(request);
-        List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
 
-        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
-            productIds);
-        List<ReadProductResponseDto> results = products.stream().map(
-            productDto -> ReadProductResponseDto.of(productDto,
-                getConvenienceStoreEvents(convenienceStoreEvents, productDto))).toList();
-        return new PageImpl<>(results, pageable, totalCount);
+        return new PageImpl<>(getProducts(products), pageable, totalCount);
     }
 
     /**
@@ -188,6 +186,33 @@ public class ProductService {
 
         return ReadProductFilterResponseDto.of(convenienceStoreNames, categoryNames, eventTypes,
             highestPrice);
+    }
+
+    /**
+     * 특정 사용자의 좋아요 상품 목록을 조회한다.
+     *
+     * @param request 사용자가 적용한 정렬 기준
+     * @return 상품 목록
+     */
+    @Transactional(readOnly = true)
+    public Page<ReadProductResponseDto> readLikedProductList(Long userId,
+        ReadLikedProductRequestDto request, Pageable pageable) {
+        User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+
+        List<ReadProductQueryDto> products = productRepository.findAllByUser(user,
+            request.getSortBy(), pageable);
+        Long totalCount = productRepository.countByUser(user);
+
+        return new PageImpl<>(getProducts(products), pageable, totalCount);
+    }
+
+    private List<ReadProductResponseDto> getProducts(List<ReadProductQueryDto> products) {
+        List<Long> productIds = products.stream().map(ReadProductQueryDto::getProductId).toList();
+        List<ConvenienceStoreEventQueryDto> convenienceStoreEvents = productRepository.findConvenienceStoreEventsByProductIds(
+            productIds);
+
+        return products.stream().map(productDto -> ReadProductResponseDto.of(productDto,
+            getConvenienceStoreEvents(convenienceStoreEvents, productDto))).toList();
     }
 
     private List<ConvenienceStoreEventDto> getConvenienceStoreEvents(
