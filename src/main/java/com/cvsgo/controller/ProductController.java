@@ -2,7 +2,6 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
@@ -76,12 +75,6 @@ public class ProductController {
     @GetMapping("/filter")
     public SuccessResponse<ReadProductFilterResponseDto> readProductFilter() {
         return SuccessResponse.from(productService.readProductFilter());
-    }
-
-    @GetMapping("/likes")
-    public SuccessResponse<Page<ReadProductResponseDto>> readLikedProductList(@LoginUser User user,
-        @ModelAttribute ReadLikedProductRequestDto request, Pageable pageable) {
-        return SuccessResponse.from(productService.readLikedProductList(user, request, pageable));
     }
 
 }

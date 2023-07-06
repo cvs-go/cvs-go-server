@@ -5,6 +5,7 @@ import static com.cvsgo.exception.ExceptionConstants.DUPLICATE_PRODUCT_LIKE;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_BOOKMARK;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT_LIKE;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
 
 import com.cvsgo.dto.product.CategoryDto;
 import com.cvsgo.dto.product.ConvenienceStoreDto;
@@ -30,6 +31,7 @@ import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
+import com.cvsgo.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,7 @@ public class ProductService {
     private final ConvenienceStoreRepository convenienceStoreRepository;
     private final ProductLikeRepository productLikeRepository;
     private final ProductBookmarkRepository productBookmarkRepository;
+    private final UserRepository userRepository;
 
     /**
      * 사용자가 적용한 필터를 적용해 상품을 조회한다.
@@ -186,20 +189,19 @@ public class ProductService {
     }
 
     /**
-     * 사용자가 좋아요 한 상품을 조회한다.
+     * 특정 사용자의 좋아요 상품 목록을 조회한다.
      *
      * @param request 사용자가 적용한 정렬 기준
      * @return 상품 목록
      */
     @Transactional(readOnly = true)
-    public Page<ReadProductResponseDto> readLikedProductList(User user,
+    public Page<ReadProductResponseDto> readLikedProductList(Long userId,
         ReadLikedProductRequestDto request, Pageable pageable) {
-        List<ReadProductQueryDto> products = List.of();
-        Long totalCount = 0L;
-        if (user != null) {
-            products = productRepository.findAllByUser(user, request.getSortBy(), pageable);
-            totalCount = productRepository.countByUser(user);
-        }
+        User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+
+        List<ReadProductQueryDto> products = productRepository.findAllByUser(user,
+            request.getSortBy(), pageable);
+        Long totalCount = productRepository.countByUser(user);
 
         return new PageImpl<>(getProducts(products), pageable, totalCount);
     }
