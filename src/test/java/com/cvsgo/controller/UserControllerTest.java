@@ -18,6 +18,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
@@ -31,13 +32,29 @@ import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfig
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
+import com.cvsgo.dto.product.ConvenienceStoreEventDto;
+import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.ReadLikedProductRequestDto;
+import com.cvsgo.dto.product.ReadProductQueryDto;
+import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
+import com.cvsgo.entity.BogoEvent;
+import com.cvsgo.entity.BtgoEvent;
+import com.cvsgo.entity.Category;
+import com.cvsgo.entity.ConvenienceStore;
+import com.cvsgo.entity.DiscountEvent;
+import com.cvsgo.entity.GiftEvent;
+import com.cvsgo.entity.Manufacturer;
+import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductBookmark;
+import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.interceptor.AuthInterceptor;
+import com.cvsgo.service.ProductService;
 import com.cvsgo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -51,12 +68,15 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -67,6 +87,9 @@ class UserControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private ProductService productService;
 
     private MockMvc mockMvc;
 
@@ -422,6 +445,47 @@ class UserControllerTest {
             .andDo(print());
     }
 
+
+    @Test
+    @DisplayName("특정 회원의 좋아요 상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_liked_product_list_successfully() throws Exception {
+        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
+
+        Page<ReadProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
+        given(productService.readLikedProductList(any(), any(), any())).willReturn(responseDto);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/users/{userId}/liked-products", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("{class-name}/{method-name}",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userId").description("좋아요 상품 목록을 조회할 회원 ID")
+                ),
+                requestFields(
+                    fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional()
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data.content[].productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data.content[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
+                    fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
+                    fieldWithPath("data.content[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
+                    fieldWithPath("data.content[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
+                    fieldWithPath("data.content[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
+                    fieldWithPath("data.content[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
+                    fieldWithPath("data.content[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
+                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].name").type(JsonFieldType.STRING).description("판매 편의점 이름"),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
+                    fieldWithPath("data.content[].convenienceStoreEvents[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
+                )
+            ));
+    }
+
     private List<Tag> getTags() {
         List<Tag> tags = new ArrayList<>();
         tags.add(Tag.builder().id(2L).name("맵부심").group(1).build());
@@ -445,6 +509,106 @@ class UserControllerTest {
 
     private SignUpResponseDto createResponse() {
         return SignUpResponseDto.from(createUser());
+    }
+
+    Category category1 = Category.builder()
+        .id(1L)
+        .name("아이스크림")
+        .build();
+
+    Category category2 = Category.builder()
+        .id(2L)
+        .name("과자&빵")
+        .build();
+
+    Manufacturer manufacturer1 = Manufacturer.builder()
+        .name("롯데")
+        .build();
+
+    Manufacturer manufacturer2 = Manufacturer.builder()
+        .name("농심")
+        .build();
+
+    Product product1 = Product.builder()
+        .id(1L)
+        .name("아이시스 500ml")
+        .price(2000)
+        .category(category1)
+        .imageUrl("")
+        .manufacturer(manufacturer1)
+        .build();
+
+    Product product2 = Product.builder()
+        .id(2L)
+        .name("백산수 500ml")
+        .price(1500)
+        .category(category2)
+        .imageUrl("")
+        .manufacturer(manufacturer2)
+        .build();
+
+    User user = User.builder().build();
+
+    ProductLike productLike = ProductLike.builder()
+        .user(user)
+        .product(product1)
+        .build();
+
+    ProductBookmark productBookmark = ProductBookmark.builder()
+        .user(user)
+        .product(product1)
+        .build();
+
+    ConvenienceStore cvs1 = ConvenienceStore.builder()
+        .id(1L)
+        .name("CU")
+        .build();
+
+    ConvenienceStore cvs2 = ConvenienceStore.builder()
+        .id(2L)
+        .name("GS25")
+        .build();
+
+    BogoEvent bogoEvent = BogoEvent.builder()
+        .product(product1)
+        .convenienceStore(cvs1)
+        .build();
+
+    BtgoEvent btgoEvent = BtgoEvent.builder()
+        .product(product1)
+        .convenienceStore(cvs2)
+        .build();
+
+    GiftEvent giftEvent = GiftEvent.builder()
+        .product(product2)
+        .convenienceStore(cvs1)
+        .giftProduct(product1)
+        .build();
+
+    DiscountEvent discountEvent = DiscountEvent.builder()
+        .product(product2)
+        .convenienceStore(cvs2)
+        .discountAmount(300)
+        .build();
+
+    private List<ReadProductResponseDto> getProductsResponse() {
+        ReadProductQueryDto productQueryDto1 = new ReadProductQueryDto(product1.getId(),
+            product1.getName(), product1.getPrice(), product1.getImageUrl(),
+            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike, productBookmark, 5L, 3.5, 4.5);
+        List<ConvenienceStoreEventDto> convenienceStoreEvents1 = List.of(
+            ConvenienceStoreEventDto.of(cvs1.getName(), bogoEvent),
+            ConvenienceStoreEventDto.of(cvs2.getName(), btgoEvent));
+
+        ReadProductQueryDto productQueryDto2 = new ReadProductQueryDto(product2.getId(),
+            product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null, 5L, 4.0, 4.0);
+        List<ConvenienceStoreEventDto> convenienceStoreEvents2 = List.of(
+            ConvenienceStoreEventDto.of(cvs1.getName(), giftEvent),
+            ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent));
+
+        ReadProductResponseDto productResponse1 = ReadProductResponseDto.of(productQueryDto1, convenienceStoreEvents1);
+        ReadProductResponseDto productResponse2 = ReadProductResponseDto.of(productQueryDto2, convenienceStoreEvents2);
+        return List.of(productResponse1, productResponse2);
     }
 
 }

@@ -386,43 +386,6 @@ class ProductControllerTest {
             ));
     }
 
-    @Test
-    @DisplayName("로그인 한 회원의 좋아요 상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
-    void respond_200_when_read_liked_product_list_successfully() throws Exception {
-        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
-
-        Page<ReadProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
-        given(productService.readLikedProductList(any(), any(), any())).willReturn(responseDto);
-
-        mockMvc.perform(get("/api/products/likes")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andDo(print())
-            .andDo(document("{class-name}/{method-name}",
-                getDocumentRequest(),
-                getDocumentResponse(),
-                requestFields(
-                    fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional()
-                ),
-                relaxedResponseFields(
-                    fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
-                    fieldWithPath("data.content[].productName").type(JsonFieldType.STRING).description("상품명"),
-                    fieldWithPath("data.content[].productPrice").type(JsonFieldType.NUMBER).description("상품 가격"),
-                    fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 url"),
-                    fieldWithPath("data.content[].categoryId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
-                    fieldWithPath("data.content[].manufacturerName").type(JsonFieldType.STRING).description("제조사"),
-                    fieldWithPath("data.content[].isLiked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 좋아요 여부"),
-                    fieldWithPath("data.content[].isBookmarked").type(JsonFieldType.BOOLEAN).description("사용자의 상품 북마크 여부"),
-                    fieldWithPath("data.content[].reviewCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
-                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.STRING).description("상품 리뷰 평점"),
-                    fieldWithPath("data.content[].convenienceStoreEvents[].name").type(JsonFieldType.STRING).description("판매 편의점 이름"),
-                    fieldWithPath("data.content[].convenienceStoreEvents[].eventType").type(JsonFieldType.STRING).description("행사 정보").optional(),
-                    fieldWithPath("data.content[].convenienceStoreEvents[].discountAmount").type(JsonFieldType.NUMBER).description("할인 가격").optional()
-                )
-            ));
-    }
-
     Category category1 = Category.builder()
         .id(1L)
         .name("아이스크림")
