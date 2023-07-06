@@ -2,7 +2,7 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
@@ -72,8 +72,9 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}/liked-products")
-    public SuccessResponse<Page<ReadProductResponseDto>> readLikedProductList(@PathVariable Long userId,
-        @ModelAttribute ReadLikedProductRequestDto request, Pageable pageable) {
+    public SuccessResponse<Page<ReadProductResponseDto>> readLikedProductList(
+        @PathVariable Long userId, @ModelAttribute ReadUserProductRequestDto request,
+        Pageable pageable) {
         return SuccessResponse.from(productService.readLikedProductList(userId, request, pageable));
     }
 

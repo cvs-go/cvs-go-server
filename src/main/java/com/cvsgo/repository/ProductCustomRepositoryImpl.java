@@ -111,7 +111,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetchOne();
     }
 
-    public List<ReadProductQueryDto> findAllByUser(User loginUser,
+    public List<ReadProductQueryDto> findAllByUserProductLike(User loginUser,
         ProductSortBy sortBy, Pageable pageable) {
         NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
         NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
@@ -155,7 +155,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Long countByUser(User loginUser) {
+    public Long countByUserProductLike(User loginUser) {
         return queryFactory.select(product.count())
             .from(product)
             .leftJoin(productLike)

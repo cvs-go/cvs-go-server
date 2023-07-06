@@ -13,7 +13,7 @@ import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
@@ -28,7 +28,6 @@ import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.User;
-import com.cvsgo.exception.BadRequestException;
 import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
 import com.cvsgo.repository.CategoryRepository;
@@ -287,19 +286,19 @@ class ProductServiceTest {
     @DisplayName("특정 회원의 상품 좋아요 목록을 정상적으로 조회한다")
     void succeed_to_read_liked_product_list_user_not_null() {
         Pageable pageable = PageRequest.of(0, 20);
-        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(ProductSortBy.SCORE);
 
         given(userRepository.findById(any())).willReturn(Optional.of(user));
-        given(productRepository.findAllByUser(any(), any(), any())).willReturn(getProductList());
-        given(productRepository.countByUser(any())).willReturn((long) getProductList().size());
+        given(productRepository.findAllByUserProductLike(any(), any(), any())).willReturn(getProductList());
+        given(productRepository.countByUserProductLike(any())).willReturn((long) getProductList().size());
         given(productRepository.findConvenienceStoreEventsByProductIds(anyList())).willReturn(getCvsEventList());
 
         Page<ReadProductResponseDto> result = productService.readLikedProductList(user.getId(), request, pageable);
         assertEquals(result.getTotalElements(), getProductList().size());
 
         then(userRepository).should(times(1)).findById(any());
-        then(productRepository).should(times(1)).findAllByUser(any(), any(), any());
-        then(productRepository).should(times(1)).countByUser(any());
+        then(productRepository).should(times(1)).findAllByUserProductLike(any(), any(), any());
+        then(productRepository).should(times(1)).countByUserProductLike(any());
         then(productRepository).should(times(1)).findConvenienceStoreEventsByProductIds(anyList());
     }
 
@@ -307,7 +306,7 @@ class ProductServiceTest {
     @DisplayName("특정 회원의 상품 좋아요 목록 조회 시 해당 회원이 없는 경우 NotFoundException이 발생한다")
     void should_throw_NotFoundException_when_read_liked_product_but_user_does_not_exist() {
         Pageable pageable = PageRequest.of(0, 20);
-        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(ProductSortBy.SCORE);
 
         given(userRepository.findById(any())).willReturn(Optional.empty());
 

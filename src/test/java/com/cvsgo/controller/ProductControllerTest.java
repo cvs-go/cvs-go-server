@@ -32,7 +32,6 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.EventTypeDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;

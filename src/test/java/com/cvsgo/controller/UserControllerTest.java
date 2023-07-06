@@ -34,7 +34,7 @@ import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
@@ -76,7 +76,6 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
@@ -449,7 +448,7 @@ class UserControllerTest {
     @Test
     @DisplayName("특정 회원의 좋아요 상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_liked_product_list_successfully() throws Exception {
-        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(ProductSortBy.SCORE);
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(ProductSortBy.SCORE);
 
         Page<ReadProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
         given(productService.readLikedProductList(any(), any(), any())).willReturn(responseDto);

@@ -12,7 +12,7 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
@@ -196,12 +196,12 @@ public class ProductService {
      */
     @Transactional(readOnly = true)
     public Page<ReadProductResponseDto> readLikedProductList(Long userId,
-        ReadLikedProductRequestDto request, Pageable pageable) {
+        ReadUserProductRequestDto request, Pageable pageable) {
         User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
 
-        List<ReadProductQueryDto> products = productRepository.findAllByUser(user,
+        List<ReadProductQueryDto> products = productRepository.findAllByUserProductLike(user,
             request.getSortBy(), pageable);
-        Long totalCount = productRepository.countByUser(user);
+        Long totalCount = productRepository.countByUserProductLike(user);
 
         return new PageImpl<>(getProducts(products), pageable, totalCount);
     }
