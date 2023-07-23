@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.cvsgo.config.TestConfig;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.ReadLikedProductRequestDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
@@ -17,6 +17,7 @@ import com.cvsgo.entity.DiscountEvent;
 import com.cvsgo.entity.EventType;
 import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
+import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
 import com.cvsgo.entity.Review;
 import com.cvsgo.entity.SellAt;
@@ -64,6 +65,9 @@ class ProductRepositoryTest {
 
     @Autowired
     ProductLikeRepository productLikeRepository;
+
+    @Autowired
+    ProductBookmarkRepository productBookmarkRepository;
 
     User user1;
     User user2;
@@ -313,10 +317,10 @@ class ProductRepositoryTest {
     }
 
     @Test
-    @DisplayName("회원이 좋아요 한 상품 목록을 조회한다")
-    void succeed_to_find_all_by_user_not_null() {
+    @DisplayName("특정 회원이 좋아요 한 상품 목록을 조회한다")
+    void succeed_to_find_all_by_user_product_like() {
         // given
-        ReadLikedProductRequestDto request = new ReadLikedProductRequestDto(null);
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(null);
         ProductLike productLike1 = ProductLike.builder()
             .user(user1)
             .product(product1)
@@ -325,16 +329,47 @@ class ProductRepositoryTest {
 
         ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
             product1.getName(), product1.getPrice(), product1.getImageUrl(),
-            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike1, null,
-            5L, 3.5, 4.5);
+            product1.getCategory().getId(), product1.getManufacturer().getName(), productLike1,
+            null, 5L, 3.5, 4.5);
         ReadProductQueryDto productResponse2 = new ReadProductQueryDto(product2.getId(),
             product2.getName(), product2.getPrice(), product2.getImageUrl(),
             product2.getCategory().getId(), product2.getManufacturer().getName(), null, null,
             5L, 3.5, 4.5);
 
         // when
-        List<ReadProductQueryDto> foundProducts = productRepository.findAllByUser(user1,
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByUserProductLike(user1,
             request.getSortBy(), PageRequest.of(0, 20));
+
+        // then
+        List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
+            .toList();
+        assertThat(productResponse1.getProductId()).isIn(foundProductIds);
+        assertThat(productResponse2.getProductId()).isNotIn(foundProductIds);
+    }
+
+    @Test
+    @DisplayName("특정 회원이 북마크 한 상품 목록을 조회한다")
+    void succeed_to_find_all_by_user_product_bookmark() {
+        // given
+        ReadUserProductRequestDto request = new ReadUserProductRequestDto(null);
+        ProductBookmark productBookmark1 = ProductBookmark.builder()
+            .user(user1)
+            .product(product1)
+            .build();
+        productBookmarkRepository.save(productBookmark1);
+
+        ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
+            product1.getName(), product1.getPrice(), product1.getImageUrl(),
+            product1.getCategory().getId(), product1.getManufacturer().getName(), null,
+            productBookmark1, 5L, 3.5, 4.5);
+        ReadProductQueryDto productResponse2 = new ReadProductQueryDto(product2.getId(),
+            product2.getName(), product2.getPrice(), product2.getImageUrl(),
+            product2.getCategory().getId(), product2.getManufacturer().getName(), null, null,
+            5L, 3.5, 4.5);
+
+        // when
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByUserProductBookmark(
+            user1, request.getSortBy(), PageRequest.of(0, 20));
 
         // then
         List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)

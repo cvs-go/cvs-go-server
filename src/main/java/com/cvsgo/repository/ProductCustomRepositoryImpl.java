@@ -111,7 +111,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetchOne();
     }
 
-    public List<ReadProductQueryDto> findAllByUser(User loginUser,
+    public List<ReadProductQueryDto> findAllByUserProductLike(User loginUser,
         ProductSortBy sortBy, Pageable pageable) {
         NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
         NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
@@ -155,7 +155,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
             .fetch();
     }
 
-    public Long countByUser(User loginUser) {
+    public Long countByUserProductLike(User loginUser) {
         return queryFactory.select(product.count())
             .from(product)
             .leftJoin(productLike)
@@ -167,6 +167,67 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         .leftJoin(event).on(sellAt.product.eq(event.product))
                         .where(
                             productLikeUserEq(loginUser)
+                        ))
+            )
+            .fetchOne();
+    }
+
+    public List<ReadProductQueryDto> findAllByUserProductBookmark(User loginUser,
+        ProductSortBy sortBy, Pageable pageable) {
+        NumberPath<Long> reviewCount = Expressions.numberPath(Long.class, "reviewCount");
+        NumberPath<Double> avgRating = Expressions.numberPath(Double.class, "avgRating");
+        NumberPath<Double> score = Expressions.numberPath(Double.class, "score");
+        return queryFactory.select(new QReadProductQueryDto(
+                product.id,
+                product.name,
+                product.price,
+                product.imageUrl,
+                product.category.id,
+                manufacturer.name,
+                productLike,
+                productBookmark,
+                review.count().as("reviewCount"),
+                review.rating.avg().as("avgRating"),
+                (review.rating.coalesce(0).avg().multiply(review.count()).add(product.likeCount)).as(
+                    "score")
+            ))
+            .from(product)
+            .leftJoin(productLike)
+            .on(productLike.product.eq(product).and(productLikeUserEq(loginUser)))
+            .leftJoin(productBookmark)
+            .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
+            .leftJoin(review).on(review.product.eq(product))
+            .leftJoin(manufacturer).on(product.manufacturer.eq(manufacturer))
+            .where(
+                product.in(
+                    selectDistinct(sellAt.product)
+                        .from(sellAt)
+                        .leftJoin(event).on(sellAt.product.eq(event.product))
+                        .where(
+                            productBookmarkUserEq(loginUser)
+                        ))
+            )
+            .groupBy(product)
+            .orderBy(
+                sortBy(sortBy, score, avgRating, reviewCount).toArray(
+                    OrderSpecifier[]::new))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
+
+    public Long countByUserProductBookmark(User loginUser) {
+        return queryFactory.select(product.count())
+            .from(product)
+            .leftJoin(productBookmark)
+            .on(productBookmark.product.eq(product).and(productLikeUserEq(loginUser)))
+            .where(
+                product.in(
+                    selectDistinct(sellAt.product)
+                        .from(sellAt)
+                        .leftJoin(event).on(sellAt.product.eq(event.product))
+                        .where(
+                            productBookmarkUserEq(loginUser)
                         ))
             )
             .fetchOne();

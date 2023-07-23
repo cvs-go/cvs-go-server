@@ -3,11 +3,11 @@ package com.cvsgo.dto.product;
 import lombok.Getter;
 
 @Getter
-public class ReadLikedProductRequestDto {
+public class ReadUserProductRequestDto {
 
     private final ProductSortBy sortBy;
 
-    public ReadLikedProductRequestDto(ProductSortBy sortBy) {
+    public ReadUserProductRequestDto(ProductSortBy sortBy) {
         this.sortBy = sortBy;
     }
 }
