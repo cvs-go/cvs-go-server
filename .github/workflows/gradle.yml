@@ -29,12 +29,12 @@ jobs:
         
     - name: Grant execute permission for gradlew
       run: chmod +x ./gradlew
+    
+    - name: Controller Test with Gradle
+      run: ./gradlew test --tests "com.cvsgo.controller.*"
         
     - name: Build with Gradle
       run: ./gradlew build -x test
-
-    - name: Controller Test with Gradle
-      run: ./gradlew test --tests "com.cvsgo.controller.*"
         
     - name: AWS Configure credentials
       uses: aws-actions/configure-aws-credentials@v1
