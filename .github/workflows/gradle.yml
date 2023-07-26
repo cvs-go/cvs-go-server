@@ -31,14 +31,10 @@ jobs:
       run: chmod +x ./gradlew
         
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: ./gradlew build -x test
+      run: ./gradlew build -x test
 
     - name: Controller Test with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: ./gradlew test --tests "com.cvsgo.controller.*"
+      run: ./gradlew test --tests "com.cvsgo.controller.*"
         
     - name: AWS Configure credentials
       uses: aws-actions/configure-aws-credentials@v1
