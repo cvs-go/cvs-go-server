@@ -44,11 +44,7 @@ jobs:
         aws-region: ap-northeast-2      
 
     - name: Upload to S3
-      run: aws deploy push \
-          --application-name ${{ env.CODE_DEPLOY_APPLICATION_NAME }} \
-          --ignore-hidden-files \
-          --s3-location s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip \
-          --source .
+      run: aws s3 cp ${{ env.GITHUB_SHA }}.zip s3://${{ env.S3_BUCKET_NAME }}/${{ env.GITHUB_SHA }}.zip
       
     - name: Deploy with AWS codeDeploy
       run: aws deploy create-deployment
