@@ -66,6 +66,10 @@ ext {
 	snippetsDir = file('build/generated-snippets')
 }
 
+jar {
+	enabled = false
+}
+
 bootJar {
 	enabled = true
 	dependsOn asciidoctor
