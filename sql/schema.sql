@@ -54,6 +54,15 @@ create table manufacturer (
                               primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+create table notice (
+                              id bigint not null auto_increment,
+                              title varchar(255) not null,
+                              content varchar(255) not null,
+                              created_at datetime,
+                              modified_at datetime,
+                              primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 create table product (
                          id bigint not null auto_increment,
                          created_at datetime,
