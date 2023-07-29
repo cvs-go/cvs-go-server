@@ -63,6 +63,15 @@ create table notice (
                               primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+create table notice_image (
+                              id bigint not null auto_increment,
+                              image_url varchar(255) not null,
+                              notice_id bigint not null,
+                              created_at datetime,
+                              modified_at datetime,
+                              primary key (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 create table product (
                          id bigint not null auto_increment,
                          created_at datetime,
