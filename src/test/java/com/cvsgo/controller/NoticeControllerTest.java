@@ -21,6 +21,7 @@ import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.notice.ReadNoticeDetailResponseDto;
 import com.cvsgo.dto.notice.ReadNoticeResponseDto;
 import com.cvsgo.entity.Notice;
+import com.cvsgo.entity.NoticeImage;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.NoticeService;
 import java.util.List;
@@ -89,9 +90,9 @@ class NoticeControllerTest {
     }
 
     @Test
-    @DisplayName("공지사항을 상적으로 조회하면 HTTP 200을 응답한다")
+    @DisplayName("공지사항을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_notice_successfully() throws Exception {
-        ReadNoticeDetailResponseDto responseDto = ReadNoticeDetailResponseDto.from(notice1);
+        ReadNoticeDetailResponseDto responseDto = ReadNoticeDetailResponseDto.of(notice1, List.of(noticeImage.getImageUrl()));
         given(noticeService.readNotice(any())).willReturn(responseDto);
 
         mockMvc.perform(get("/api/notices/{noticeId}", 1L)
@@ -108,6 +109,7 @@ class NoticeControllerTest {
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("공지사항 ID"),
                     fieldWithPath("data.title").type(JsonFieldType.STRING).description("공지사항 제목"),
                     fieldWithPath("data.content").type(JsonFieldType.STRING).description("공지사항 내용"),
+                    fieldWithPath("data.noticeImageUrls").type(JsonFieldType.ARRAY).description("공지사항 이미지 URL").optional(),
                     fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("공지사항 생성 시간").optional()
                 )
             ));
@@ -123,6 +125,12 @@ class NoticeControllerTest {
         .id(2L)
         .title("이벤트 공지")
         .content("이벤트 배너를 확인하세요")
+        .build();
+
+    NoticeImage noticeImage = NoticeImage.builder()
+        .id(1L)
+        .imageUrl("imageUrl")
+        .notice(notice1)
         .build();
 
 }

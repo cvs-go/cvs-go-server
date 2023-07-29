@@ -5,7 +5,9 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_NOTICE;
 import com.cvsgo.dto.notice.ReadNoticeDetailResponseDto;
 import com.cvsgo.dto.notice.ReadNoticeResponseDto;
 import com.cvsgo.entity.Notice;
+import com.cvsgo.entity.NoticeImage;
 import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.repository.NoticeImageRepository;
 import com.cvsgo.repository.NoticeRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NoticeService {
 
     private final NoticeRepository noticeRepository;
+    private final NoticeImageRepository noticeImageRepository;
 
     /**
      * 공지사항 목록을 조회한다.
@@ -40,7 +43,10 @@ public class NoticeService {
     @Transactional(readOnly = true)
     public ReadNoticeDetailResponseDto readNotice(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId).orElseThrow(() -> NOT_FOUND_NOTICE);
-        return ReadNoticeDetailResponseDto.from(notice);
+        List<String> noticeImages = noticeImageRepository.findByNotice(notice).stream()
+            .map(NoticeImage::getImageUrl).toList();
+
+        return ReadNoticeDetailResponseDto.of(notice, noticeImages);
     }
 
 }
