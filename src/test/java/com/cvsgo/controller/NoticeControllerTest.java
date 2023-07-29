@@ -3,18 +3,22 @@ package com.cvsgo.controller;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.relaxedResponseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.SharedHttpSessionConfigurer.sharedHttpSession;
 
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
+import com.cvsgo.dto.notice.ReadNoticeDetailResponseDto;
 import com.cvsgo.dto.notice.ReadNoticeResponseDto;
 import com.cvsgo.entity.Notice;
 import com.cvsgo.interceptor.AuthInterceptor;
@@ -80,6 +84,31 @@ class NoticeControllerTest {
                     fieldWithPath("data[].title").type(JsonFieldType.STRING).description("공지사항 제목"),
                     fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("공지사항 생성 시간").optional(),
                     fieldWithPath("data[].isNew").type(JsonFieldType.BOOLEAN).description("새 공지사항 여부").optional()
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("공지사항을 상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_notice_successfully() throws Exception {
+        ReadNoticeDetailResponseDto responseDto = ReadNoticeDetailResponseDto.from(notice1);
+        given(noticeService.readNotice(any())).willReturn(responseDto);
+
+        mockMvc.perform(get("/api/notices/{noticeId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("noticeId").description("공지사항 ID")
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("공지사항 ID"),
+                    fieldWithPath("data.title").type(JsonFieldType.STRING).description("공지사항 제목"),
+                    fieldWithPath("data.content").type(JsonFieldType.STRING).description("공지사항 내용"),
+                    fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("공지사항 생성 시간").optional()
                 )
             ));
     }
