@@ -39,7 +39,9 @@ public class AuthService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public AuthService(@Value("${jwt.secret-key}") final String secretKey, UserRepository userRepository, PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository) {
+    public AuthService(@Value("${jwt.secret-key}") final String secretKey,
+        UserRepository userRepository, PasswordEncoder passwordEncoder,
+        RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.refreshTokenRepository = refreshTokenRepository;
@@ -57,7 +59,8 @@ public class AuthService {
      */
     @Transactional
     public LoginResponseDto login(LoginRequestDto request) {
-        User user = userRepository.findByUserId(request.getEmail()).orElseThrow(() -> NOT_FOUND_USER);
+        User user = userRepository.findByUserId(request.getEmail())
+            .orElseThrow(() -> NOT_FOUND_USER);
         user.validatePassword(request.getPassword(), passwordEncoder);
 
         String accessToken = createAccessToken(user, key, ACCESS_TOKEN_TTL_MILLISECOND);
@@ -66,11 +69,11 @@ public class AuthService {
         refreshTokenRepository.save(refreshToken);
 
         return LoginResponseDto.builder()
-                .userId(user.getId())
-                .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
-                .tokenType(TOKEN_TYPE)
-                .build();
+            .userId(user.getId())
+            .accessToken(accessToken)
+            .refreshToken(refreshToken.getToken())
+            .tokenType(TOKEN_TYPE)
+            .build();
     }
 
     /**
@@ -81,7 +84,8 @@ public class AuthService {
      */
     @Transactional
     public void logout(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> UNAUTHORIZED_USER);
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+            .orElseThrow(() -> UNAUTHORIZED_USER);
         refreshTokenRepository.delete(refreshToken);
     }
 
@@ -94,27 +98,29 @@ public class AuthService {
      */
     @Transactional
     public ReissueTokenResponseDto reissueToken(String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByToken(token).orElseThrow(() -> UNAUTHORIZED_USER);
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+            .orElseThrow(() -> UNAUTHORIZED_USER);
         refreshToken.updateToken(key, REFRESH_TOKEN_TTL_MILLISECOND);
         refreshTokenRepository.save(refreshToken);
 
-        String accessToken = createAccessToken(refreshToken.getUser(), key, ACCESS_TOKEN_TTL_MILLISECOND);
+        String accessToken = createAccessToken(refreshToken.getUser(), key,
+            ACCESS_TOKEN_TTL_MILLISECOND);
 
         return ReissueTokenResponseDto.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken.getToken())
-                .tokenType(TOKEN_TYPE)
-                .build();
+            .accessToken(accessToken)
+            .refreshToken(refreshToken.getToken())
+            .tokenType(TOKEN_TYPE)
+            .build();
     }
 
     private String createAccessToken(User user, Key key, long ttlMillis) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
-                .setSubject(user.getUserId())
-                .setIssuedAt(new Date(now))
-                .setExpiration(new Date(now + ttlMillis))
-                .signWith(key)
-                .compact();
+            .setSubject(user.getUserId())
+            .setIssuedAt(new Date(now))
+            .setExpiration(new Date(now + ttlMillis))
+            .signWith(key)
+            .compact();
     }
 
     /**
@@ -141,9 +147,9 @@ public class AuthService {
      */
     public void validateToken(String token) {
         Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token);
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token);
     }
 
     @Transactional(readOnly = true)
@@ -152,11 +158,11 @@ public class AuthService {
             return Optional.empty();
         }
         String email = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(accessToken)
-                .getBody()
-                .getSubject();
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(accessToken)
+            .getBody()
+            .getSubject();
         return userRepository.findByUserId(email);
     }
 

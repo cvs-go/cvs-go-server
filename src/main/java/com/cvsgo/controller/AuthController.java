@@ -35,7 +35,8 @@ public class AuthController {
     }
 
     @GetMapping("/tokens")
-    public SuccessResponse<ReissueTokenResponseDto> reissueToken(@RequestHeader("Authorization") String authorizationHeader) {
+    public SuccessResponse<ReissueTokenResponseDto> reissueToken(
+        @RequestHeader("Authorization") String authorizationHeader) {
         String refreshToken = authService.extractToken(authorizationHeader, TOKEN_TYPE);
         return SuccessResponse.from(authService.reissueToken(refreshToken));
     }
