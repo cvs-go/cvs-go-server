@@ -375,3 +375,28 @@ include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_ima
 include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_images/http-request.adoc[]
 ==== Sample Response
 include::{snippets}/image-controller-test/respond_201_when_succeed_to_upload_images/http-response.adoc[]
+
+== 6. 공지사항
+=== 6-1. 공지사항 목록 조회
+==== Sample Request
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_list_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_list_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_list_successfully/http-response.adoc[]
+
+=== 6-2. 공지사항 상세 조회
+==== Path Parameters
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_successfully/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/notice-controller-test/respond_200_when_read_notice_successfully/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `404 NOT FOUND` | `NOT_FOUND_NOTICE` | 해당하는 공지사항이 없는 경우
+|===
