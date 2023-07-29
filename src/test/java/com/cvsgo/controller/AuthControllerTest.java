@@ -3,8 +3,9 @@ package com.cvsgo.controller;
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.auth.LoginRequestDto;
+import com.cvsgo.dto.auth.LoginResponseDto;
 import com.cvsgo.dto.auth.LogoutRequestDto;
-import com.cvsgo.dto.auth.TokenDto;
+import com.cvsgo.dto.auth.ReissueTokenResponseDto;
 import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.AuthService;
@@ -81,13 +82,14 @@ class AuthControllerTest {
                 .email("abc@naver.com")
                 .password("password1!")
                 .build();
-        TokenDto tokenDto = TokenDto.builder()
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+                .userId(1L)
                 .accessToken(getSampleAccessToken())
                 .refreshToken(getSampleRefreshToken())
                 .tokenType(TOKEN_TYPE)
                 .build();
 
-        given(authService.login(any())).willReturn(tokenDto);
+        given(authService.login(any())).willReturn(loginResponseDto);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,6 +105,7 @@ class AuthControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("요청 시각"),
+                                fieldWithPath("data.userId").type(JsonFieldType.NUMBER).description("사용자 ID"),
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
                                 fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
                                 fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 종류")
@@ -173,7 +176,7 @@ class AuthControllerTest {
     void respond_200_when_succeed_to_reissue_tokens() throws Exception {
 
         given(authService.reissueToken(any()))
-                .willReturn(TokenDto.builder()
+                .willReturn(ReissueTokenResponseDto.builder()
                         .accessToken(getSampleAccessToken())
                         .refreshToken(getSampleRefreshToken())
                         .tokenType(TOKEN_TYPE)

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class TokenDto {
+public class ReissueTokenResponseDto {
 
     private String accessToken;
 
@@ -15,7 +15,7 @@ public class TokenDto {
     private String tokenType;
 
     @Builder
-    public TokenDto(String accessToken, String refreshToken, String tokenType) {
+    public ReissueTokenResponseDto(String accessToken, String refreshToken, String tokenType) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.tokenType = tokenType;

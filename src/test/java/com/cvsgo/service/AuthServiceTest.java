@@ -1,7 +1,8 @@
 package com.cvsgo.service;
 
 import com.cvsgo.dto.auth.LoginRequestDto;
-import com.cvsgo.dto.auth.TokenDto;
+import com.cvsgo.dto.auth.LoginResponseDto;
+import com.cvsgo.dto.auth.ReissueTokenResponseDto;
 import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.NotFoundException;
@@ -70,10 +71,10 @@ class AuthServiceTest {
         given(userRepository.findByUserId(loginRequestDto.getEmail()))
                 .willReturn(Optional.of(user));
 
-        TokenDto tokenDto = authService.login(loginRequestDto);
+        LoginResponseDto loginResponseDto = authService.login(loginRequestDto);
 
-        assertNotNull(tokenDto.getAccessToken());
-        assertNotNull(tokenDto.getRefreshToken());
+        assertNotNull(loginResponseDto.getAccessToken());
+        assertNotNull(loginResponseDto.getRefreshToken());
 
     }
 
@@ -154,10 +155,10 @@ class AuthServiceTest {
         given(refreshTokenRepository.findByToken(anyString()))
                 .willReturn(Optional.of(refreshToken));
 
-        TokenDto tokenDto = authService.reissueToken(anyString());
+        ReissueTokenResponseDto reissueTokenResponseDto = authService.reissueToken(anyString());
 
-        assertNotNull(tokenDto.getAccessToken());
-        assertNotNull(tokenDto.getRefreshToken());
+        assertNotNull(reissueTokenResponseDto.getAccessToken());
+        assertNotNull(reissueTokenResponseDto.getRefreshToken());
         then(refreshTokenRepository).should(times(1)).findByToken(any());
     }
 

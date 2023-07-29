@@ -2,8 +2,9 @@ package com.cvsgo.controller;
 
 import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.auth.LoginRequestDto;
+import com.cvsgo.dto.auth.LoginResponseDto;
 import com.cvsgo.dto.auth.LogoutRequestDto;
-import com.cvsgo.dto.auth.TokenDto;
+import com.cvsgo.dto.auth.ReissueTokenResponseDto;
 import com.cvsgo.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public SuccessResponse<TokenDto> login(@RequestBody LoginRequestDto request) {
+    public SuccessResponse<LoginResponseDto> login(@RequestBody LoginRequestDto request) {
         return SuccessResponse.from(authService.login(request));
     }
 
@@ -34,7 +35,7 @@ public class AuthController {
     }
 
     @GetMapping("/tokens")
-    public SuccessResponse<TokenDto> reissueToken(@RequestHeader("Authorization") String authorizationHeader) {
+    public SuccessResponse<ReissueTokenResponseDto> reissueToken(@RequestHeader("Authorization") String authorizationHeader) {
         String refreshToken = authService.extractToken(authorizationHeader, TOKEN_TYPE);
         return SuccessResponse.from(authService.reissueToken(refreshToken));
     }
