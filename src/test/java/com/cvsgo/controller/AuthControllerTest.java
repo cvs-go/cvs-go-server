@@ -84,6 +84,7 @@ class AuthControllerTest {
                 .build();
         LoginResponseDto loginResponseDto = LoginResponseDto.builder()
                 .userId(1L)
+                .userNickname("닉네임")
                 .accessToken(getSampleAccessToken())
                 .refreshToken(getSampleRefreshToken())
                 .tokenType(TOKEN_TYPE)
@@ -106,6 +107,7 @@ class AuthControllerTest {
                         responseFields(
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("요청 시각"),
                                 fieldWithPath("data.userId").type(JsonFieldType.NUMBER).description("사용자 ID"),
+                                fieldWithPath("data.userNickname").type(JsonFieldType.STRING).description("사용자 닉네임"),
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
                                 fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
                                 fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 종류")

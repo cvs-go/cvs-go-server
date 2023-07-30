@@ -10,6 +10,8 @@ public class LoginResponseDto {
 
     private Long userId;
 
+    private String userNickname;
+
     private String accessToken;
 
     private String refreshToken;
@@ -17,9 +19,10 @@ public class LoginResponseDto {
     private String tokenType;
 
     @Builder
-    public LoginResponseDto(Long userId, String accessToken, String refreshToken,
+    public LoginResponseDto(Long userId, String userNickname, String accessToken, String refreshToken,
         String tokenType) {
         this.userId = userId;
+        this.userNickname = userNickname;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.tokenType = tokenType;

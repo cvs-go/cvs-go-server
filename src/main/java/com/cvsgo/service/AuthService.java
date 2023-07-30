@@ -70,6 +70,7 @@ public class AuthService {
 
         return LoginResponseDto.builder()
             .userId(user.getId())
+            .userNickname(user.getNickname())
             .accessToken(accessToken)
             .refreshToken(refreshToken.getToken())
             .tokenType(TOKEN_TYPE)
