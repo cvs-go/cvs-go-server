@@ -3,7 +3,7 @@
 
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
 
-    <property name="LOG_PATH" value="/home/ubuntu/cvs-go-server/log" />
+    <property name="LOG_PATH" value="./log" />
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %clr(%5level) %clr(%logger){cyan} : %msg%n" />
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
