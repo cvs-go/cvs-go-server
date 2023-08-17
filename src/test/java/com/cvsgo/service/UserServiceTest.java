@@ -10,8 +10,10 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
+import com.cvsgo.dto.review.ReadProductReviewResponseDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
+import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
@@ -20,10 +22,10 @@ import com.cvsgo.entity.UserTag;
 import com.cvsgo.exception.BadRequestException;
 import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
-import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
@@ -50,10 +52,10 @@ class UserServiceTest {
     private TagRepository tagRepository;
 
     @Mock
-    private UserTagRepository userTagRepository;
+    private UserFollowRepository userFollowRepository;
 
     @Mock
-    private UserFollowRepository userFollowRepository;
+    private ReviewRepository reviewRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -161,6 +163,16 @@ class UserServiceTest {
         // then
         assertFalse(result);
         then(userRepository).should(times(1)).findByNickname(nickname);
+    }
+
+    @Test
+    @DisplayName("사용자 정보를 조회한다")
+    void succeed_to_read_user() {
+        given(reviewRepository.findAllByUser(any())).willReturn(List.of(review1));
+
+        userService.readUser(user);
+
+        then(reviewRepository).should(times(1)).findAllByUser(any());
     }
 
     @Test
@@ -319,6 +331,14 @@ class UserServiceTest {
     UserTag userTag2 = UserTag.builder()
         .user(user)
         .tag(tag2)
+        .build();
+
+    Review review1 = Review.builder()
+        .user(user)
+        .build();
+
+    Review review2 = Review.builder()
+        .user(user2)
         .build();
 
     UserFollow userFollow = UserFollow.create(user2, user);
