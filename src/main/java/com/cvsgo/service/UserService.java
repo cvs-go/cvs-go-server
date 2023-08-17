@@ -10,16 +10,18 @@ import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER_FOLLOW;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
+import com.cvsgo.dto.user.UserResponseDto;
+import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
 import com.cvsgo.exception.BadRequestException;
 import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
+import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
-import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +40,9 @@ public class UserService {
 
     private final TagRepository tagRepository;
 
-    private final UserTagRepository userTagRepository;
-
     private final UserFollowRepository userFollowRepository;
+
+    private final ReviewRepository reviewRepository;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -97,6 +99,19 @@ public class UserService {
         return userRepository.findByNickname(nickname).isPresent();
     }
 
+    /**
+     * 사용자 정보를 조회한다.
+     *
+     * @param user 로그인한 사용자
+     * @return 로그인 한 사용자 상세 정보
+     */
+    @Transactional(readOnly = true)
+    public UserResponseDto readUser(User user) {
+        long reviewLikeCount = reviewRepository.findAllByUser(user)
+            .stream().mapToLong(Review::getLikeCount).sum();
+
+        return UserResponseDto.of(user, reviewLikeCount);
+    }
 
     /**
      * 사용자 정보를 수정한다.

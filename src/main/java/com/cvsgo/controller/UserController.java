@@ -2,11 +2,12 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
-import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
+import com.cvsgo.dto.user.UserResponseDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
 import com.cvsgo.service.UserService;
@@ -49,6 +50,11 @@ public class UserController {
     @GetMapping("/users/nicknames/{nickname}/exists")
     public SuccessResponse<Boolean> checkNicknameExists(@PathVariable String nickname) {
         return SuccessResponse.from(userService.isDuplicatedNickname(nickname));
+    }
+
+    @GetMapping("/user")
+    public SuccessResponse<UserResponseDto> readUser(@LoginUser User user) {
+        return SuccessResponse.from(userService.readUser(user));
     }
 
     @PutMapping("/user")
