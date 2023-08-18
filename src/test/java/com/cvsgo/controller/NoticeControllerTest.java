@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -72,7 +73,7 @@ class NoticeControllerTest {
     @DisplayName("공지사항 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_notice_list_successfully() throws Exception {
         List<ReadNoticeResponseDto> responseDto = List.of(new ReadNoticeResponseDto(notice1), new ReadNoticeResponseDto(notice2));
-        given(noticeService.readNoticeList()).willReturn(responseDto);
+        given(noticeService.readNoticeList(any())).willReturn(new PageImpl<>(responseDto));
 
         mockMvc.perform(get("/api/notices").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -81,10 +82,10 @@ class NoticeControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 relaxedResponseFields(
-                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("공지사항 ID"),
-                    fieldWithPath("data[].title").type(JsonFieldType.STRING).description("공지사항 제목"),
-                    fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("공지사항 생성 시간").optional(),
-                    fieldWithPath("data[].isNew").type(JsonFieldType.BOOLEAN).description("새 공지사항 여부").optional()
+                    fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("공지사항 ID"),
+                    fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("공지사항 제목"),
+                    fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING).description("공지사항 생성 시간").optional(),
+                    fieldWithPath("data.content[].isNew").type(JsonFieldType.BOOLEAN).description("새 공지사항 여부").optional()
                 )
             ));
     }

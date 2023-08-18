@@ -11,6 +11,8 @@ import com.cvsgo.repository.NoticeImageRepository;
 import com.cvsgo.repository.NoticeRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +30,9 @@ public class NoticeService {
      * @return 공지사항 목록
      */
     @Transactional(readOnly = true)
-    public List<ReadNoticeResponseDto> readNoticeList() {
-        List<Notice> notices = noticeRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
-        return notices.stream().map(ReadNoticeResponseDto::from).toList();
+    public Page<ReadNoticeResponseDto> readNoticeList(Pageable pageable) {
+        return noticeRepository.findAllByOrderByCreatedAtDesc(pageable)
+            .map(ReadNoticeResponseDto::from);
     }
 
     /**
