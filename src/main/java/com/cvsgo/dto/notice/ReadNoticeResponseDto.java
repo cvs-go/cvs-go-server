@@ -17,15 +17,14 @@ public class ReadNoticeResponseDto {
     @JsonFormat(pattern = "yy.MM.dd", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
 
-    private final Boolean isNew;
+    private final boolean isNew;
 
     public ReadNoticeResponseDto(Notice notice) {
         this.id = notice.getId();
         this.title = notice.getTitle();
         this.createdAt = notice.getCreatedAt();
         this.isNew = notice.getCreatedAt() != null
-            && ChronoUnit.DAYS.between(notice.getCreatedAt().toLocalDate(), LocalDate.now()) <= 7
-            ? Boolean.TRUE : Boolean.FALSE;
+            && ChronoUnit.DAYS.between(notice.getCreatedAt().toLocalDate(), LocalDate.now()) <= 7;
     }
 
     public static ReadNoticeResponseDto from(Notice notice) {
