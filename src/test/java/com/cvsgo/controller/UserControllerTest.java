@@ -40,6 +40,7 @@ import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
+import com.cvsgo.dto.user.UserResponseDto;
 import com.cvsgo.entity.BogoEvent;
 import com.cvsgo.entity.BtgoEvent;
 import com.cvsgo.entity.Category;
@@ -322,6 +323,31 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("로그인한 사용자 정보를 정상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_user_successfully() throws Exception {
+        given(userService.readUser(any())).willReturn(getUser());
+
+        mockMvc.perform(get("/api/user")
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                relaxedResponseFields(
+                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 ID").optional(),
+                    fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
+                    fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("닉네임"),
+                    fieldWithPath("data.profileImage").type(JsonFieldType.STRING).description("회원 프로필 이미지 URL").optional(),
+                    fieldWithPath("data.tags[].id").type(JsonFieldType.NUMBER).description("태그 ID"),
+                    fieldWithPath("data.tags[].name").type(JsonFieldType.STRING).description("태그 이름"),
+                    fieldWithPath("data.tags[].group").type(JsonFieldType.NUMBER).description("태그 그룹"),
+                    fieldWithPath("data.reviewLikeCount").type(JsonFieldType.NUMBER).description("리뷰 좋아요 총 합")
+                )
+            ));
+    }
+
+    @Test
     @DisplayName("회원 정보 수정에 성공하면 200을 응답한다")
     void respond_200_when_update_user_succeed() throws Exception {
         UpdateUserRequestDto request = new UpdateUserRequestDto("수정닉네임", List.of(1L, 3L),
@@ -443,7 +469,6 @@ class UserControllerTest {
             .andExpect(status().isNotFound())
             .andDo(print());
     }
-
 
     @Test
     @DisplayName("특정 회원의 좋아요 상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
@@ -629,6 +654,10 @@ class UserControllerTest {
         .convenienceStore(cvs2)
         .discountAmount(300)
         .build();
+
+    private UserResponseDto getUser() {
+        return UserResponseDto.of(createUser(), 4L);
+    }
 
     private List<ReadProductResponseDto> getProductsResponse() {
         ReadProductQueryDto productQueryDto1 = new ReadProductQueryDto(product1.getId(),

@@ -45,7 +45,15 @@ include::{snippets}/user-controller-test/respond_201_when_sign_up_succeed/respon
 ==== Sample Response
 include::{snippets}/user-controller-test/respond_201_when_sign_up_succeed/http-response.adoc[]
 
-=== 1-5. 회원 정보 수정
+=== 1-5. 회원 정보 조회
+==== Sample Request
+include::{snippets}/user-controller-test/respond_200_when_read_user_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/user-controller-test/respond_200_when_read_user_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/user-controller-test/respond_200_when_read_user_successfully/http-response.adoc[]
+
+=== 1-6. 회원 정보 수정
 ==== Request Fields
 include::{snippets}/user-controller-test/respond_200_when_update_user_succeed/request-fields.adoc[]
 ==== Sample Request
@@ -59,7 +67,7 @@ include::{snippets}/user-controller-test/respond_200_when_update_user_succeed/ht
 | `409 CONFLICT` | `DUPLICATE_NICKNAME` | 해당하는 닉네임을 가진 유저가 이미 있는 경우
 |===
 
-=== 1-6. 회원 팔로우 생성
+=== 1-7. 회원 팔로우 생성
 ==== Path Parameters
 include::{snippets}/user-controller-test/respond_201_when_create_user_follow_succeed/path-parameters.adoc[]
 ==== Sample Request
@@ -75,7 +83,7 @@ include::{snippets}/user-controller-test/respond_201_when_create_user_follow_suc
 | `409 CONFLICT` | `DUPLICATE_USER_FOLLOW` | 해당하는 유저 팔로우가 이미 있는 경우
 |===
 
-=== 1-7. 회원 팔로우 삭제
+=== 1-8. 회원 팔로우 삭제
 ==== Path Parameters
 include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_succeed/path-parameters.adoc[]
 ==== Sample Request
@@ -90,7 +98,7 @@ include::{snippets}/user-controller-test/respond_200_when_delete_user_follow_suc
 | `404 NOT FOUND` | `NOT_FOUND_USER_FOLLOW` | 해당하는 팔로우가 없는 경우
 |===
 
-=== 1-8. 특정 회원의 좋아요 상품 목록 조회
+=== 1-9. 특정 회원의 좋아요 상품 목록 조회
 ==== Path Parameters
 include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/path-parameters.adoc[]
 ==== Request Fields
@@ -110,7 +118,7 @@ include::{snippets}/user-controller-test/respond_200_when_read_liked_product_lis
 ==== Sample Response
 include::{snippets}/user-controller-test/respond_200_when_read_liked_product_list_successfully/http-response.adoc[]
 
-=== 1-9. 특정 회원의 북마크 상품 목록 조회
+=== 1-10. 특정 회원의 북마크 상품 목록 조회
 ==== Path Parameters
 include::{snippets}/user-controller-test/respond_200_when_read_bookmarked_product_list_successfully/path-parameters.adoc[]
 ==== Request Fields

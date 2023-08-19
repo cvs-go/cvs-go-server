@@ -1,5 +1,6 @@
 package com.cvsgo.repository;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cvsgo.config.TestConfig;
@@ -219,6 +220,14 @@ class ReviewRepositoryTest {
         Long totalCount = reviewRepository.countByProductIdAndFilter(product1.getId(), requestDto);
 
         assertThat(totalCount).isEqualTo(2L);
+    }
+
+    @Test
+    @DisplayName("리뷰 작성자로 리뷰를 조회한다")
+    void succeed_to_find_review_by_user() {
+        List<Review> foundReviews = reviewRepository.findAllByUser(user1);
+        assertThat(review1).isIn(foundReviews);
+        assertThat(review2).isNotIn(foundReviews);
     }
 
     private Review review1;
