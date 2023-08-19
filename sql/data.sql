@@ -14,6 +14,9 @@ insert into manufacturer (name, created_at, modified_at) values('삼각', now(),
 insert into manufacturer (name, created_at, modified_at) values('주', now(), now());
 insert into manufacturer (name, created_at, modified_at) values('도', now(), now());
 
+-- notice
+insert into notice (title, content, created_at, modified_at) values('편해 출시', '편의점 리뷰 서비스 편해가 출시되었습니다.', now(), now());
+
 -- product
 insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('진라면순한맛', 950, 0, 2, 1, now(), now());
 insert into product (name, price, version, category_id, manufacturer_id, created_at, modified_at) values ('마이쮸포도', 800, 0, 3, 2, now(), now());

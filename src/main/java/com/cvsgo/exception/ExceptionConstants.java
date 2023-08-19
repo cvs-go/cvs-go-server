@@ -18,6 +18,7 @@ public interface ExceptionConstants {
     NotFoundException NOT_FOUND_PRODUCT_BOOKMARK = new NotFoundException(ErrorCode.NOT_FOUND_PRODUCT_BOOKMARK);
     NotFoundException NOT_FOUND_REVIEW = new NotFoundException(ErrorCode.NOT_FOUND_REVIEW);
     NotFoundException NOT_FOUND_REVIEW_LIKE = new NotFoundException(ErrorCode.NOT_FOUND_REVIEW_LIKE);
+    NotFoundException NOT_FOUND_NOTICE = new NotFoundException(ErrorCode.NOT_FOUND_NOTICE);
 
     DuplicateException DUPLICATE_EMAIL = new DuplicateException(ErrorCode.DUPLICATE_EMAIL);
     DuplicateException DUPLICATE_NICKNAME = new DuplicateException(ErrorCode.DUPLICATE_NICKNAME);
