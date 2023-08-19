@@ -5,6 +5,7 @@ files:
   - source:  /
     destination: /home/ubuntu/cvs-go-server
     overwrite: yes
+file_exists_behavior: OVERWRITE
 
 permissions:
   - object: /home/ubuntu/cvs-go-server
