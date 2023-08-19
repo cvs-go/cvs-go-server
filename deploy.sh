@@ -20,4 +20,4 @@ cp $PROJECT_ROOT/build/libs/cvsgo-0.0.1-SNAPSHOT.jar $JAR_FILE
 
 # jar 파일 실행
 echo "> deploy $JAR_FILE"
-nohup java -jar $JAR_FILE &
+nohup java -jar $JAR_FILE > $PROJECT_ROOT/nohup.out 2>&1 &
