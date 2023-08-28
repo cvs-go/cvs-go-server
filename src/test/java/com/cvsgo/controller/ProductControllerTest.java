@@ -35,6 +35,7 @@ import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
+import com.cvsgo.dto.product.ReadProductLikeTagResponseDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
@@ -49,6 +50,7 @@ import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
+import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ProductService;
@@ -183,6 +185,40 @@ class ProductControllerTest {
         given(productService.readProduct(any(), any())).willThrow(NOT_FOUND_PRODUCT);
 
         mockMvc.perform(get("/api/products/{productId}", 1000L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 태그를 정상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_product_like_tags_successfully() throws Exception {
+        given(productService.readProductLikeTags(any())).willReturn(getProductLikeTagsResponse());
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/products/{productId}/tags", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("productId").description("상품 ID")
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("태그 ID").optional(),
+                    fieldWithPath("data.name").type(JsonFieldType.STRING).description("태그 이름").optional(),
+                    fieldWithPath("data.tagCount").type(JsonFieldType.NUMBER).description("태그 수").optional()
+                )
+            ));
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 태그 조회 시 해당 ID를 가진 상품이 존재하지 않으면 HTTP 404를 응답한다")
+    void respond_404_when_read_product_like_tags_but_product_does_not_exist() throws Exception {
+        given(productService.readProductLikeTags(any())).willThrow(NOT_FOUND_PRODUCT);
+
+        mockMvc.perform(get("/api/products/{productId}/tags", 1000L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andDo(print());
@@ -403,6 +439,21 @@ class ProductControllerTest {
         .name("농심")
         .build();
 
+    Tag tag1 = Tag.builder()
+        .id(1L)
+        .name("맵부심")
+        .build();
+
+    Tag tag2 = Tag.builder()
+        .id(2L)
+        .name("다이어터")
+        .build();
+
+    Tag tag3 = Tag.builder()
+        .id(3L)
+        .name("초코러버")
+        .build();
+
     Product product1 = Product.builder()
         .id(1L)
         .name("아이시스 500ml")
@@ -499,6 +550,20 @@ class ProductControllerTest {
             ConvenienceStoreEventDto.of(cvs2.getName(), discountEvent));
 
         return ReadProductDetailResponseDto.of(productDetailQueryDto, convenienceStoreEvents);
+    }
+
+    private List<ReadProductLikeTagResponseDto> getProductLikeTagsResponse() {
+        ReadProductLikeTagResponseDto productLikeTagResponseDto1 = new ReadProductLikeTagResponseDto(
+            tag1.getId(), tag1.getName(), 215L
+        );
+        ReadProductLikeTagResponseDto productLikeTagResponseDto2 = new ReadProductLikeTagResponseDto(
+            tag2.getId(), tag2.getName(), 163L
+        );
+        ReadProductLikeTagResponseDto productLikeTagResponseDto3 = new ReadProductLikeTagResponseDto(
+            tag3.getId(), tag3.getName(), 71L
+        );
+
+        return List.of(productLikeTagResponseDto1, productLikeTagResponseDto2, productLikeTagResponseDto3);
     }
 
     private ReadProductFilterResponseDto getProductFilterResponse() {

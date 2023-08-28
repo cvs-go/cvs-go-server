@@ -13,6 +13,7 @@ import static org.mockito.Mockito.times;
 
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.ProductSortBy;
+import com.cvsgo.dto.product.ReadProductLikeTagResponseDto;
 import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
@@ -27,6 +28,7 @@ import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
+import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
@@ -35,6 +37,7 @@ import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
+import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -59,6 +62,9 @@ class ProductServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @Mock
     private ProductLikeRepository productLikeRepository;
@@ -111,6 +117,29 @@ class ProductServiceTest {
         assertThrows(NotFoundException.class, () -> productService.readProduct(user, 1000L));
 
         then(productRepository).should(times(1)).findByProductId(any(), any());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 상위 태그 3개를 정상적으로 조회한다")
+    void succeed_to_read_product_like_tags() {
+        given(productRepository.findById(any())).willReturn(Optional.of(product1));
+        given(tagRepository.findTop3ByProduct(any())).willReturn(getProductLikeTagsResponse());
+
+        List<ReadProductLikeTagResponseDto> result = productService.readProductLikeTags(product1.getId());
+        assertThat(result).hasSize(3);
+
+        then(productRepository).should(times(1)).findById(any());
+        then(tagRepository).should(times(1)).findTop3ByProduct(any());
+    }
+
+    @Test
+    @DisplayName("상품 좋아요 상위 태그 조회 시 존재하지 않는 상품이면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_read_product_like_tags_but_product_does_not_exist() {
+        given(productRepository.findById(any())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> productService.readProductLikeTags(1000L));
+
+        then(productRepository).should(times(1)).findById(any());
     }
 
     @Test
@@ -348,6 +377,21 @@ class ProductServiceTest {
         then(userRepository).should(times(1)).findById(any());
     }
 
+    Tag tag1 = Tag.builder()
+        .id(1L)
+        .name("맵부심")
+        .build();
+
+    Tag tag2 = Tag.builder()
+        .id(2L)
+        .name("다이어터")
+        .build();
+
+    Tag tag3 = Tag.builder()
+        .id(3L)
+        .name("초코러버")
+        .build();
+
     Category category1 = Category.builder()
         .id(1L)
         .name("아이스크림")
@@ -424,6 +468,19 @@ class ProductServiceTest {
 
     private List<ConvenienceStoreEventQueryDto> getCvsEventList() {
         return List.of(cvsEvent1, cvsEvent2, cvsEvent3);
+    }
+
+    private List<ReadProductLikeTagResponseDto> getProductLikeTagsResponse() {
+        ReadProductLikeTagResponseDto productLikeTagResponseDto1 = new ReadProductLikeTagResponseDto(
+            tag1.getId(), tag1.getName(), 215L
+        );
+        ReadProductLikeTagResponseDto productLikeTagResponseDto2 = new ReadProductLikeTagResponseDto(
+            tag2.getId(), tag2.getName(), 163L
+        );
+        ReadProductLikeTagResponseDto productLikeTagResponseDto3 = new ReadProductLikeTagResponseDto(
+            tag3.getId(), tag3.getName(), 71L
+        );
+        return List.of(productLikeTagResponseDto1, productLikeTagResponseDto2, productLikeTagResponseDto3);
     }
 
 }
