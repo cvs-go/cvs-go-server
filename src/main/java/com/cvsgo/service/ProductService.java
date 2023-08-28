@@ -12,6 +12,7 @@ import com.cvsgo.dto.product.ConvenienceStoreDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ConvenienceStoreEventQueryDto;
 import com.cvsgo.dto.product.EventTypeDto;
+import com.cvsgo.dto.product.ReadProductLikeTagResponseDto;
 import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductDetailQueryDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
@@ -31,6 +32,7 @@ import com.cvsgo.repository.ConvenienceStoreRepository;
 import com.cvsgo.repository.ProductBookmarkRepository;
 import com.cvsgo.repository.ProductLikeRepository;
 import com.cvsgo.repository.ProductRepository;
+import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserRepository;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +52,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ConvenienceStoreRepository convenienceStoreRepository;
+    private final TagRepository tagRepository;
     private final ProductLikeRepository productLikeRepository;
     private final ProductBookmarkRepository productBookmarkRepository;
     private final UserRepository userRepository;
@@ -87,6 +90,21 @@ public class ProductService {
             productId);
         return ReadProductDetailResponseDto.of(product,
             getConvenienceStoreEvents(convenienceStoreEvents));
+    }
+
+    /**
+     * 상품 ID를 통해 특정 상품에 좋아요 한 유저의 상위 3개 태그를 조회한다.
+     *
+     * @param productId 상품 ID
+     * @return 태그 정보
+     * @throws NotFoundException 해당하는 아이디를 가진 상품이 없는 경우
+     */
+    @Transactional(readOnly = true)
+    public List<ReadProductLikeTagResponseDto> readProductLikeTags(Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> NOT_FOUND_PRODUCT);
+
+        return tagRepository.findTop3ByProduct(product);
     }
 
     /**
