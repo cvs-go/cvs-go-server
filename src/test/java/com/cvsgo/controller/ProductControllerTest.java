@@ -106,7 +106,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("상품 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_product_list_successfully() throws Exception {
-        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE,
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE, false,
             List.of(1L), List.of(1L), List.of(EventType.BOGO), 0, 10000, "500");
 
         Page<ReadProductResponseDto> responseDto = new PageImpl<>(getProductsResponse());
@@ -122,6 +122,7 @@ class ProductControllerTest {
                 getDocumentResponse(),
                 requestFields(
                     fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional(),
+                    fieldWithPath("isEvent").type(JsonFieldType.BOOLEAN).description("행사 상품 여부"),
                     fieldWithPath("convenienceStoreIds").type(JsonFieldType.ARRAY).description("편의점 ID 리스트"),
                     fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("제품 카테고리 ID 리스트"),
                     fieldWithPath("eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),

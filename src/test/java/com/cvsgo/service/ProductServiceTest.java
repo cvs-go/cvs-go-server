@@ -76,7 +76,7 @@ class ProductServiceTest {
     @DisplayName("상품 목록을 정상적으로 조회한다")
     void succeed_to_read_product_list() {
         Pageable pageable = PageRequest.of(0, 20);
-        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE,
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE, false,
             List.of(1L), List.of(1L), List.of(EventType.BOGO), 0, 10000, null);
 
         given(productRepository.findAllByFilter(any(), any(), any())).willReturn(getProductList());
