@@ -2,12 +2,14 @@ package com.cvsgo.controller;
 
 import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
+import com.cvsgo.dto.product.ReadProductLikeTagResponseDto;
 import com.cvsgo.dto.product.ReadProductDetailResponseDto;
 import com.cvsgo.dto.product.ReadProductFilterResponseDto;
 import com.cvsgo.dto.product.ReadProductRequestDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -40,6 +42,12 @@ public class ProductController {
     public SuccessResponse<ReadProductDetailResponseDto> readProduct(@LoginUser User user,
         @PathVariable Long productId) {
         return SuccessResponse.from(productService.readProduct(user, productId));
+    }
+
+    @GetMapping("/{productId}/tags")
+    public SuccessResponse<List<ReadProductLikeTagResponseDto>> readProductLikeTags(
+        @PathVariable Long productId) {
+        return SuccessResponse.from(productService.readProductLikeTags(productId));
     }
 
     @PostMapping("/{productId}/likes")

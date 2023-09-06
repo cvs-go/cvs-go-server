@@ -210,7 +210,23 @@ include::{snippets}/product-controller-test/respond_200_when_read_product_succes
 | `404 NOT FOUND` | `NOT_FOUND_PRODUCT` | 해당하는 상품이 없는 경우
 |===
 
-=== 3-4. 상품 좋아요 생성
+=== 3-4. 특정 상품 좋아요 태그 조회
+==== Path Parameters
+include::{snippets}/product-controller-test/respond_200_when_read_product_like_tags_successfully/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/product-controller-test/respond_200_when_read_product_like_tags_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/product-controller-test/respond_200_when_read_product_like_tags_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/product-controller-test/respond_200_when_read_product_like_tags_successfully/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `404 NOT FOUND` | `NOT_FOUND_PRODUCT` | 해당하는 상품이 없는 경우
+|===
+
+=== 3-5. 상품 좋아요 생성
 ==== Path Parameters
 include::{snippets}/product-controller-test/respond_201_when_create_product_like_succeed/path-parameters.adoc[]
 ==== Sample Request
@@ -225,7 +241,7 @@ include::{snippets}/product-controller-test/respond_201_when_create_product_like
 | `409 CONFLICT` | `DUPLICATE_PRODUCT_LIKE` | 해당하는 상품 좋아요가 이미 있는 경우
 |===
 
-=== 3-5. 상품 좋아요 삭제
+=== 3-6. 상품 좋아요 삭제
 ==== Path Parameters
 include::{snippets}/product-controller-test/respond_200_when_delete_product_like_succeed/path-parameters.adoc[]
 ==== Sample Request
@@ -240,7 +256,7 @@ include::{snippets}/product-controller-test/respond_200_when_delete_product_like
 | `404 NOT FOUND` | `NOT_FOUND_PRODUCT_LIKE` | 해당하는 상품 좋아요가 없는 경우
 |===
 
-=== 3-6. 상품 북마크 생성
+=== 3-7. 상품 북마크 생성
 ==== Path Parameters
 include::{snippets}/product-controller-test/respond_201_when_create_product_bookmark_succeed/path-parameters.adoc[]
 ==== Sample Request
@@ -255,7 +271,7 @@ include::{snippets}/product-controller-test/respond_201_when_create_product_book
 | `409 CONFLICT` | `DUPLICATE_PRODUCT_BOOKMARK` | 해당하는 상품 북마크가 이미 있는 경우
 |===
 
-=== 3-7. 상품 북마크 삭제
+=== 3-8. 상품 북마크 삭제
 ==== Path Parameters
 include::{snippets}/product-controller-test/respond_200_when_delete_product_bookmark_succeed/path-parameters.adoc[]
 ==== Sample Request
