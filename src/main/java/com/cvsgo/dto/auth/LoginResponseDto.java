@@ -10,21 +10,11 @@ public class LoginResponseDto {
 
     private Long userId;
 
-    private String userNickname;
-
-    private String accessToken;
-
-    private String refreshToken;
-
-    private String tokenType;
+    private TokenDto token;
 
     @Builder
-    public LoginResponseDto(Long userId, String userNickname, String accessToken, String refreshToken,
-        String tokenType) {
+    public LoginResponseDto(Long userId, TokenDto token) {
         this.userId = userId;
-        this.userNickname = userNickname;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.tokenType = tokenType;
+        this.token = token;
     }
 }

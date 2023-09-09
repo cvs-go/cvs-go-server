@@ -8,7 +8,7 @@ import static com.cvsgo.util.AuthConstants.TOKEN_TYPE;
 
 import com.cvsgo.dto.auth.LoginRequestDto;
 import com.cvsgo.dto.auth.LoginResponseDto;
-import com.cvsgo.dto.auth.ReissueTokenResponseDto;
+import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.NotFoundException;
@@ -66,14 +66,17 @@ public class AuthService {
         String accessToken = createAccessToken(user, key, ACCESS_TOKEN_TTL_MILLISECOND);
         RefreshToken refreshToken = RefreshToken.create(user, key, REFRESH_TOKEN_TTL_MILLISECOND);
 
+        TokenDto token = TokenDto.builder()
+            .accessToken(accessToken)
+            .refreshToken(refreshToken.getToken())
+            .tokenType(TOKEN_TYPE)
+            .build();
+
         refreshTokenRepository.save(refreshToken);
 
         return LoginResponseDto.builder()
             .userId(user.getId())
-            .userNickname(user.getNickname())
-            .accessToken(accessToken)
-            .refreshToken(refreshToken.getToken())
-            .tokenType(TOKEN_TYPE)
+            .token(token)
             .build();
     }
 
@@ -98,7 +101,7 @@ public class AuthService {
      * @throws UnauthorizedException 토큰이 유효하지 않은 경우
      */
     @Transactional
-    public ReissueTokenResponseDto reissueToken(String token) {
+    public TokenDto reissueToken(String token) {
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
             .orElseThrow(() -> UNAUTHORIZED_USER);
         refreshToken.updateToken(key, REFRESH_TOKEN_TTL_MILLISECOND);
@@ -107,7 +110,7 @@ public class AuthService {
         String accessToken = createAccessToken(refreshToken.getUser(), key,
             ACCESS_TOKEN_TTL_MILLISECOND);
 
-        return ReissueTokenResponseDto.builder()
+        return TokenDto.builder()
             .accessToken(accessToken)
             .refreshToken(refreshToken.getToken())
             .tokenType(TOKEN_TYPE)
