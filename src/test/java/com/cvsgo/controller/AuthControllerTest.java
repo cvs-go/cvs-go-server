@@ -3,6 +3,7 @@ package com.cvsgo.controller;
 import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.auth.LoginRequestDto;
+import com.cvsgo.dto.auth.LoginResponseDto;
 import com.cvsgo.dto.auth.LogoutRequestDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.exception.ExceptionConstants;
@@ -81,13 +82,17 @@ class AuthControllerTest {
                 .email("abc@naver.com")
                 .password("password1!")
                 .build();
-        TokenDto tokenDto = TokenDto.builder()
-                .accessToken(getSampleAccessToken())
-                .refreshToken(getSampleRefreshToken())
-                .tokenType(TOKEN_TYPE)
-                .build();
+        TokenDto token = TokenDto.builder()
+            .accessToken(getSampleAccessToken())
+            .refreshToken(getSampleRefreshToken())
+            .tokenType(TOKEN_TYPE)
+            .build();
+        LoginResponseDto loginResponseDto = LoginResponseDto.builder()
+            .userId(1L)
+            .token(token)
+            .build();
 
-        given(authService.login(any())).willReturn(tokenDto);
+        given(authService.login(any())).willReturn(loginResponseDto);
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,9 +108,10 @@ class AuthControllerTest {
                         ),
                         responseFields(
                                 fieldWithPath("timestamp").type(JsonFieldType.STRING).description("요청 시각"),
-                                fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
-                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
-                                fieldWithPath("data.tokenType").type(JsonFieldType.STRING).description("토큰 종류")
+                                fieldWithPath("data.userId").type(JsonFieldType.NUMBER).description("사용자 ID"),
+                                fieldWithPath("data.token.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
+                                fieldWithPath("data.token.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
+                                fieldWithPath("data.token.tokenType").type(JsonFieldType.STRING).description("토큰 종류")
                         )
                 ));
     }

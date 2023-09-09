@@ -1,6 +1,7 @@
 package com.cvsgo.service;
 
 import com.cvsgo.dto.auth.LoginRequestDto;
+import com.cvsgo.dto.auth.LoginResponseDto;
 import com.cvsgo.dto.auth.TokenDto;
 import com.cvsgo.entity.RefreshToken;
 import com.cvsgo.entity.User;
@@ -70,10 +71,10 @@ class AuthServiceTest {
         given(userRepository.findByUserId(loginRequestDto.getEmail()))
                 .willReturn(Optional.of(user));
 
-        TokenDto tokenDto = authService.login(loginRequestDto);
+        LoginResponseDto loginResponseDto = authService.login(loginRequestDto);
 
-        assertNotNull(tokenDto.getAccessToken());
-        assertNotNull(tokenDto.getRefreshToken());
+        assertNotNull(loginResponseDto.getToken().getAccessToken());
+        assertNotNull(loginResponseDto.getToken().getRefreshToken());
 
     }
 
