@@ -52,9 +52,9 @@ public class UserController {
         return SuccessResponse.from(userService.isDuplicatedNickname(nickname));
     }
 
-    @GetMapping("/user")
-    public SuccessResponse<UserResponseDto> readUser(@LoginUser User user) {
-        return SuccessResponse.from(userService.readUser(user));
+    @GetMapping("/users/{userId}")
+    public SuccessResponse<UserResponseDto> readUser(@PathVariable Long userId) {
+        return SuccessResponse.from(userService.readUser(userId));
     }
 
     @PutMapping("/user")

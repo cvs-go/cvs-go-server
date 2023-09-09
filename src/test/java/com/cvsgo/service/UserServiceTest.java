@@ -168,11 +168,24 @@ class UserServiceTest {
     @Test
     @DisplayName("사용자 정보를 조회한다")
     void succeed_to_read_user() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
         given(reviewRepository.findAllByUser(any())).willReturn(List.of(review1));
 
-        userService.readUser(user);
+        userService.readUser(user.getId());
 
+        then(userRepository).should(times(1)).findById(user.getId());
         then(reviewRepository).should(times(1)).findAllByUser(any());
+    }
+
+    @Test
+    @DisplayName("사용자 정보 조회 시 해당하는 아이디를 가진 사용자가 없으면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_read_user_but_user_does_not_exist() {
+        final Long userId = 10000L;
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.readUser(userId));
+        then(userRepository).should(times(1)).findById(anyLong());
     }
 
     @Test

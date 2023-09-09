@@ -46,6 +46,8 @@ include::{snippets}/user-controller-test/respond_201_when_sign_up_succeed/respon
 include::{snippets}/user-controller-test/respond_201_when_sign_up_succeed/http-response.adoc[]
 
 === 1-5. 회원 정보 조회
+==== Path Parameters
+include::{snippets}/user-controller-test/respond_200_when_read_user_successfully/path-parameters.adoc[]
 ==== Sample Request
 include::{snippets}/user-controller-test/respond_200_when_read_user_successfully/http-request.adoc[]
 ==== Response Fields
