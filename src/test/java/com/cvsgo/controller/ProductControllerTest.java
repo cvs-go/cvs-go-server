@@ -122,7 +122,7 @@ class ProductControllerTest {
                 getDocumentResponse(),
                 requestFields(
                     fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional(),
-                    fieldWithPath("isEvent").type(JsonFieldType.BOOLEAN).description("행사 상품 여부"),
+                    fieldWithPath("isEvent").type(JsonFieldType.BOOLEAN).description("행사 상품만 조회할지 여부"),
                     fieldWithPath("convenienceStoreIds").type(JsonFieldType.ARRAY).description("편의점 ID 리스트"),
                     fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("제품 카테고리 ID 리스트"),
                     fieldWithPath("eventTypes").type(JsonFieldType.ARRAY).description("이벤트타입 리스트"),
