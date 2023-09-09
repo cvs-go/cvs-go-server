@@ -71,6 +71,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         .from(sellAt)
                         .leftJoin(event).on(sellAt.product.eq(event.product))
                         .where(
+                            isEvent(searchFilter.getIsEvent()),
                             convenienceStoreEq(searchFilter.getConvenienceStoreIds()),
                             eventTypeEq(searchFilter.getEventTypes()),
                             categoryEq(searchFilter.getCategoryIds()),
@@ -99,6 +100,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
                         .from(sellAt)
                         .leftJoin(event).on(sellAt.product.eq(event.product))
                         .where(
+                            isEvent(searchFilter.getIsEvent()),
                             convenienceStoreEq(searchFilter.getConvenienceStoreIds()),
                             eventTypeEq(searchFilter.getEventTypes()),
                             categoryEq(searchFilter.getCategoryIds()),
@@ -347,6 +349,10 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
 
     private BooleanExpression priceGreaterOrEqual(Integer lowestPrice) {
         return lowestPrice != null ? product.price.goe(lowestPrice) : null;
+    }
+
+    private BooleanExpression isEvent(Boolean isEvent) {
+        return isEvent != null && isEvent ? event.product.isNotNull() : null;
     }
 
     private BooleanBuilder searchKeyword(String keyword,

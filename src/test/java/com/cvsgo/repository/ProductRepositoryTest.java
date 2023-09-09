@@ -69,19 +69,6 @@ class ProductRepositoryTest {
     @Autowired
     ProductBookmarkRepository productBookmarkRepository;
 
-    User user1;
-    User user2;
-    Category category1;
-    Category category2;
-    Product product1;
-    Product product2;
-    BogoEvent bogoEvent;
-    BtgoEvent btgoEvent;
-    DiscountEvent discountEvent;
-    Review review1;
-    Review review2;
-    Review review3;
-
     @BeforeEach
     void initData() {
         user1 = User.create("abc@naver.com", "password1!", "닉네임", new ArrayList<>());
@@ -108,14 +95,19 @@ class ProductRepositoryTest {
             .category(category1)
             .manufacturer(manufacturer)
             .build();
-
         product2 = Product.builder()
             .name("상품2")
             .price(5000)
             .category(category1)
             .manufacturer(manufacturer)
             .build();
-        productRepository.saveAll(List.of(product1, product2));
+        product3 = Product.builder()
+            .name("이벤트 안하는 상품")
+            .price(500)
+            .category(category1)
+            .manufacturer(manufacturer)
+            .build();
+        productRepository.saveAll(List.of(product1, product2, product3));
 
         ConvenienceStore cvs = ConvenienceStore.builder()
             .name("GS25")
@@ -200,7 +192,7 @@ class ProductRepositoryTest {
     @DisplayName("상품 목록을 조회한다")
     void succeed_to_find_all_by_filter() {
         // given
-        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(null, false, null,
             null, null, 0, 1000, null);
 
         ReadProductQueryDto productResponse1 = new ReadProductQueryDto(product1.getId(),
@@ -226,7 +218,7 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("랭킹 내림차순으로 정렬하여 특정 상품을 조회하면 첫번째 상품 랭킹이 마지막 상품 랭킹보다 크거나 같아야 한다")
     void score_of_first_product_should_greater_than_or_equal_to_score_of_last_product_when_sorted_by_score_descending_order() {
-        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.SCORE, false, null,
             null, null, 0, 10000, null);
 
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
@@ -239,7 +231,7 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("별점 내림차순으로 정렬하여 특정 상품을 조회하면 첫번째 상품 평균 별점이 마지막 상품 평균 별점보다 크거나 같아야 한다")
     void rating_of_first_product_should_greater_than_or_equal_to_rating_of_last_product_when_sorted_by_rating_descending_order() {
-        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.RATING, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.RATING, false, null,
             null, null, 0, 1000, null);
 
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
@@ -252,7 +244,7 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("리뷰순으로 정렬하여 특정 상품을 조회하면 첫번째 상품의 리뷰 개수가 마지막 상품의 리뷰 개수보다 크거나 같아야 한다")
     void review_count_of_first_product_should_greater_than_or_equal_to_review_count_of_last_product_when_sorted_by_review_count_descending_order() {
-        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.REVIEW_COUNT, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(ProductSortBy.REVIEW_COUNT, false, null,
             null, null, 0, 1000, null);
 
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
@@ -263,10 +255,27 @@ class ProductRepositoryTest {
     }
 
     @Test
+    @DisplayName("이벤트 여부 필터를 적용하면 행사 상품만 조회된다 ")
+    void succeed_to_find_product_by_is_event_filter() {
+        ReadProductRequestDto request = new ReadProductRequestDto(null, false, null,
+            null, null, 0, 10000, null);
+
+        List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
+            PageRequest.of(0, 20));
+
+        assertThat(foundProducts).hasSize(2);
+        List<Long> foundProductIds = foundProducts.stream().map(ReadProductQueryDto::getProductId)
+            .toList();
+        assertThat(product1.getId()).isIn(foundProductIds);
+        assertThat(product2.getId()).isIn(foundProductIds);
+        assertThat(product3.getId()).isNotIn(foundProductIds);
+    }
+
+    @Test
     @DisplayName("카테고리 필터를 적용하여 특정 상품을 조회하면 해당하는 상품들만 조회된다 ")
     void succeed_to_find_product_by_category_filter() {
         Long categoryId = category1.getId();
-        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(null, false, null,
             List.of(categoryId), null, 0, 1000, null);
 
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
@@ -280,7 +289,7 @@ class ProductRepositoryTest {
     @DisplayName("이벤트 타입 필터를 적용하여 특정 상품을 조회하면 해당하는 상품들만 조회된다 ")
     void succeed_to_find_product_by_event_type_filter() {
         EventType eventType = EventType.BOGO;
-        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(null, false, null,
             null, List.of(eventType), 0, 1000, null);
 
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
@@ -293,7 +302,7 @@ class ProductRepositoryTest {
     @DisplayName("키워드를 입력하여 특정 상품을 조회하면 해당하는 상품들만 조회된다 ")
     void succeed_to_find_product_by_keyword_filter() {
         String keyword = "상품1";
-        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(null, false, null,
             null, null, 0, 1000, keyword);
 
         List<ReadProductQueryDto> foundProducts = productRepository.findAllByFilter(user1, request,
@@ -306,7 +315,7 @@ class ProductRepositoryTest {
     @DisplayName("상품 목록 요소의 전체 개수를 조회한다")
     void succeed_to_count_by_filter() {
         // given
-        ReadProductRequestDto request = new ReadProductRequestDto(null, null,
+        ReadProductRequestDto request = new ReadProductRequestDto(null, false, null,
             null, null, 0, 1000, null);
 
         // when
@@ -447,5 +456,19 @@ class ProductRepositoryTest {
         assertThat(product1CvsEvent2.getEvent()).isIn(
             foundProducts.stream().map(ConvenienceStoreEventQueryDto::getEvent).toList());
     }
+
+    User user1;
+    User user2;
+    Category category1;
+    Category category2;
+    Product product1;
+    Product product2;
+    Product product3;
+    BogoEvent bogoEvent;
+    BtgoEvent btgoEvent;
+    DiscountEvent discountEvent;
+    Review review1;
+    Review review2;
+    Review review3;
 
 }
