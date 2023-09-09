@@ -102,11 +102,13 @@ public class UserService {
     /**
      * 사용자 정보를 조회한다.
      *
-     * @param user 로그인한 사용자
-     * @return 로그인 한 사용자 상세 정보
+     * @param userId 조회할 사용자 ID
+     * @return 사용자 상세 정보
      */
     @Transactional(readOnly = true)
-    public UserResponseDto readUser(User user) {
+    public UserResponseDto readUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+
         long reviewLikeCount = reviewRepository.findAllByUser(user)
             .stream().mapToLong(Review::getLikeCount).sum();
 

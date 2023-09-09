@@ -323,17 +323,20 @@ class UserControllerTest {
     }
 
     @Test
-    @DisplayName("로그인한 사용자 정보를 정상적으로 조회하면 HTTP 200을 응답한다")
+    @DisplayName("사용자 정보를 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_user_successfully() throws Exception {
         given(userService.readUser(any())).willReturn(getUser());
 
-        mockMvc.perform(get("/api/user")
+        mockMvc.perform(get("/api/users/{userId}", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print())
             .andDo(document(documentIdentifier,
                 getDocumentRequest(),
                 getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userId").description("조회할 회원 ID")
+                ),
                 relaxedResponseFields(
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 ID").optional(),
                     fieldWithPath("data.email").type(JsonFieldType.STRING).description("이메일"),
