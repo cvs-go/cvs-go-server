@@ -10,7 +10,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-import com.cvsgo.dto.review.ReadProductReviewResponseDto;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
 import com.cvsgo.entity.Review;
@@ -26,6 +25,7 @@ import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
+import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +50,9 @@ class UserServiceTest {
 
     @Mock
     private TagRepository tagRepository;
+
+    @Mock
+    private UserTagRepository userTagRepository;
 
     @Mock
     private UserFollowRepository userFollowRepository;
@@ -310,6 +313,30 @@ class UserServiceTest {
         then(userFollowRepository).should(times(1)).findByUserAndFollower(any(), any());
     }
 
+    @Test
+    @DisplayName("태그 매칭률을 조회한다")
+    void succeed_to_read_user_tag_match_percentage() {
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user2));
+        given(userTagRepository.findAllByUser(any())).willReturn(List.of(userTag1, userTag2));
+        given(userTagRepository.findAllByUser(any())).willReturn(List.of(userTag3, userTag4));
+
+        userService.readUserTagMatchPercentage(user, user2.getId());
+
+        then(userRepository).should(times(1)).findById(user2.getId());
+        then(userTagRepository).should(times(2)).findAllByUser(any());
+    }
+
+    @Test
+    @DisplayName("태그 매칭률 조회 시 해당하는 아이디를 가진 사용자가 없으면 NotFoundException이 발생한다")
+    void should_throw_NotFoundException_when_read_user_tag_match_percentage_but_user_does_not_exist() {
+        final Long userId = 10000L;
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.readUserTagMatchPercentage(user, userId));
+        then(userRepository).should(times(1)).findById(anyLong());
+    }
+
     User user = User.builder()
         .id(1L)
         .userId("abc@naver.com")
@@ -336,6 +363,12 @@ class UserServiceTest {
         .group(2)
         .build();
 
+    Tag tag3 = Tag.builder()
+        .id(5L)
+        .name("다이어터")
+        .group(4)
+        .build();
+
     UserTag userTag1 = UserTag.builder()
         .user(user)
         .tag(tag1)
@@ -343,7 +376,17 @@ class UserServiceTest {
 
     UserTag userTag2 = UserTag.builder()
         .user(user)
+        .tag(tag3)
+        .build();
+
+    UserTag userTag3 = UserTag.builder()
+        .user(user2)
         .tag(tag2)
+        .build();
+
+    UserTag userTag4 = UserTag.builder()
+        .user(user2)
+        .tag(tag3)
         .build();
 
     Review review1 = Review.builder()
