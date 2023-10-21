@@ -15,7 +15,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, ReviewCus
 
     boolean existsByProductAndUser(Product product, User user);
 
-    long countByUser(User user);
+    Long countByUser(User user);
 
     @Lock(LockModeType.OPTIMISTIC)
     @Query(value = "select p from Review p where p.id = :id")

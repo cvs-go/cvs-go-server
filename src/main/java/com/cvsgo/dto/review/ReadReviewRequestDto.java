@@ -1,7 +1,5 @@
 package com.cvsgo.dto.review;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import java.util.List;
 import lombok.Getter;
 

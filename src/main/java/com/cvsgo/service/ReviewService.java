@@ -6,6 +6,7 @@ import static com.cvsgo.exception.ExceptionConstants.FORBIDDEN_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_PRODUCT;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW;
 import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_REVIEW_LIKE;
+import static com.cvsgo.exception.ExceptionConstants.NOT_FOUND_USER;
 
 import com.cvsgo.dto.review.CreateReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
@@ -14,7 +15,10 @@ import com.cvsgo.dto.review.ReadProductReviewResponseDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewResponseDto;
+import com.cvsgo.dto.review.ReadUserReviewQueryDto;
+import com.cvsgo.dto.review.ReadUserReviewResponseDto;
 import com.cvsgo.dto.review.ReviewDto;
+import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.Review;
@@ -31,6 +35,7 @@ import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewLikeRepository;
 import com.cvsgo.repository.ReviewRepository;
+import com.cvsgo.repository.UserRepository;
 import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
@@ -60,6 +65,8 @@ public class ReviewService {
     private final ReviewLikeRepository reviewLikeRepository;
 
     private final EntityManager entityManager;
+
+    private final UserRepository userRepository;
 
     /**
      * 리뷰를 추가합니다.
@@ -179,6 +186,42 @@ public class ReviewService {
             reviewDto -> ReadProductReviewResponseDto.of(reviewDto, user,
                 getReviewImages(reviewDto.getReviewId(), reviewImages),
                 getUserTags(reviewDto.getReviewerId(), userTags))).toList();
+
+        return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    /**
+     * 특정 사용자가 작성한 리뷰를 조회합니다
+     *
+     * @param loginUser 로그인한 사용자
+     * @param userId    사용자 ID
+     * @param sortBy    정렬 정보
+     * @param pageable  페이지 정보
+     * @return 리뷰 목록
+     */
+    @Transactional(readOnly = true)
+    public Page<ReadUserReviewResponseDto> readUserReviewList(User loginUser, Long userId,
+        ReviewSortBy sortBy, Pageable pageable) {
+        if (loginUser == null || loginUser.getRole() != Role.REGULAR) {
+            if (pageable.getPageNumber() > 0) {
+                throw FORBIDDEN_REVIEW;
+            } else {
+                pageable = PageRequest.of(pageable.getPageNumber(), 5);
+            }
+        }
+
+        User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+        List<ReadUserReviewQueryDto> reviews = reviewRepository.findAllByUser(loginUser, user,
+            sortBy, pageable);
+
+        long totalCount = reviewRepository.countByUser(user);
+
+        List<ReviewImage> reviewImages = reviewImageRepository.findByReviewIdIn(
+            reviews.stream().map(ReadUserReviewQueryDto::getReviewId).distinct().toList());
+
+        List<ReadUserReviewResponseDto> results = reviews.stream().map(
+            reviewDto -> ReadUserReviewResponseDto.of(reviewDto,
+                getReviewImages(reviewDto.getReviewId(), reviewImages))).toList();
 
         return new PageImpl<>(results, pageable, totalCount);
     }

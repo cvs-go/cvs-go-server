@@ -11,9 +11,11 @@ import static com.querydsl.jpa.JPAExpressions.selectDistinct;
 
 import com.cvsgo.dto.review.QReadProductReviewQueryDto;
 import com.cvsgo.dto.review.QReadReviewQueryDto;
+import com.cvsgo.dto.review.QReadUserReviewQueryDto;
 import com.cvsgo.dto.review.ReadProductReviewQueryDto;
 import com.cvsgo.dto.review.ReadProductReviewRequestDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
+import com.cvsgo.dto.review.ReadUserReviewQueryDto;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
 import com.cvsgo.entity.User;
@@ -106,6 +108,38 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
             .fetch();
     }
 
+    public List<ReadUserReviewQueryDto> findAllByUser(User loginUser, User reviewer,
+        ReviewSortBy sortBy, Pageable pageable) {
+        return queryFactory.select(new QReadUserReviewQueryDto(
+                review.id,
+                product.id,
+                product.name,
+                product.manufacturer.name,
+                product.imageUrl,
+                review.user.id,
+                review.user.nickname,
+                review.user.profileImageUrl,
+                review.likeCount,
+                review.rating,
+                review.content,
+                review.createdAt,
+                reviewLike,
+                productBookmark))
+            .from(review)
+            .join(user).on(user.eq(review.user))
+            .join(product).on(review.product.eq(product))
+            .leftJoin(reviewLike).on(reviewLike.review.eq(review).and(reviewLikeUserEq(reviewer)))
+            .leftJoin(productBookmark)
+            .on(productBookmark.product.eq(review.product).and(productBookmarkUserEq(loginUser)))
+            .where(
+                review.user.eq(reviewer)
+            )
+            .orderBy(sortBy(sortBy))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
+
     public Long countByProductIdAndFilter(Long productId, ReadProductReviewRequestDto filter) {
         return queryFactory.select(review.count())
             .from(review)
@@ -115,6 +149,17 @@ public class ReviewCustomRepositoryImpl implements ReviewCustomRepository {
                 review.product.id.eq(productId),
                 ratingIn(filter.getRatings()),
                 userIn(filter.getTagIds())
+            )
+            .fetchOne();
+    }
+
+    public Long countByUser(User reviewer) {
+        return queryFactory.select(review.count())
+            .from(review)
+            .join(user).on(user.eq(review.user))
+            .join(product).on(review.product.eq(product))
+            .where(
+                review.user.eq(reviewer)
             )
             .fetchOne();
     }
