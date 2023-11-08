@@ -38,7 +38,7 @@ Java17, Spring Boot 3.0.0, Gradle, JPA, MariaDB, GitHub Actions, AWS S3, AWS RDS
 
 ## ☁️ API 문서
 
-http://15.164.110.225:8080/docs/api-doc.html
+http://13.209.181.165:8080/docs/api-doc.html
 
 <br>     
 
