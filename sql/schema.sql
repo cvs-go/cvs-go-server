@@ -106,9 +106,14 @@ create table product_like (
 
 create table promotion (
                            id bigint not null auto_increment,
+                           name varchar(50) not null unique,
+                           image_url varchar(255) not null,
+                           landing_url varchar(255),
+                           priority integer,
+                           start_at datetime,
+                           end_at datetime,
                            created_at datetime,
                            modified_at datetime,
-                           image_url varchar(255),
                            primary key (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
