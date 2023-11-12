@@ -23,6 +23,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.requestF
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -37,6 +38,9 @@ import com.cvsgo.dto.product.ProductSortBy;
 import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
+import com.cvsgo.dto.review.ReadUserReviewQueryDto;
+import com.cvsgo.dto.review.ReadUserReviewResponseDto;
+import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
@@ -51,13 +55,18 @@ import com.cvsgo.entity.Manufacturer;
 import com.cvsgo.entity.Product;
 import com.cvsgo.entity.ProductBookmark;
 import com.cvsgo.entity.ProductLike;
+import com.cvsgo.entity.Review;
+import com.cvsgo.entity.ReviewImage;
+import com.cvsgo.entity.Role;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.exception.ExceptionConstants;
 import com.cvsgo.interceptor.AuthInterceptor;
 import com.cvsgo.service.ProductService;
+import com.cvsgo.service.ReviewService;
 import com.cvsgo.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,6 +99,9 @@ class UserControllerTest {
 
     @MockBean
     private ProductService productService;
+
+    @MockBean
+    private ReviewService reviewService;
 
     private MockMvc mockMvc;
 
@@ -553,6 +565,46 @@ class UserControllerTest {
             ));
     }
 
+    @Test
+    @DisplayName("특정 회원이 작성한 리뷰 목록을 정상적으로 조회하면 HTTP 200을 응답한다.")
+    public void respond_200_when_read_user_review_list_successfully() throws Exception {
+        Page<ReadUserReviewResponseDto> responseDto = new PageImpl<>(getReviewsResponse());
+        given(reviewService.readUserReviewList(any(), anyLong(), any(), any()))
+            .willReturn(responseDto);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/api/users/{userId}/reviews", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .queryParam("sortBy", ReviewSortBy.LATEST.toString()))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("{class-name}/{method-name}",
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userId").description("리뷰 목록을 조회할 회원 ID")
+                ),
+                queryParameters(
+                    parameterWithName("sortBy").description("정렬 기준").optional()
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data.content[].productId").type(JsonFieldType.NUMBER).description("상품 ID"),
+                    fieldWithPath("data.content[].productName").type(JsonFieldType.STRING).description("상품명"),
+                    fieldWithPath("data.content[].productManufacturer").type(JsonFieldType.STRING).description("제조사"),
+                    fieldWithPath("data.content[].productImageUrl").type(JsonFieldType.STRING).description("상품 이미지 URL"),
+                    fieldWithPath("data.content[].reviewId").type(JsonFieldType.NUMBER).description("상품 카테고리 ID"),
+                    fieldWithPath("data.content[].reviewerId").type(JsonFieldType.NUMBER).description("리뷰 작성자 ID"),
+                    fieldWithPath("data.content[].reviewerNickname").type(JsonFieldType.STRING).description("리뷰 작성자 닉네임"),
+                    fieldWithPath("data.content[].reviewerProfileImageUrl").type(JsonFieldType.STRING).description("리뷰 작성자"),
+                    fieldWithPath("data.content[].reviewLikeCount").type(JsonFieldType.NUMBER).description("상품 리뷰 개수"),
+                    fieldWithPath("data.content[].reviewRating").type(JsonFieldType.NUMBER).description("상품 리뷰 평점"),
+                    fieldWithPath("data.content[].reviewContent").type(JsonFieldType.STRING).description("리뷰 내용").optional(),
+                    fieldWithPath("data.content[].isReviewLiked").type(JsonFieldType.BOOLEAN).description("판매 편의점 이름"),
+                    fieldWithPath("data.content[].isProductBookmarked").type(JsonFieldType.BOOLEAN).description("행사 정보").optional(),
+                    fieldWithPath("data.content[].reviewImageUrls").type(JsonFieldType.ARRAY).description("할인 가격").optional()
+                )
+            ));
+    }
+
     private List<Tag> getTags() {
         List<Tag> tags = new ArrayList<>();
         tags.add(Tag.builder().id(2L).name("맵부심").group(1).build());
@@ -614,7 +666,11 @@ class UserControllerTest {
         .manufacturer(manufacturer2)
         .build();
 
-    User user = User.builder().build();
+    User user = User.builder()
+        .id(1L)
+        .role(Role.REGULAR)
+        .nickname("닉네임")
+        .build();
 
     ProductLike productLike = ProductLike.builder()
         .user(user)
@@ -658,6 +714,16 @@ class UserControllerTest {
         .discountAmount(300)
         .build();
 
+    Review review1 = Review.builder()
+        .id(1L)
+        .user(user)
+        .product(product1)
+        .rating(5)
+        .imageUrls(List.of("image1", "image2"))
+        .content("리뷰입니다")
+        .build();
+
+
     private UserResponseDto getUser() {
         return UserResponseDto.of(createUser(), 4L);
     }
@@ -680,6 +746,17 @@ class UserControllerTest {
         ReadProductResponseDto productResponse1 = ReadProductResponseDto.of(productQueryDto1, convenienceStoreEvents1);
         ReadProductResponseDto productResponse2 = ReadProductResponseDto.of(productQueryDto2, convenienceStoreEvents2);
         return List.of(productResponse1, productResponse2);
+    }
+
+    private List<ReadUserReviewResponseDto> getReviewsResponse() {
+        ReadUserReviewQueryDto queryDto1 = new ReadUserReviewQueryDto(review1.getId(),
+            review1.getProduct().getId(), product1.getName(), product1.getManufacturer().getName(),
+            product1.getImageUrl(), review1.getUser().getId(), review1.getUser().getNickname(),
+            "프로필 이미지", review1.getLikeCount(), review1.getRating(),
+            review1.getContent(), LocalDateTime.now(), null, null);
+        ReadUserReviewResponseDto dto1 = ReadUserReviewResponseDto.of(queryDto1,
+            review1.getReviewImages().stream().map(ReviewImage::getImageUrl).toList());
+        return List.of(dto1);
     }
 
 }
