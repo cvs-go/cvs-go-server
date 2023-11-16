@@ -15,6 +15,7 @@ import com.cvsgo.entity.Review;
 import com.cvsgo.entity.Tag;
 import com.cvsgo.entity.User;
 import com.cvsgo.entity.UserFollow;
+import com.cvsgo.entity.UserTag;
 import com.cvsgo.exception.BadRequestException;
 import com.cvsgo.exception.DuplicateException;
 import com.cvsgo.exception.NotFoundException;
@@ -22,6 +23,7 @@ import com.cvsgo.repository.ReviewRepository;
 import com.cvsgo.repository.TagRepository;
 import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
+import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private final UserTagRepository userTagRepository;
 
     private final UserRepository userRepository;
 
@@ -175,6 +179,33 @@ public class UserService {
         UserFollow userFollow = userFollowRepository.findByUserAndFollower(followee, user)
             .orElseThrow(() -> NOT_FOUND_USER_FOLLOW);
         userFollowRepository.delete(userFollow);
+    }
+
+    /**
+     * 태그 매칭률을 조회한다.
+     *
+     * @param user   로그인한 사용자
+     * @param userId 태그 매칭률을 조회할 사용자 ID
+     * @return 태그 매칭률
+     * @throws NotFoundException 해당하는 아이디를 가진 사용자가 없는 경우
+     */
+    @Transactional(readOnly = true)
+    public Integer readUserTagMatchPercentage(User user, Long userId) {
+        User targetUser = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
+
+        List<Tag> loginUserTag = userTagRepository.findAllByUser(user).stream().map(UserTag::getTag)
+            .toList();
+        List<Tag> targetUserTag = userTagRepository.findAllByUser(targetUser).stream().map(
+            UserTag::getTag).toList();
+
+        int matchingCount = 0;
+        for (Tag tag : loginUserTag) {
+            if (targetUserTag.contains(tag)) {
+                matchingCount++;
+            }
+        }
+
+        return (int) (((double) matchingCount / loginUserTag.size()) * 100);
     }
 
 }

@@ -77,6 +77,12 @@ public class UserController {
         return SuccessResponse.create();
     }
 
+    @GetMapping("/users/{userId}/tag-match-percentage")
+    public SuccessResponse<Integer> readUserTagMatchPercentage(
+        @LoginUser User user, @PathVariable Long userId) {
+        return SuccessResponse.from(userService.readUserTagMatchPercentage(user, userId));
+    }
+
     @GetMapping("/users/{userId}/liked-products")
     public SuccessResponse<Page<ReadProductResponseDto>> readLikedProductList(
         @PathVariable Long userId, @ModelAttribute ReadUserProductRequestDto request,
