@@ -163,13 +163,7 @@ public class ReviewService {
     public Page<ReadProductReviewResponseDto> readProductReviewList(User user, Long productId,
         ReadProductReviewRequestDto request, Pageable pageable) {
 
-        if (user == null || user.getRole() != Role.REGULAR) {
-            if (pageable.getPageNumber() > 0) {
-                throw FORBIDDEN_REVIEW;
-            } else {
-                pageable = PageRequest.of(pageable.getPageNumber(), 5);
-            }
-        }
+        pageable = getPageableByRole(user, pageable);
 
         List<ReadProductReviewQueryDto> reviews = reviewRepository.findAllByProductIdAndFilter(user,
             productId, request, pageable);
@@ -202,13 +196,7 @@ public class ReviewService {
     @Transactional(readOnly = true)
     public Page<ReadUserReviewResponseDto> readUserReviewList(User loginUser, Long userId,
         ReviewSortBy sortBy, Pageable pageable) {
-        if (loginUser == null || loginUser.getRole() != Role.REGULAR) {
-            if (pageable.getPageNumber() > 0) {
-                throw FORBIDDEN_REVIEW;
-            } else {
-                pageable = PageRequest.of(pageable.getPageNumber(), 5);
-            }
-        }
+        pageable = getPageableByRole(loginUser, pageable);
 
         User user = userRepository.findById(userId).orElseThrow(() -> NOT_FOUND_USER);
         List<ReadUserReviewQueryDto> reviews = reviewRepository.findAllByUser(loginUser, user,
@@ -224,6 +212,17 @@ public class ReviewService {
                 getReviewImages(reviewDto.getReviewId(), reviewImages))).toList();
 
         return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    private Pageable getPageableByRole(User loginUser, Pageable pageable) {
+        if (loginUser == null || loginUser.getRole() != Role.REGULAR) {
+            if (pageable.getPageNumber() > 0) {
+                throw FORBIDDEN_REVIEW;
+            } else {
+                pageable = PageRequest.of(pageable.getPageNumber(), 5);
+            }
+        }
+        return pageable;
     }
 
     /**
