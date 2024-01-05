@@ -192,6 +192,8 @@ public class ReviewService {
      * @param sortBy    정렬 정보
      * @param pageable  페이지 정보
      * @return 리뷰 목록
+     * @throws ForbiddenException 정회원이 아닌 회원이 0페이지가 아닌 다른 페이지를 조회하는 경우
+     * @throws NotFoundException  해당 회원이 존재하지 않는 경우
      */
     @Transactional(readOnly = true)
     public Page<ReadUserReviewResponseDto> readUserReviewList(User loginUser, Long userId,
