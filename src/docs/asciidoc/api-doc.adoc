@@ -140,6 +140,24 @@ include::{snippets}/user-controller-test/respond_200_when_read_bookmarked_produc
 ==== Sample Response
 include::{snippets}/user-controller-test/respond_200_when_read_bookmarked_product_list_successfully/http-response.adoc[]
 
+=== 1-11. 특정 사용자의 리뷰 목록 조회
+==== Request Fields
+include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/request-fields.adoc[]
+==== 정렬 기준 항목
+|===
+| sortBy 값 | 정렬 기준 | 비고
+
+| LATEST | 최신순  | 정렬 기준 미지정시 기본값
+| LIKE | 좋아요순 |
+| RATING | 별점순 |
+|===
+==== Sample Request
+include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/http-response.adoc[]
+
 == 2. 인증
 === 2-1. 로그인
 ==== Request Fields
@@ -362,25 +380,7 @@ include::{snippets}/review-controller-test/respond_200_when_success_to_read_prod
 ==== Sample Response
 include::{snippets}/review-controller-test/respond_200_when_success_to_read_product_reviews/http-response.adoc[]
 
-=== 4-5. 특정 사용자의 리뷰 목록 조회
-==== Request Fields
-include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/request-fields.adoc[]
-==== 정렬 기준 항목
-|===
-| sortBy 값 | 정렬 기준 | 비고
-
-| LATEST | 최신순  | 정렬 기준 미지정시 기본값
-| LIKE | 좋아요순 |
-| RATING | 별점순 |
-|===
-==== Sample Request
-include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/http-request.adoc[]
-==== Response Fields
-include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/response-fields.adoc[]
-==== Sample Response
-include::{snippets}/user-controller-test/respond_200_when_read_user_review_list_successfully/http-response.adoc[]
-
-=== 4-6. 리뷰 좋아요 추가
+=== 4-5. 리뷰 좋아요 추가
 ==== Path Parameters
 include::{snippets}/review-controller-test/respond_201_when_succeed_to_create_review_like/path-parameters.adoc[]
 ==== Sample Request
@@ -395,7 +395,7 @@ include::{snippets}/review-controller-test/respond_201_when_succeed_to_create_re
 | `409 CONFLICT` | `DUPLICATE_REVIEW_LIKE` | 해당하는 리뷰 좋아요가 이미 있는 경우
 |===
 
-=== 4-7. 리뷰 좋아요 취소
+=== 4-6. 리뷰 좋아요 취소
 ==== Path Parameters
 include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review_like/path-parameters.adoc[]
 ==== Sample Request
