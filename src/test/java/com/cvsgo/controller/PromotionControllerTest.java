@@ -3,7 +3,6 @@ package com.cvsgo.controller;
 import static com.cvsgo.ApiDocumentUtils.documentIdentifier;
 import static com.cvsgo.ApiDocumentUtils.getDocumentRequest;
 import static com.cvsgo.ApiDocumentUtils.getDocumentResponse;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -69,7 +67,7 @@ class PromotionControllerTest {
     @DisplayName("프로모션 목록을 정상적으로 조회하면 HTTP 200을 응답한다")
     void respond_200_when_read_promotion_list_successfully() throws Exception {
         List<ReadPromotionResponseDto> responseDto = List.of(new ReadPromotionResponseDto(promotion1), new ReadPromotionResponseDto(promotion2));
-        given(promotionService.readPromotionList(any())).willReturn(new PageImpl<>(responseDto));
+        given(promotionService.readPromotionList()).willReturn(responseDto);
 
         mockMvc.perform(get("/api/promotions").contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -78,9 +76,9 @@ class PromotionControllerTest {
                 getDocumentRequest(),
                 getDocumentResponse(),
                 relaxedResponseFields(
-                    fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("프로모션 ID"),
-                    fieldWithPath("data.content[].imageUrl").type(JsonFieldType.STRING).description("프로모션 이미지 url"),
-                    fieldWithPath("data.content[].landingUrl").type(JsonFieldType.STRING).description("프로모션 랜딩 url")
+                    fieldWithPath("data.[].id").type(JsonFieldType.NUMBER).description("프로모션 ID"),
+                    fieldWithPath("data.[].imageUrl").type(JsonFieldType.STRING).description("프로모션 이미지 url"),
+                    fieldWithPath("data.[].landingUrl").type(JsonFieldType.STRING).description("프로모션 랜딩 url")
                 )
             ));
     }

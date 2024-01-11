@@ -13,8 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 
 @Import(TestConfig.class)
 @DataJpaTest
@@ -41,14 +39,13 @@ class PromotionRepositoryTest {
     @DisplayName("활성된 프로모션을 조회한다")
     void find_active_promotions() {
         // when
-        Page<Promotion> foundPromotions = promotionRepository.findActivePromotions(
-            LocalDateTime.now(), PageRequest.of(0, 20));
+        LocalDateTime now = LocalDateTime.now();
+        List<Promotion> foundPromotions = promotionRepository.findActivePromotions(now);
 
         // then
-        assertThat(foundPromotions).isNotEmpty();
-        assertThat(foundPromotions.getContent()).hasSize(2);
-        assertThat(foundPromotions.getContent().get(0).getPriority()).isEqualTo(1);
-        assertThat(foundPromotions.getContent().get(1).getPriority()).isEqualTo(2);
+        assertThat(foundPromotions).hasSize(2);
+        assertThat(foundPromotions.get(0).getPriority()).isEqualTo(1);
+        assertThat(foundPromotions.get(1).getPriority()).isEqualTo(2);
     }
 
     private Promotion promotion1;

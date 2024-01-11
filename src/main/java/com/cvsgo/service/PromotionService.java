@@ -3,8 +3,8 @@ package com.cvsgo.service;
 import com.cvsgo.dto.promotion.ReadPromotionResponseDto;
 import com.cvsgo.repository.PromotionRepository;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +21,10 @@ public class PromotionService {
      * @return 프로모션 목록
      */
     @Transactional(readOnly = true)
-    public Page<ReadPromotionResponseDto> readPromotionList(Pageable pageable) {
-        return promotionRepository.findActivePromotions(LocalDateTime.now(), pageable)
-            .map(ReadPromotionResponseDto::from);
+    public List<ReadPromotionResponseDto> readPromotionList() {
+        List<ReadPromotionResponseDto> promotionResponseDtos = promotionRepository.findActivePromotions(LocalDateTime.now()).stream()
+            .map(ReadPromotionResponseDto::from).toList();
+        return promotionResponseDtos;
     }
 
 }
