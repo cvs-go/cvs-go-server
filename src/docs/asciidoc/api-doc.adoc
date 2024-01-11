@@ -460,3 +460,12 @@ include::{snippets}/notice-controller-test/respond_200_when_read_notice_successf
 
 | `404 NOT FOUND` | `NOT_FOUND_NOTICE` | 해당하는 공지사항이 없는 경우
 |===
+
+== 7. 프로모션
+=== 7-1. 프로모션 목록 조회
+==== Sample Request
+include::{snippets}/promotion-controller-test/respond_200_when_read_promotion_list_successfully/http-request.adoc[]
+==== Response Fields
+include::{snippets}/promotion-controller-test/respond_200_when_read_promotion_list_successfully/response-fields.adoc[]
+==== Sample Response
+include::{snippets}/promotion-controller-test/respond_200_when_read_promotion_list_successfully/http-response.adoc[]
