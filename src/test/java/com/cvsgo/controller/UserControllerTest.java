@@ -35,9 +35,9 @@ import com.cvsgo.argumentresolver.LoginUserArgumentResolver;
 import com.cvsgo.config.WebConfig;
 import com.cvsgo.dto.product.ConvenienceStoreEventDto;
 import com.cvsgo.dto.product.ProductSortBy;
-import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.product.ReadProductQueryDto;
 import com.cvsgo.dto.product.ReadProductResponseDto;
+import com.cvsgo.dto.product.ReadUserProductRequestDto;
 import com.cvsgo.dto.review.ReadUserReviewQueryDto;
 import com.cvsgo.dto.review.ReadUserReviewResponseDto;
 import com.cvsgo.dto.review.ReviewSortBy;
@@ -483,6 +483,28 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isNotFound())
             .andDo(print());
+    }
+
+    @Test
+    @DisplayName("태그 매칭률을 정상적으로 조회하면 HTTP 200을 응답한다")
+    void respond_200_when_read_user_tag_match_percentage_successfully() throws Exception {
+        Integer percentage = 66;
+        given(userService.readUserTagMatchPercentage(any(), anyLong())).willReturn(percentage);
+
+        mockMvc.perform(get("/api/users/{userId}/tag-match-percentage", 1L)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("userId").description("태그 매칭률을 조회할 회원 ID")
+                ),
+                relaxedResponseFields(
+                    fieldWithPath("data").type(JsonFieldType.NUMBER).description("태그 매칭률")
+                )
+            ));
     }
 
     @Test
