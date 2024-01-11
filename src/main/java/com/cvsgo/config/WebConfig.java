@@ -30,6 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
             .addPathPatterns("/**")
             .excludePathPatterns("/", "/docs/**", "/*.ico", "/api/auth/login", "/api/users",
                 "/api/tags", "/api/users/emails/*/exists", "/api/users/nicknames/*/exists",
-                "/api/products", "/api/products/*", "/api/products/*/tags", "/api/users/*/reviews");
+                "/api/products", "/api/products/*", "/api/products/*/tags", "/api/users/*/reviews",
+                "/error");
     }
 }
