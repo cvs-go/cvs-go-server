@@ -17,6 +17,8 @@ import com.cvsgo.dto.review.ReadProductReviewRequestDto;
 import com.cvsgo.dto.review.ReadProductReviewResponseDto;
 import com.cvsgo.dto.review.ReadReviewQueryDto;
 import com.cvsgo.dto.review.ReadReviewRequestDto;
+import com.cvsgo.dto.review.ReadUserReviewQueryDto;
+import com.cvsgo.dto.review.ReadUserReviewResponseDto;
 import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.review.UpdateReviewRequestDto;
 import com.cvsgo.entity.Product;
@@ -35,6 +37,7 @@ import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewLikeRepository;
 import com.cvsgo.repository.ReviewRepository;
+import com.cvsgo.repository.UserRepository;
 import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -67,6 +70,9 @@ class ReviewServiceTest {
 
     @Mock
     private ReviewLikeRepository reviewLikeRepository;
+
+    @Mock
+    private UserRepository userRepository;
 
     @InjectMocks
     ReviewService reviewService;
@@ -411,6 +417,21 @@ class ReviewServiceTest {
         then(reviewLikeRepository).should(times(1)).findByReviewAndUser(any(), any());
     }
 
+    @Test
+    @DisplayName("특정 회원이 작성한 리뷰 목록을 정상적으로 조회한다")
+    void succeed_to_read_user_review() {
+        given(reviewRepository.findAllByUser(any(), any(), any(), any()))
+            .willReturn(List.of(readUserReviewQueryDto));
+        given(userRepository.findById(any())).willReturn(Optional.of(user1));
+
+        List<ReadUserReviewResponseDto> reviews = reviewService.readUserReviewList(user1, 1L,
+            ReviewSortBy.LIKE, PageRequest.of(0, 20)).getContent();
+
+        then(reviewRepository).should(times(1)).findAllByUser(any(), any(), any(), any());
+        then(reviewRepository).should(times(1)).countByUser(any());
+        assertThat(reviews.size()).isEqualTo(1);
+    }
+
     User user1 = User.builder()
         .id(1L)
         .userId("abc@naver.com")
@@ -469,5 +490,10 @@ class ReviewServiceTest {
         .build();
 
     ReviewLike reviewLike = ReviewLike.create(user1, review);
+
+    ReadUserReviewQueryDto readUserReviewQueryDto = new ReadUserReviewQueryDto(1L,
+        1L, "상품", "제조사", "이미지 URL", 1L,
+        "닉네임", "프로필 이미지 URL", 3L, 5,
+        "내용", LocalDateTime.now(), null, null);
 
 }
