@@ -222,7 +222,7 @@ public class ProductCustomRepositoryImpl implements ProductCustomRepository {
         return queryFactory.select(product.count())
             .from(product)
             .leftJoin(productBookmark)
-            .on(productBookmark.product.eq(product).and(productLikeUserEq(loginUser)))
+            .on(productBookmark.product.eq(product).and(productBookmarkUserEq(loginUser)))
             .where(
                 product.in(
                     selectDistinct(sellAt.product)

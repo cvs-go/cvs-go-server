@@ -4,12 +4,15 @@ import com.cvsgo.argumentresolver.LoginUser;
 import com.cvsgo.dto.SuccessResponse;
 import com.cvsgo.dto.product.ReadProductResponseDto;
 import com.cvsgo.dto.product.ReadUserProductRequestDto;
+import com.cvsgo.dto.review.ReadUserReviewResponseDto;
+import com.cvsgo.dto.review.ReviewSortBy;
 import com.cvsgo.dto.user.SignUpRequestDto;
 import com.cvsgo.dto.user.SignUpResponseDto;
 import com.cvsgo.dto.user.UpdateUserRequestDto;
 import com.cvsgo.dto.user.UserResponseDto;
 import com.cvsgo.entity.User;
 import com.cvsgo.service.ProductService;
+import com.cvsgo.service.ReviewService;
 import com.cvsgo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
     private final UserService userService;
+
     private final ProductService productService;
+
+    private final ReviewService reviewService;
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
@@ -77,6 +83,12 @@ public class UserController {
         return SuccessResponse.create();
     }
 
+    @GetMapping("/users/{userId}/tag-match-percentage")
+    public SuccessResponse<Integer> readUserTagMatchPercentage(
+        @LoginUser User user, @PathVariable Long userId) {
+        return SuccessResponse.from(userService.readUserTagMatchPercentage(user, userId));
+    }
+
     @GetMapping("/users/{userId}/liked-products")
     public SuccessResponse<Page<ReadProductResponseDto>> readLikedProductList(
         @PathVariable Long userId, @ModelAttribute ReadUserProductRequestDto request,
@@ -90,6 +102,13 @@ public class UserController {
         Pageable pageable) {
         return SuccessResponse.from(
             productService.readBookmarkedProductList(userId, request, pageable));
+    }
+
+    @GetMapping("/users/{userId}/reviews")
+    public SuccessResponse<Page<ReadUserReviewResponseDto>> readUserReviewList(@LoginUser User loginUser,
+        @PathVariable Long userId, ReviewSortBy sortBy, Pageable pageable) {
+        return SuccessResponse.from(
+            reviewService.readUserReviewList(loginUser, userId, sortBy, pageable));
     }
 
 }
