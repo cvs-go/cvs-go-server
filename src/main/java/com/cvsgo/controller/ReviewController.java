@@ -62,6 +62,12 @@ public class ReviewController {
         return SuccessResponse.create();
     }
 
+    @DeleteMapping("/reviews/{reviewId}")
+    public SuccessResponse<Void> deleteReview(@LoginUser User user, @PathVariable Long reviewId) {
+        reviewService.deleteReview(user, reviewId);
+        return SuccessResponse.create();
+    }
+
     @PostMapping("/reviews/{reviewId}/likes")
     @ResponseStatus(HttpStatus.CREATED)
     public SuccessResponse<Void> createReviewLike(@LoginUser User user,

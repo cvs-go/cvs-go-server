@@ -120,6 +120,21 @@ public class ReviewService {
     }
 
     /**
+     * 리뷰를 삭제합니다.
+     *
+     * @param user     현재 로그인한 사용자
+     * @param reviewId 삭제하려는 리뷰 ID
+     */
+    @Transactional
+    public void deleteReview(User user, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> NOT_FOUND_REVIEW);
+        if (!review.getUser().equals(user)) {
+            throw FORBIDDEN_REVIEW;
+        }
+        reviewRepository.delete(review);
+    }
+
+    /**
      * 필터를 적용하여 리뷰를 조회합니다.
      *
      * @param user     현재 로그인한 사용자
