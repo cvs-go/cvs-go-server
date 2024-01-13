@@ -425,6 +425,22 @@ include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_re
 | `404 NOT FOUND` | `NOT_FOUND_REVIEW` | 해당하는 리뷰가 없는 경우
 | `404 NOT FOUND` | `NOT_FOUND_REVIEW_LIKE` | 해당하는 리뷰 좋아요가 없는 경우
 |===
+
+=== 4-7. 리뷰 삭제
+==== Path Parameters
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review/path-parameters.adoc[]
+==== Sample Request
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review/http-request.adoc[]
+==== Sample Response
+include::{snippets}/review-controller-test/respond_200_when_succeed_to_delete_review/http-response.adoc[]
+==== Error Response
+|===
+| HTTP Status | Error Code | Detail
+
+| `403 FORBIDDEN` | `FORBIDDEN_REVIEW` | 해당 리뷰에 대한 삭제 권한이 없는 경우
+| `404 NOT FOUND` | `NOT_FOUND_REVIEW` | 해당하는 리뷰가 없는 경우
+|===
+
 == 5. 이미지
 === 5-1. 이미지 업로드
 ==== Path Parameters
