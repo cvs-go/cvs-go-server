@@ -92,7 +92,7 @@ class ReviewControllerTest {
 
     private static final String PRODUCT_REVIEW_API_PATH = "/api/products/{productId}/reviews";
 
-    private static final String UPDATE_REVIEW_API_PATH = "/api/reviews/{reviewId}";
+    private static final String REVIEW_API_PATH = "/api/reviews/{reviewId}";
 
     private static final String SEARCH_REVIEW_API_PATH = "/api/reviews";
 
@@ -267,7 +267,7 @@ class ReviewControllerTest {
         UpdateReviewRequestDto requestDto = new UpdateReviewRequestDto(5, "맛있어요",
             List.of("리뷰 이미지 URL 1", "리뷰 이미지 URL 2"));
 
-        mockMvc.perform(put(UPDATE_REVIEW_API_PATH, 1)
+        mockMvc.perform(put(REVIEW_API_PATH, 1)
                 .content(objectMapper.writeValueAsString(requestDto))
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk()).andDo(print())
@@ -448,6 +448,22 @@ class ReviewControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isInternalServerError())
             .andDo(print());
+    }
+
+    @Test
+    @DisplayName("리뷰 삭제에 성공하면 HTTP 200을 응답한다")
+    void respond_200_when_succeed_to_delete_review() throws Exception {
+        mockMvc.perform(delete(REVIEW_API_PATH, 1)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document(documentIdentifier,
+                getDocumentRequest(),
+                getDocumentResponse(),
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 ID")
+                )
+            ));
     }
 
     ReviewDto responseDto1 = ReviewDto.builder()

@@ -432,6 +432,36 @@ class ReviewServiceTest {
         assertThat(reviews.size()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("특정 리뷰를 정상적으로 삭제한다.")
+    void succeed_to_delete_review() {
+        given(reviewRepository.findById(any())).willReturn(Optional.of(review));
+
+        reviewService.deleteReview(user2, 1L);
+
+        then(reviewRepository).should(times(1)).findById(anyLong());
+        then(reviewRepository).should(times(1)).delete(any());
+    }
+
+    @Test
+    @DisplayName("리뷰 작성자가 아닌 사용자가 리뷰 삭제를 시도하면 ForbiddenException이 발생한다.")
+    void should_throw_ForbiddenException_when_delete_review_but_review_does_not_exist() {
+        given(reviewRepository.findById(any())).willReturn(Optional.of(review));
+
+        assertThrows(ForbiddenException.class,
+            () -> reviewService.deleteReview(user1, 1L));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 리뷰를 삭제하면 NotFoundException이 발생한다.")
+    void should_throw_NotFoundException_when_delete_review_but_review_does_not_exist() {
+        given(reviewRepository.findById(any())).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+            () -> reviewService.deleteReview(user1, 1000L));
+    }
+
+
     User user1 = User.builder()
         .id(1L)
         .userId("abc@naver.com")
