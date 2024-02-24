@@ -158,7 +158,7 @@ class ReviewRepositoryTest {
     void succeed_to_read_reviews() {
         reviewRepository.flush();
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(null, List.of(), List.of(),
-            List.of(3, 4, 5));
+            List.of(3, 4, 5), null);
         List<ReadReviewQueryDto> reviews = reviewRepository.findAllByFilter(user1, requestDto,
             PageRequest.of(0, 20));
         assertThat(reviews.size()).isEqualTo(1);
