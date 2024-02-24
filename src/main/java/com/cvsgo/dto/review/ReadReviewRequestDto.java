@@ -14,11 +14,14 @@ public class ReadReviewRequestDto {
 
     private final List<Integer> ratings;
 
+    private final Boolean followingOnly;
+
     public ReadReviewRequestDto(ReviewSortBy sortBy, List<Long> categoryIds, List<Long> tagIds,
-        List<Integer> ratings) {
+        List<Integer> ratings, Boolean followingOnly) {
         this.sortBy = sortBy;
         this.categoryIds = categoryIds;
         this.tagIds = tagIds;
         this.ratings = ratings;
+        this.followingOnly = followingOnly != null && followingOnly;
     }
 }
