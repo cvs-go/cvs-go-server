@@ -35,6 +35,7 @@ import com.cvsgo.repository.ProductRepository;
 import com.cvsgo.repository.ReviewImageRepository;
 import com.cvsgo.repository.ReviewLikeRepository;
 import com.cvsgo.repository.ReviewRepository;
+import com.cvsgo.repository.UserFollowRepository;
 import com.cvsgo.repository.UserRepository;
 import com.cvsgo.repository.UserTagRepository;
 import jakarta.persistence.EntityManager;
@@ -67,6 +68,8 @@ public class ReviewService {
     private final EntityManager entityManager;
 
     private final UserRepository userRepository;
+
+    private final UserFollowRepository userFollowRepository;
 
     /**
      * 리뷰를 추가합니다.
@@ -160,6 +163,13 @@ public class ReviewService {
             getReviewImages(reviewDto.getReviewId(), reviewImages),
             getUserTags(reviewDto.getReviewerId(), userTags))
         ).toList();
+
+        if (request.getFollowingOnly()) {
+            List<Long> followingUserIds = userFollowRepository.findAllByFollower(user).stream()
+                .map(follow -> follow.getUser().getId()).toList();
+            reviewDtos = reviewDtos.stream()
+                .filter(review -> followingUserIds.contains(review.getReviewerId())).toList();
+        }
 
         return ReadReviewResponseDto.of(latestReviewCount, reviewDtos);
     }

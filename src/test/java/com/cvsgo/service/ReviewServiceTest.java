@@ -493,7 +493,7 @@ class ReviewServiceTest {
         new ArrayList<>());
 
     ReadReviewRequestDto searchReviewRequest = new ReadReviewRequestDto(null, null,
-        null, null);
+        null, null, null);
 
     ReadReviewQueryDto readReviewQueryDto = new ReadReviewQueryDto(1L, 2L,
         "불닭볶음면큰컵", "삼양", "https://어쩌구저쩌구/products/불닭볶음면.png",

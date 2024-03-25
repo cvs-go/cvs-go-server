@@ -158,7 +158,7 @@ class ReviewControllerTest {
     @DisplayName("리뷰 조회에 성공하면 HTTP 200을 응답한다.")
     void respond_200_when_success_to_read_reviews() throws Exception {
         ReadReviewRequestDto requestDto = new ReadReviewRequestDto(ReviewSortBy.LIKE,
-            List.of(1L, 2L, 3L), List.of(2L), List.of(4, 5));
+            List.of(1L, 2L, 3L), List.of(2L), List.of(4, 5), null);
 
         List<ReviewDto> reviews = List.of(responseDto1, responseDto2);
 
@@ -176,7 +176,8 @@ class ReviewControllerTest {
                     fieldWithPath("sortBy").type(JsonFieldType.STRING).description("정렬 기준").optional(),
                     fieldWithPath("categoryIds").type(JsonFieldType.ARRAY).description("상품 카테고리 ID 목록").optional(),
                     fieldWithPath("tagIds").type(JsonFieldType.ARRAY).description("태그 ID 목록").optional(),
-                    fieldWithPath("ratings").type(JsonFieldType.ARRAY).description("별점 목록").optional()
+                    fieldWithPath("ratings").type(JsonFieldType.ARRAY).description("별점 목록").optional(),
+                    fieldWithPath("followingOnly").type(JsonFieldType.BOOLEAN).description("팔로우하는 사용자의 리뷰만 조회할지 여부").optional()
                 ),
                 relaxedResponseFields(
                     fieldWithPath("data.latestReviewCount").type(JsonFieldType.NUMBER).description("최근 7일간 작성된 리뷰 개수"),
